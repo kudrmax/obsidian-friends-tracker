@@ -50,6 +50,16 @@ describe("searchPeople", () => {
 		expect(service.searchPeople("").recent.map((hit) => hit.name)).toEqual(["Seryozha", "Senya", "Ksenia"]);
 		expect(service.searchPeople("").everyone.map((hit) => hit.name)).toEqual(["Aleseya", "Boris"]);
 	});
+
+	it("shows a person it can't read with the problem, never as someone without interactions", async () => {
+		const { service, repository } = await setUp({ Anya: [] });
+		repository.entries.set("People/Bob.md", { kind: "broken", path: "People/Bob.md", name: "Bob", problem: "date: invalid date" });
+		const found = service.searchPeople("");
+		expect(found.everyone.map((hit) => [hit.name, hit.problem])).toEqual([
+			["Anya", undefined],
+			["Bob", "date: invalid date"],
+		]);
+	});
 });
 
 describe("changing interactions", () => {
@@ -62,6 +72,16 @@ describe("changing interactions", () => {
 		const { service, repository } = await setUp({ Misha: [call(today)] });
 		await expect(service.replaceInteraction("People/Misha.md", 0, text(today), text(ago(1)))).rejects.toThrow(DomainError);
 		expect(repository.person("People/Misha.md").interactions()).toEqual([call(today)]);
+	});
+
+	it("tells where the new interaction landed, so undo removes exactly it", async () => {
+		const { service, repository } = await setUp({ Misha: [call(today)] });
+		const added = await service.addInteraction("People/Misha.md", call(today));
+		expect(added.index).toBe(1);
+		await service.removeInteraction("People/Misha.md", added.index, call(today));
+		expect(repository.person("People/Misha.md").interactions()).toEqual([call(today)]);
+		const older = await service.addInteraction("People/Misha.md", text(ago(3)));
+		expect(older.index).toBe(1);
 	});
 
 	it("creates a person and logs with them", async () => {

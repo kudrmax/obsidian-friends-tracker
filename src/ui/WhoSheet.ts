@@ -65,6 +65,16 @@ export class WhoSheet extends FullSheet {
 
 	private renderHit(parent: HTMLElement, hit: PersonHit): void {
 		const today = this.ui.service.today();
+		if (hit.problem !== undefined) {
+			const problem = hit.problem;
+			row(parent, {
+				circle: { initial: hit.name.slice(0, 1).toUpperCase() },
+				title: this.highlight(hit.name),
+				subtitle: `Can't read: ${problem}`,
+				onClick: () => new Notice(`${hit.name} can't be read: ${problem}`),
+			}).addClass("is-broken");
+			return;
+		}
 		row(parent, {
 			circle: { initial: hit.name.slice(0, 1).toUpperCase() },
 			title: this.highlight(hit.name),

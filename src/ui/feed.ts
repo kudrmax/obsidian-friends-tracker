@@ -4,10 +4,10 @@ import { LocalDate } from "../domain/LocalDate";
 /** How many calendar days one page of the feed covers. */
 export const PAGE_DAYS = 30;
 
-/** The pages shown so far: the feed reaches back this many calendar days from today. */
-export interface Paged {
-	readonly days: FeedDay[];
-	readonly pages: number;
+/** How many pages there are at all: down to the day of the oldest interaction, none when there is none. */
+export function pagesAvailable(oldest: LocalDate | undefined, today: LocalDate): number {
+	if (!oldest) return 0;
+	return Math.floor(today.daysSince(oldest) / PAGE_DAYS) + 1;
 }
 
 /** The feed with one more page of days added at its end. */

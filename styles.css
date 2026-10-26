@@ -116,6 +116,10 @@ body {
 	--pt-space-44: 44px;
 	--pt-space-104: 104px;
 
+	/* Opacity */
+	--pt-dim: 0.5;
+	--pt-disabled: 0.4;
+
 	/* Layers */
 	--pt-layer-fade: 2;
 	--pt-layer-fab: 3;
@@ -141,6 +145,7 @@ body {
 .people-tracker .pt-row { display: flex; align-items: center; gap: var(--pt-space-12); width: 100%; height: var(--pt-row); margin: 0; padding: 0; border: none; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: default; }
 .people-tracker button.pt-row { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .people-tracker button.pt-row:active { background: var(--pt-hover); }
+.people-tracker .pt-row.is-broken { opacity: var(--pt-dim); }
 .pt-circle { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: var(--pt-circle); height: var(--pt-circle); border-radius: var(--pt-radius-circle); background: var(--pt-fill); color: var(--pt-muted); font-size: var(--pt-font-capsule); font-weight: var(--pt-weight-semibold); }
 .pt-circle.is-accent { background: var(--pt-accent-tint); color: var(--pt-accent-text); }
 .pt-circle.is-strong { background: var(--pt-strong); color: var(--pt-on-strong); }
@@ -267,4 +272,3 @@ body {
 .people-tracker .pt-picker-day.is-picked { background: var(--pt-strong); color: var(--pt-on-strong); }
 
 .people-tracker .pt-empty { padding: var(--pt-space-20) 0; color: var(--pt-faint); font-size: var(--pt-font-body); }
-body { --pt-disabled: 0.4; }

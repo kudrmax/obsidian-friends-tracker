@@ -45,6 +45,14 @@ export class Person {
 		return this.extra;
 	}
 
+	/** Where the latest copy of this interaction sits: the last of its day's equals, which is the one added last. */
+	indexOfLatest(interaction: Interaction): number {
+		for (let index = this.state.interactions.length - 1; index >= 0; index--) {
+			if (sameInteraction(this.state.interactions[index], interaction)) return index;
+		}
+		return -1;
+	}
+
 	lastDate(): LocalDate | undefined {
 		return this.state.interactions[0]?.date;
 	}

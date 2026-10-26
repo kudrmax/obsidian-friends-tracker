@@ -22,6 +22,14 @@ export interface PersonHit {
 	readonly path: string;
 	readonly name: string;
 	readonly last: LocalDate | undefined;
+	/** Why the person's note can't be read, when it can't. */
+	readonly problem?: string;
+}
+
+/** A person after an interaction was added, and where in their list it landed. */
+export interface Added {
+	readonly person: Person;
+	readonly index: number;
 }
 
 export interface SearchResult {
@@ -77,7 +85,8 @@ export class PeopleService {
 		const hits: PersonHit[] = this.repository.list().flatMap((entry) => {
 			const name = entry.kind === "ok" ? entry.person.name : entry.name;
 			if (needle && !name.toLowerCase().includes(needle)) return [];
-			return [{ path: entry.path, name, last: entry.kind === "ok" ? entry.person.lastDate() : undefined }];
+			if (entry.kind === "broken") return [{ path: entry.path, name, last: undefined, problem: entry.problem }];
+			return [{ path: entry.path, name, last: entry.person.lastDate() }];
 		});
 		const recent = hits.filter((hit) => hit.last).sort((a, b) => (b.last as LocalDate).compare(a.last as LocalDate) || byName(a, b));
 		const everyone = hits.filter((hit) => !hit.last).sort(byName);
@@ -85,8 +94,9 @@ export class PeopleService {
 		return { recent, everyone, exact };
 	}
 
-	addInteraction(path: string, interaction: Interaction): Promise<Person> {
-		return this.repository.update(path, (person) => person.add(interaction, this.today()));
+	async addInteraction(path: string, interaction: Interaction): Promise<Added> {
+		const person = await this.repository.update(path, (current) => current.add(interaction, this.today()));
+		return { person, index: person.indexOfLatest(interaction) };
 	}
 
 	replaceInteraction(path: string, index: number, expected: Interaction, next: Interaction): Promise<Person> {

@@ -5,8 +5,6 @@ import { DatePicker } from "./DatePicker";
 import { KIND_ICONS, QUALIFIER_ICONS, forkRow, iconButton, row, sheetHeader, subtleButton } from "./components";
 import { longDate } from "./format";
 import { HowState, isComplete, toInteraction } from "./howState";
-
-
 import { FullSheet } from "./sheet";
 import { UiContext } from "./UiContext";
 
@@ -85,10 +83,10 @@ export class HowSheet extends FullSheet {
 		if (!isComplete(this.state)) return;
 		await this.run(async () => {
 			const interaction = toInteraction(this.state);
-			await this.ui.service.addInteraction(this.person.path, interaction);
+			const added = await this.ui.service.addInteraction(this.person.path, interaction);
 			this.ui.offerUndo({
 				text: `${this.person.name}: ${describe(interaction, this.ui.settings().labels)}`,
-				undo: () => this.ui.service.removeInteraction(this.person.path, 0, interaction),
+				undo: () => this.ui.service.removeInteraction(this.person.path, added.index, interaction),
 			});
 		});
 	}

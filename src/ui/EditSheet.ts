@@ -1,5 +1,6 @@
 import { App } from "obsidian";
 import { FeedRow } from "../application/PeopleService";
+import { describe } from "../domain/Interaction";
 import { iconButton } from "./components";
 import { fromInteraction, isComplete, toInteraction } from "./howState";
 import { HowSheet } from "./HowSheet";
@@ -37,6 +38,12 @@ export class EditSheet extends HowSheet {
 	}
 
 	private async remove(): Promise<void> {
-		await this.run(() => this.ui.service.removeInteraction(this.row.path, this.row.index, this.row.interaction));
+		await this.run(async () => {
+			await this.ui.service.removeInteraction(this.row.path, this.row.index, this.row.interaction);
+			this.ui.offerUndo({
+				text: `Deleted ${this.row.name}: ${describe(this.row.interaction, this.ui.settings().labels)}`,
+				undo: () => this.ui.service.addInteraction(this.row.path, this.row.interaction),
+			});
+		});
 	}
 }

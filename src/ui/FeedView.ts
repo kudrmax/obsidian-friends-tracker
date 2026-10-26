@@ -1,8 +1,9 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
 import { FeedDay, FeedRow } from "../application/PeopleService";
 import { describe } from "../domain/Interaction";
+import { LocalDate } from "../domain/LocalDate";
 import { KIND_ICONS, dayHeader, fab, iconButton, row } from "./components";
-import { PAGE_DAYS, nextPage } from "./feed";
+import { PAGE_DAYS, nextPage, pagesAvailable } from "./feed";
 import { dayDate, dayName } from "./format";
 import { UiContext, UndoOffer } from "./UiContext";
 
@@ -68,7 +69,39 @@ export class FeedView extends ItemView {
 		const pages = Math.max(1, this.pagesShown());
 		this.shown = [];
 		for (let page = 0; page < pages; page++) this.shown = nextPage(this.shown, this.ui.service, this.ui.service.today(), page);
+		this.pagesLoaded = pages;
 		this.render();
+		this.fillScreen();
+	}
+
+	/** How many pages the notes hold at all. */
+	private pagesInAll(): number {
+		const today = this.ui.service.today();
+		const oldest = this.ui.service
+			.people()
+			.map((person) => person.interactions()[person.interactions().length - 1]?.date)
+			.filter((date): date is LocalDate => date !== undefined)
+			.reduce<LocalDate | undefined>((earliest, date) => (!earliest || date.isBefore(earliest) ? date : earliest), undefined);
+		return pagesAvailable(oldest, today);
+	}
+
+	/** A sparse feed may not reach the bottom of the screen, so no scroll ever asks for more: keep adding pages until it does. */
+	private fillScreen(): void {
+		const scroller = this.scroller;
+		if (!scroller) return;
+		while (scroller.scrollHeight <= scroller.clientHeight && this.loadMore()) {
+			/* each page drawn makes the list taller, until there are no pages left */
+		}
+	}
+
+	/** Adds the next page when there is one; says whether it did. */
+	private loadMore(): boolean {
+		const pages = this.pagesShown();
+		if (pages >= this.pagesInAll()) return false;
+		this.shown = nextPage(this.shown, this.ui.service, this.ui.service.today(), pages);
+		this.pagesLoaded = pages + 1;
+		this.render();
+		return true;
 	}
 
 	/** Offers to undo what was just logged, for a few seconds, over the "+". */
@@ -78,7 +111,7 @@ export class FeedView extends ItemView {
 		line.createSpan({ cls: "pt-undo-text", text: offer.text });
 		line.createEl("button", { cls: "pt-undo-button", text: "Undo" }).addEventListener("click", () => {
 			this.clearUndo();
-			void offer.undo();
+			offer.undo().catch((error: unknown) => new Notice(error instanceof Error ? error.message : String(error)));
 		});
 		line.addEventListener("click", (event) => {
 			if (event.target === line) this.clearUndo();
@@ -94,11 +127,13 @@ export class FeedView extends ItemView {
 		this.undoEl = null;
 	}
 
+	/** The pages drawn so far; a page with no days still counts, so an empty stretch isn't asked for again. */
+	private pagesLoaded = 0;
+
 	private pagesShown(): number {
 		const last = this.shown[this.shown.length - 1];
-		if (!last) return 0;
-		const days = this.ui.service.today().daysSince(last.date);
-		return Math.floor(days / PAGE_DAYS) + 1;
+		const fromDays = last ? Math.floor(this.ui.service.today().daysSince(last.date) / PAGE_DAYS) + 1 : 0;
+		return Math.max(fromDays, this.pagesLoaded);
 	}
 
 	private render(): void {
@@ -130,12 +165,10 @@ export class FeedView extends ItemView {
 
 	private maybeLoadMore(): void {
 		const scroller = this.scroller;
-		if (!scroller || !this.shown.length) return;
+		if (!scroller) return;
 		const rowHeight = scroller.querySelector<HTMLElement>(".pt-row")?.offsetHeight ?? 0;
 		const left = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
 		if (left > rowHeight * ROWS_BEFORE_END) return;
-		const before = this.shown.length;
-		this.shown = nextPage(this.shown, this.ui.service, this.ui.service.today());
-		if (this.shown.length !== before) this.render();
+		this.loadMore();
 	}
 }
