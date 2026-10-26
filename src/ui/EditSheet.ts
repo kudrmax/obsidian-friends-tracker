@@ -18,7 +18,7 @@ export class EditSheet extends HowSheet {
 	}
 
 	override descriptor(): PageDescriptor {
-		return { kind: "edit", path: this.row.path, index: this.row.index };
+		return { kind: "edit", path: this.person.path, index: this.row.index };
 	}
 
 	protected override get title(): string {
@@ -39,15 +39,16 @@ export class EditSheet extends HowSheet {
 
 	protected override async submit(): Promise<void> {
 		if (!isComplete(this.state)) return;
-		await this.run(() => this.ui.service.replaceInteraction(this.row.path, this.row.index, this.row.interaction, toInteraction(this.state)));
+		await this.run(() => this.ui.service.replaceInteraction(this.person.path, this.row.index, this.row.interaction, toInteraction(this.state)));
 	}
 
 	private async remove(): Promise<void> {
+		const person = this.person;
 		await this.run(async () => {
-			await this.ui.service.removeInteraction(this.row.path, this.row.index, this.row.interaction);
+			await this.ui.service.removeInteraction(person.path, this.row.index, this.row.interaction);
 			this.ui.offerUndo({
-				text: `Deleted ${this.row.name}: ${describe(this.row.interaction, this.ui.settings().labels)}`,
-				undo: () => this.ui.service.addInteraction(this.row.path, this.row.interaction),
+				text: `Deleted ${person.name}: ${describe(this.row.interaction, this.ui.settings().labels)}`,
+				undo: () => this.ui.service.addInteraction(person.path, this.row.interaction),
 			});
 		});
 	}

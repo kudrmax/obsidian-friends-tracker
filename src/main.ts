@@ -97,7 +97,10 @@ export default class FriendsTrackerPlugin extends Plugin implements SettingsHost
 			this.refreshViews();
 		}));
 		this.registerEvent(this.app.vault.on("delete", (file) => refreshIfPerson(file.path)));
-		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => refreshIfPerson(file.path, oldPath)));
+		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
+			for (const view of this.feedViews()) view.moved(oldPath, file.path);
+			refreshIfPerson(file.path, oldPath);
+		}));
 		const watcher = new DayWatcher(service, () => this.refreshViews());
 		this.registerInterval(window.setInterval(() => watcher.check(), DAY_CHECK_MS));
 	}

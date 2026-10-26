@@ -207,6 +207,11 @@ export class FeedView extends ItemView implements PageHolder {
 		this.contentEl.removeClass("has-page");
 	}
 
+	/** A note was renamed or moved: the page about it follows. */
+	moved(from: string, to: string): void {
+		this.sheet?.moved(from, to);
+	}
+
 	/** Offers to undo what was just logged, for a few seconds, over the "+". */
 	offerUndo(offer: UndoOffer): void {
 		this.clearUndo();

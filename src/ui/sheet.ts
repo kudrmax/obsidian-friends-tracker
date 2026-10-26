@@ -29,6 +29,7 @@ export interface PageHolder {
  */
 export abstract class FullSheet {
 	private holder: PageHolder | null = null;
+	private content: HTMLElement | null = null;
 
 	protected constructor(
 		protected readonly app: App,
@@ -69,9 +70,18 @@ export abstract class FullSheet {
 	/** The people changed while the sheet shows: redraw what depends on them. Nothing, unless a sheet says otherwise. */
 	refresh(): void {}
 
+	/** A note was renamed or moved while the sheet shows. Nothing, unless the sheet is about that note. */
+	moved(_from: string, _to: string): void {}
+
+	/** Draws the sheet afresh from what it holds. */
+	protected redraw(): void {
+		if (this.content) this.mount(this.content, this.holder ?? undefined);
+	}
+
 	/** The holder calls this with the element the sheet owns while it is shown. */
-	mount(content: HTMLElement, holder: PageHolder): void {
-		this.holder = holder;
+	mount(content: HTMLElement, holder: PageHolder | undefined): void {
+		this.holder = holder ?? null;
+		this.content = content;
 		content.empty();
 		this.fill(content);
 	}
@@ -79,6 +89,7 @@ export abstract class FullSheet {
 	/** The holder took the page down: whatever the sheet still finishes (a write under way) no longer steers the tab. */
 	unmount(): void {
 		this.holder = null;
+		this.content = null;
 	}
 }
 

@@ -43,7 +43,7 @@ export class HowSheet extends FullSheet {
 	constructor(
 		app: App,
 		protected readonly ui: UiContext,
-		protected readonly person: HowPerson,
+		protected person: HowPerson,
 		initial?: HowState,
 		/** What was typed on Who, so going back shows the same list. */
 		protected readonly query = "",
@@ -54,6 +54,20 @@ export class HowSheet extends FullSheet {
 
 	descriptor(): PageDescriptor {
 		return { kind: "how", path: this.person.path, name: this.person.name, query: this.query };
+	}
+
+	/** The person's note is gone: there is nothing left to log to, so the sheet steps back to the list. */
+	override refresh(): void {
+		if (!this.ui.repository.get(this.person.path)) this.close();
+	}
+
+	/** The person's note was renamed or moved: the sheet follows it, so ✓ writes to it where it is now. */
+	override moved(from: string, to: string): void {
+		if (this.person.path !== from) return;
+		const entry = this.ui.repository.get(to);
+		this.person = { path: to, name: entry?.kind === "ok" ? entry.person.name : this.person.name };
+		this.changed();
+		this.redraw();
 	}
 
 	protected get title(): string {
