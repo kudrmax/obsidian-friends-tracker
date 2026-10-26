@@ -43,6 +43,9 @@ export abstract class FullSheet {
 		this.host?.update(this);
 	}
 
+	/** The people changed while the sheet shows: redraw what depends on them. Nothing, unless a sheet says otherwise. */
+	refresh(): void {}
+
 	/** The holder calls this with the element the sheet owns while it is shown. */
 	mount(content: HTMLElement): void {
 		content.empty();
