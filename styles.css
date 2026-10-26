@@ -10,19 +10,238 @@
 body {
 	/* Colour */
 	--pt-bg: var(--background-primary);
+	--pt-surface: var(--background-secondary);
 	--pt-text: var(--text-normal);
+	--pt-muted: var(--text-muted);
+	--pt-faint: var(--text-faint);
+	--pt-line: var(--background-modifier-border);
+	--pt-accent: var(--interactive-accent);
+	--pt-accent-text: var(--text-accent);
+	--pt-accent-tint: hsla(var(--interactive-accent-hsl), 0.16);
+	/* The chosen capsule and the button that saves: the text's colour as a ground, the page's as the ink on it. */
+	--pt-strong: var(--text-normal);
+	--pt-on-strong: var(--background-primary);
+	/* iOS's fill: a quiet ground for a capsule that isn't chosen and for the circles. */
+	--pt-fill: rgba(118, 118, 128, 0.16);
+	--pt-hover: var(--background-modifier-hover);
+	--pt-danger: var(--color-red);
+	--pt-up: var(--color-green);
+	--pt-shadow-rgb: 0, 0, 0;
+	--pt-fab-shadow: 0 2px 8px rgba(var(--pt-shadow-rgb), 0.35);
+	--pt-fade-from: rgba(var(--pt-bg-rgb), 0);
+	--pt-bg-rgb: var(--mono-rgb-0);
+	/* The chart's four layers: text faint, call halfway to the accent, meeting the accent, a whole day lighter still. */
+	--pt-chart-text: var(--pt-faint);
+	--pt-chart-call: color-mix(in srgb, var(--pt-accent) 60%, var(--pt-surface));
+	--pt-chart-meeting: var(--pt-accent);
+	--pt-chart-whole: color-mix(in srgb, var(--pt-accent) 45%, var(--pt-text));
+
+	/* Shape */
+	--pt-radius-circle: 50%;
+	--pt-radius-capsule: 999px;
 
 	/* Sizes */
 	--pt-column: 640px;
 	--pt-gutter: 20px;
 	--pt-row: 60px;
+	--pt-circle: 40px;
+	--pt-button: 44px;
+	--pt-fab: 56px;
+	--pt-fab-bottom: 50px;
+	--pt-search: 40px;
+	--pt-header: 48px;
+	--pt-day: 28px;
+	--pt-section: 36px;
+	--pt-subtle: 17px;
+	--pt-fade: 120px;
+	--pt-fade-stop: 70%;
+	--pt-chevron: 14px;
+	--pt-icon: 20px;
+	--pt-icon-button: 22px;
+	--pt-icon-capsule: 16px;
+	--pt-icon-subtle: 12px;
+	--pt-icon-search: 16px;
+	--pt-chart: 64px;
+	--pt-bar-gap: 1px;
+	--pt-radius-bar: 2px;
+	--pt-swatch: 8px;
+	--pt-dot: 10px;
+	--pt-recent-date: 52px;
+	--pt-recent-dot: 16px;
+	--pt-stroke: 1.75px;
 
 	/* Type */
+	--pt-font-title: 30px;
+	--pt-font-header: 17px;
+	--pt-font-body: 17px;
+	--pt-font-capsule: 15px;
+	--pt-font-small: 13px;
+	--pt-font-micro: 10px;
+	--pt-font-number: 32px;
+	--pt-font-legend: 12px;
+	--pt-leading-title: 1.12;
+	--pt-leading-header: 20px;
+	--pt-leading-body: 22px;
+	--pt-leading-small: 17px;
+	--pt-leading-micro: 12px;
+	--pt-leading-one: 1;
+	--pt-weight-medium: var(--font-medium);
+	--pt-weight-semibold: var(--font-semibold);
+	--pt-weight-bold: var(--font-bold);
+	--pt-tracking-title: -0.02em;
+	--pt-tracking-body: -0.01em;
+	--pt-tracking-number: -0.03em;
 	/* A phone draws the screens in Apple's own font. */
 	--pt-font-phone: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-interface);
+	--pt-font-ui: var(--font-interface);
+	--pt-font-inherit: inherit;
+	/* Obsidian's Properties look, for the person's panel. */
+	--pt-property-padding: var(--input-padding);
+	--pt-property-text: var(--metadata-input-text-color);
+	--pt-property-font: var(--metadata-input-font-size);
+
+	/* Spacing */
+	--pt-space-1: 1px;
+	--pt-space-2: 2px;
+	--pt-space-4: 4px;
+	--pt-space-6: 6px;
+	--pt-space-8: 8px;
+	--pt-space-12: 12px;
+	--pt-space-16: 16px;
+	--pt-space-20: 20px;
+	--pt-space-24: 24px;
+	--pt-space-28: 28px;
+	--pt-space-44: 44px;
+	--pt-space-104: 104px;
+
+	/* Layers */
+	--pt-layer-fade: 2;
+	--pt-layer-fab: 3;
+
+	/* Motion */
+	--pt-fast: 150ms ease;
 }
 
-.people-tracker { background: var(--pt-bg); color: var(--pt-text); }
+/* The views and the sheets share one ground and, on a phone, one font. */
+.people-tracker { background: var(--pt-bg); color: var(--pt-text); font-family: var(--pt-font-ui); }
 .is-mobile .people-tracker { font-family: var(--pt-font-phone); }
+.people-tracker button { font-family: var(--pt-font-inherit); }
 .pt-column { box-sizing: border-box; width: 100%; max-width: var(--pt-column); margin: 0 auto; padding: 0 var(--pt-gutter); }
-.pt-row { display: flex; align-items: center; height: var(--pt-row); }
+.pt-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-bottom: var(--pt-space-104); }
+.pt-title { margin: 0; font-size: var(--pt-font-title); line-height: var(--pt-leading-title); font-weight: var(--pt-weight-bold); letter-spacing: var(--pt-tracking-title); color: var(--pt-text); }
+.pt-icon { display: inline-flex; }
+.pt-icon svg { width: var(--pt-icon); height: var(--pt-icon); stroke-width: var(--pt-stroke); }
+
+/* A row: the circle, the name with its line, and what stands on the right. */
+.pt-row { display: flex; align-items: center; gap: var(--pt-space-12); width: 100%; height: var(--pt-row); margin: 0; padding: 0; border: none; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: default; }
+button.pt-row { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button.pt-row:active { background: var(--pt-hover); }
+.pt-circle { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: var(--pt-circle); height: var(--pt-circle); border-radius: var(--pt-radius-circle); background: var(--pt-fill); color: var(--pt-muted); font-size: var(--pt-font-capsule); font-weight: var(--pt-weight-semibold); }
+.pt-circle.is-accent { background: var(--pt-accent-tint); color: var(--pt-accent-text); }
+.pt-circle.is-strong { background: var(--pt-strong); color: var(--pt-on-strong); }
+.pt-row-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: var(--pt-space-1); height: var(--pt-circle); }
+.pt-row-title { font-size: var(--pt-font-body); line-height: var(--pt-leading-body); letter-spacing: var(--pt-tracking-body); color: var(--pt-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-row-title b { font-weight: var(--pt-weight-semibold); }
+.pt-row-sub { font-size: var(--pt-font-small); line-height: var(--pt-leading-small); color: var(--pt-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-row-chevron { flex: 0 0 auto; color: var(--pt-faint); }
+.pt-row-chevron svg { width: var(--pt-chevron); height: var(--pt-chevron); }
+.pt-row-value { flex: 0 0 auto; font-size: var(--pt-font-body); color: var(--pt-text); font-variant-numeric: tabular-nums; }
+.pt-row-value.is-strong { font-weight: var(--pt-weight-semibold); }
+
+/* A day's header and the group under it. */
+.pt-group { display: flex; flex-direction: column; margin-top: var(--pt-space-12); padding-top: var(--pt-space-12); border-top: var(--pt-space-1) solid var(--pt-line); }
+.pt-group:first-of-type { margin-top: var(--pt-space-20); padding-top: 0; border-top: none; }
+.pt-day { display: flex; align-items: center; gap: var(--pt-space-8); height: var(--pt-day); }
+.pt-day-name { font-size: var(--pt-font-capsule); font-weight: var(--pt-weight-semibold); color: var(--pt-text); }
+.pt-day-date { font-size: var(--pt-font-small); color: var(--pt-muted); }
+.pt-section { display: flex; align-items: flex-end; box-sizing: border-box; height: var(--pt-section); margin-top: var(--pt-space-12); padding-bottom: var(--pt-space-6); font-size: var(--pt-font-small); font-weight: var(--pt-weight-semibold); color: var(--pt-muted); }
+
+/* A fork: one row of equal capsules. */
+.pt-fork { display: flex; flex-direction: column; }
+.pt-fork .pt-section { margin-top: var(--pt-space-16); padding-bottom: var(--pt-space-8); }
+.pt-fork-row { display: flex; gap: var(--pt-space-8); }
+.pt-capsule { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--pt-space-6); height: var(--pt-button); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-capsule); background: var(--pt-fill); box-shadow: none; color: var(--pt-text); font-size: var(--pt-font-capsule); font-weight: var(--pt-weight-medium); cursor: pointer; transition: background var(--pt-fast); -webkit-tap-highlight-color: transparent; }
+.pt-capsule .pt-icon svg { width: var(--pt-icon-capsule); height: var(--pt-icon-capsule); }
+.pt-capsule.is-on { background: var(--pt-strong); color: var(--pt-on-strong); font-weight: var(--pt-weight-semibold); }
+.pt-capsule.is-danger { color: var(--pt-danger); }
+
+/* Round icon buttons, the one that saves filled. */
+.pt-icon-button { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: var(--pt-button); height: var(--pt-button); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); background: transparent; box-shadow: none; color: var(--pt-text); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.pt-icon-button .pt-icon svg { width: var(--pt-icon-button); height: var(--pt-icon-button); }
+.pt-icon-button.is-filled { background: var(--pt-strong); color: var(--pt-on-strong); }
+.pt-icon-button.is-filled:disabled { opacity: var(--pt-disabled); cursor: default; }
+.pt-icon-button.is-danger { color: var(--pt-danger); }
+
+/* A sheet's header: a way out, the title with what stands under it, the actions. */
+.pt-sheet-header { flex: 0 0 auto; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: var(--pt-header); padding: 0 var(--pt-space-8); }
+.pt-sheet-left { justify-self: start; }
+.pt-sheet-middle { display: flex; flex-direction: column; align-items: center; gap: var(--pt-space-1); }
+.pt-sheet-title { font-size: var(--pt-font-header); line-height: var(--pt-leading-header); font-weight: var(--pt-weight-semibold); color: var(--pt-text); }
+.pt-sheet-right { justify-self: end; display: flex; align-items: center; gap: var(--pt-space-4); }
+.pt-subtle { display: inline-flex; align-items: center; gap: var(--pt-space-2); height: var(--pt-subtle); margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: var(--pt-muted); font-size: var(--pt-font-small); line-height: var(--pt-leading-small); cursor: pointer; }
+.pt-subtle .pt-icon svg { width: var(--pt-icon-subtle); height: var(--pt-icon-subtle); }
+
+/* The "+" over the feed, and the fade the list scrolls under. */
+.pt-fab { position: absolute; right: var(--pt-gutter); bottom: var(--pt-fab-bottom); z-index: var(--pt-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--pt-fab); height: var(--pt-fab); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); background: var(--pt-strong); box-shadow: var(--pt-fab-shadow); color: var(--pt-on-strong); cursor: pointer; }
+.pt-fab .pt-icon svg { width: var(--pt-space-24); height: var(--pt-space-24); }
+.pt-fade { position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--pt-layer-fade); height: var(--pt-fade); background: linear-gradient(to bottom, var(--pt-fade-from), var(--pt-bg) var(--pt-fade-stop)); pointer-events: none; }
+
+/* The search field on Who. */
+.pt-search { display: flex; align-items: center; gap: var(--pt-space-8); box-sizing: border-box; height: var(--pt-search); margin-top: var(--pt-space-12); padding: 0 0 0 var(--pt-space-12); border-radius: var(--pt-radius-capsule); background: var(--pt-fill); }
+.pt-search .pt-icon { color: var(--pt-muted); }
+.pt-search .pt-icon svg { width: var(--pt-icon-search); height: var(--pt-icon-search); }
+.pt-search input { flex: 1 1 auto; min-width: 0; height: 100%; padding: 0; border: none; background: transparent; box-shadow: none; color: var(--pt-text); font-size: var(--pt-font-body); font-family: var(--pt-font-inherit); }
+.pt-search input:focus { box-shadow: none; }
+.pt-search .pt-icon-button { width: var(--pt-button); height: var(--pt-search); color: var(--pt-muted); }
+
+/* Big numbers on Stats. */
+.pt-numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: var(--pt-space-28); }
+.pt-number-line { display: flex; align-items: baseline; gap: var(--pt-space-8); }
+.pt-number { font-size: var(--pt-font-number); line-height: var(--pt-leading-one); font-weight: var(--pt-weight-bold); letter-spacing: var(--pt-tracking-number); }
+.pt-delta { font-size: var(--pt-font-small); font-weight: var(--pt-weight-semibold); }
+.pt-delta.is-up { color: var(--pt-up); }
+.pt-delta.is-down { color: var(--pt-danger); }
+.pt-number-label { margin-top: var(--pt-space-6); font-size: var(--pt-font-small); color: var(--pt-muted); }
+
+/* The chart of months. */
+.pt-chart { display: flex; gap: var(--pt-space-4); align-items: flex-end; height: var(--pt-chart); }
+.pt-bar { flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: var(--pt-bar-gap); }
+.pt-bar span { display: block; border-radius: var(--pt-radius-bar); }
+.pt-bar-text { background: var(--pt-chart-text); }
+.pt-bar-call { background: var(--pt-chart-call); }
+.pt-bar-meeting { background: var(--pt-chart-meeting); }
+.pt-bar-whole { background: var(--pt-chart-whole); }
+.pt-months { display: flex; gap: var(--pt-space-4); margin-top: var(--pt-space-4); font-size: var(--pt-font-micro); line-height: var(--pt-leading-micro); color: var(--pt-faint); }
+.pt-months span { flex: 1 1 0; text-align: center; }
+.pt-legend { display: flex; gap: var(--pt-space-12); margin-top: var(--pt-space-8); font-size: var(--pt-font-legend); color: var(--pt-muted); white-space: nowrap; }
+.pt-legend span { display: inline-flex; align-items: center; gap: var(--pt-space-4); }
+.pt-swatch { display: inline-block; width: var(--pt-swatch); height: var(--pt-swatch); border-radius: var(--pt-radius-bar); }
+
+/* The person's panel inside the note: Obsidian's Properties classes draw the rows; this is only what they don't have. */
+.pt-own-property, .metadata-container.pt-only-own { display: none; }
+.pt-person-panel .metadata-property.is-wide { flex-direction: column; align-items: stretch; }
+.pt-person-panel .metadata-property.is-wide .metadata-property-value { padding: var(--pt-property-padding); padding-left: var(--pt-space-24); color: var(--pt-property-text); font-size: var(--pt-property-font); }
+.pt-person-panel .pt-legend { margin-top: var(--pt-space-8); }
+.pt-recent { display: flex; flex-direction: column; gap: var(--pt-space-8); }
+.pt-recent-row { display: grid; grid-template-columns: var(--pt-recent-date) var(--pt-recent-dot) minmax(0, 1fr); align-items: center; }
+.pt-recent-date { color: var(--pt-muted); }
+.pt-dot { width: var(--pt-dot); height: var(--pt-dot); border-radius: var(--pt-radius-circle); }
+.pt-panel-quiet { padding-inline-start: var(--pt-space-6); color: var(--pt-faint); }
+.pt-more { display: inline-flex; align-items: center; gap: var(--pt-space-4); height: var(--pt-section); margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: var(--pt-muted); font-size: var(--pt-font-capsule); cursor: pointer; }
+.pt-more .pt-icon svg { width: var(--pt-chevron); height: var(--pt-chevron); }
+
+/* The undo line over the feed after something is logged. */
+.pt-undo { position: absolute; left: var(--pt-gutter); right: var(--pt-space-104); bottom: var(--pt-fab-bottom); z-index: var(--pt-layer-fab); display: flex; align-items: center; gap: var(--pt-space-12); height: var(--pt-button); padding: 0 var(--pt-space-8) 0 var(--pt-space-16); border-radius: var(--pt-radius-capsule); background: var(--pt-surface); box-shadow: var(--pt-fab-shadow); }
+.pt-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--pt-font-capsule); }
+.pt-undo-button { margin: 0; padding: 0 var(--pt-space-8); border: none; background: transparent; box-shadow: none; color: var(--pt-accent-text); font-size: var(--pt-font-capsule); font-weight: var(--pt-weight-semibold); cursor: pointer; }
+
+/* Sheets: the whole screen on a phone, a column on a computer. */
+.pt-sheet.modal { display: flex; flex-direction: column; max-width: var(--pt-column); padding: 0; }
+.pt-sheet .modal-close-button { display: none; }
+.pt-sheet .modal-content { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.pt-sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: var(--pt-space-12) var(--pt-gutter) var(--pt-space-44); }
+.is-mobile .pt-sheet.modal { max-width: none; width: 100%; height: 100%; border-radius: 0; }
+.is-mobile .pt-sheet .pt-sheet-header { margin-top: var(--pt-space-44); }
+
+.people-tracker .pt-empty { padding: var(--pt-space-20) 0; color: var(--pt-faint); font-size: var(--pt-font-body); }
+body { --pt-disabled: 0.4; }
