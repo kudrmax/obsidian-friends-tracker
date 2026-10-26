@@ -20,6 +20,7 @@ type PropertyKey = Exclude<keyof PropertyNames, "kinds" | "companies" | "lengths
 const PROPERTY_KEYS: ReadonlyArray<{ key: PropertyKey; name: string }> = [
 	{ key: "interactions", name: "Interactions list" },
 	{ key: "date", name: "Date" },
+	{ key: "time", name: "Time" },
 	{ key: "kind", name: "Kind" },
 	{ key: "company", name: "Company" },
 	{ key: "length", name: "Length" },

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Interaction } from "../src/domain/Interaction";
 import { Person } from "../src/domain/Person";
 import { DEFAULT_PROPERTY_NAMES, Frontmatter, PersonDecodeError, decodePerson, encodePerson } from "../src/infrastructure/PersonCodec";
+import { LocalTime } from "../src/domain/LocalTime";
 import { d } from "./support/dates";
 
 const sample: Frontmatter = {
@@ -33,6 +34,17 @@ describe("decodePerson", () => {
 		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "meeting", company: "one_on_one" }] })).toThrow(/length: missing/);
 		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "meeting", length: "some_time" }] })).toThrow(/company: missing/);
 		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-23", kind: "call" }] })).toThrow(/purpose: missing/);
+	});
+
+	it("reads the time of day when a record has one, and leaves it unknown when it hasn't", () => {
+		const person = decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "text", time: "18:40" }, { date: "2026-10-23", kind: "text" }] });
+		expect(String(person.interactions()[0].time)).toBe("18:40");
+		expect(person.interactions()[1].time).toBeUndefined();
+	});
+
+	it("refuses a time it can't read", () => {
+		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "text", time: "6pm" }] })).toThrow(/time: invalid/);
+		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "text", time: 1120 }] })).toThrow(PersonDecodeError);
 	});
 
 	it("reads a date the metadata cache turned into a Date", () => {
@@ -75,6 +87,12 @@ describe("encodePerson", () => {
 			{ date: "2026-10-24", kind: "meeting", company: "one_on_one", length: "some_time" },
 			{ date: "2026-10-23", kind: "call", purpose: "talk" },
 		]);
+	});
+
+	it("writes the time as HH:MM text and leaves it out when there is none", () => {
+		const out: Frontmatter = {};
+		encodePerson(Person.restore({ name: "Misha", interactions: [{ date: d("2026-10-24"), kind: "text", time: LocalTime.of(18, 40) }, { date: d("2026-10-23"), kind: "text" }] }), out);
+		expect(out.interactions).toEqual([{ date: "2026-10-24", kind: "text", time: "18:40" }, { date: "2026-10-23", kind: "text" }]);
 	});
 
 	it("keeps unknown fields of an interaction and unknown keys of the note", () => {

@@ -5,7 +5,7 @@ export class DayWatcher {
 	private day: LocalDate;
 
 	constructor(
-		private readonly clock: Clock,
+		private readonly clock: Pick<Clock, "today">,
 		private readonly onNewDay: () => void,
 	) {
 		this.day = clock.today();

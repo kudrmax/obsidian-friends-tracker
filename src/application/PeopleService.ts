@@ -1,6 +1,7 @@
 import { Clock } from "../domain/Clock";
 import { Interaction } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
+import { LocalTime } from "../domain/LocalTime";
 import { Person } from "../domain/Person";
 import { PersonRepository } from "./ports";
 
@@ -14,7 +15,7 @@ export interface FeedRow {
 
 export interface FeedDay {
 	readonly date: LocalDate;
-	/** By person name, then in the order the person's interactions were added. */
+	/** By time of day, latest first (the small hours before the day's start count as its end); rows without a time last, by name. */
 	readonly rows: FeedRow[];
 }
 
@@ -53,6 +54,11 @@ export class PeopleService {
 		return this.clock.today();
 	}
 
+	/** The time of day right now, for a new record. */
+	now(): LocalTime {
+		return this.clock.time();
+	}
+
 	people(): Person[] {
 		return this.repository.list().flatMap((entry) => (entry.kind === "ok" ? [entry.person] : []));
 	}
@@ -75,8 +81,10 @@ export class PeopleService {
 				byDay.set(key, rows);
 			});
 		}
+		const startHour = this.clock.dayStartHour();
+		const later = (row: FeedRow): number => (row.interaction.time ? row.interaction.time.minutesSince(startHour) : -1);
 		return [...byDay.entries()]
-			.map(([key, rows]) => ({ date: LocalDate.parse(key) as LocalDate, rows }))
+			.map(([key, rows]) => ({ date: LocalDate.parse(key) as LocalDate, rows: rows.sort((a, b) => later(b) - later(a)) }))
 			.sort((a, b) => b.date.compare(a.date));
 	}
 

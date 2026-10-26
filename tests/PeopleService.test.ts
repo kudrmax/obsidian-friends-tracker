@@ -4,6 +4,7 @@ import { DayStartClock } from "../src/domain/Clock";
 import { DomainError } from "../src/domain/DomainError";
 import { Interaction } from "../src/domain/Interaction";
 import { LocalDate } from "../src/domain/LocalDate";
+import { LocalTime } from "../src/domain/LocalTime";
 import { Person } from "../src/domain/Person";
 import { InMemoryPersonRepository } from "./support/InMemoryPersonRepository";
 import { d } from "./support/dates";
@@ -12,7 +13,7 @@ const today = d("2026-10-26");
 const ago = (days: number): LocalDate => today.addDays(-days);
 const call = (date: LocalDate): Interaction => ({ date, kind: "call", purpose: "talk" });
 const text = (date: LocalDate): Interaction => ({ date, kind: "text" });
-const clock = { today: () => today };
+const clock = { today: () => today, time: () => LocalTime.of(12, 0), dayStartHour: () => 4 };
 
 async function setUp(people: Record<string, Interaction[]>): Promise<{ service: PeopleService; repository: InMemoryPersonRepository }> {
 	const repository = new InMemoryPersonRepository();
@@ -29,6 +30,13 @@ describe("feed", () => {
 		expect(first.map((day) => String(day.date))).toEqual([String(today), String(ago(2))]);
 		expect(service.feed(30, ago(2))).toEqual([]);
 		expect(service.feed(30, ago(32)).map((day) => String(day.date))).toEqual([String(ago(45))]);
+	});
+
+	it("orders a day's rows by time, latest first, counting the small hours as the end of the day, and the untimed last by name", async () => {
+		const at = (h: number, m: number): Interaction => ({ date: today, kind: "text", time: LocalTime.of(h, m) });
+		const { service } = await setUp({ Misha: [at(18, 40), at(1, 30)], Anya: [at(23, 0), text(today)], Boris: [text(today)] });
+		const rows = service.feed(30)[0].rows;
+		expect(rows.map((row) => `${row.name} ${row.interaction.time ?? "-"}`)).toEqual(["Misha 01:30", "Anya 23:00", "Misha 18:40", "Anya -", "Boris -"]);
 	});
 
 	it("shows two calls with one person on one day as two rows, each with its position", async () => {

@@ -25,4 +25,10 @@ describe("DayStartClock", () => {
 		hour = 2;
 		expect(String(clock.today())).toBe("2026-10-11");
 	});
+
+	it("tells the time of day as the wall clock shows it, and the hour the day starts", () => {
+		const clock = new DayStartClock(() => 4, at(1, 30));
+		expect(String(clock.time())).toBe("01:30");
+		expect(clock.dayStartHour()).toBe(4);
+	});
 });
