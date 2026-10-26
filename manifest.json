@@ -1,0 +1,10 @@
+{
+  "id": "friends-tracker",
+  "name": "Friends Tracker",
+  "version": "0.1.0",
+  "minAppVersion": "1.7.2",
+  "description": "Who you talked to and how. Every person is a note, every interaction a line in its frontmatter.",
+  "author": "kudrmax",
+  "authorUrl": "https://github.com/kudrmax",
+  "isDesktopOnly": false
+}
