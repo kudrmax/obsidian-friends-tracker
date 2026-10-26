@@ -12,4 +12,11 @@ export interface UiContext {
 	/** Opens the How step straight away for a person already known. */
 	logWith(person: { path: string; name: string }): void;
 	editInteraction(row: FeedRow): void;
+	/** Shows the undo line over the feed for what was just logged. */
+	offerUndo(offer: UndoOffer): void;
+}
+
+export interface UndoOffer {
+	readonly text: string;
+	undo(): Promise<unknown>;
 }

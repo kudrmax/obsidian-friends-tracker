@@ -246,5 +246,15 @@ button.pt-row:active { background: var(--pt-hover); }
 .is-mobile .pt-sheet.modal { max-width: none; width: 100%; height: 100%; border-radius: 0; }
 .is-mobile .pt-sheet .pt-sheet-header { margin-top: var(--pt-space-44); }
 
+/* The date picker: a month of round days. */
+.pt-date-picker .pt-picker-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--pt-space-8); }
+.pt-picker-title { font-size: var(--pt-font-header); font-weight: var(--pt-weight-semibold); }
+.pt-picker-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--pt-space-4); justify-items: center; }
+.pt-picker-weekday { font-size: var(--pt-font-small); color: var(--pt-faint); }
+.pt-picker-day { width: var(--pt-circle); height: var(--pt-circle); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); background: transparent; box-shadow: none; color: var(--pt-text); font-size: var(--pt-font-capsule); cursor: pointer; }
+.pt-picker-day:disabled { color: var(--pt-faint); cursor: default; }
+.pt-picker-day.is-today { box-shadow: inset 0 0 0 var(--pt-stroke) var(--pt-accent); }
+.pt-picker-day.is-picked { background: var(--pt-strong); color: var(--pt-on-strong); }
+
 .people-tracker .pt-empty { padding: var(--pt-space-20) 0; color: var(--pt-faint); font-size: var(--pt-font-body); }
 body { --pt-disabled: 0.4; }

@@ -4,18 +4,13 @@ import { describe } from "../domain/Interaction";
 import { KIND_ICONS, dayHeader, fab, iconButton, row } from "./components";
 import { PAGE_DAYS, nextPage } from "./feed";
 import { dayDate, dayName } from "./format";
-import { UiContext } from "./UiContext";
+import { UiContext, UndoOffer } from "./UiContext";
 
 export const FEED_VIEW = "people-tracker-feed";
 /** How close to the bottom, in rows, the list gets before the next page is added. */
 const ROWS_BEFORE_END = 5;
 /** How long the undo line stays. */
 export const UNDO_MS = 5000;
-
-export interface UndoOffer {
-	readonly text: string;
-	undo(): Promise<unknown>;
-}
 
 /** The main screen: every interaction logged, grouped by day, newest first, with the "+" to log another. */
 export class FeedView extends ItemView {
