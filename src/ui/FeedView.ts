@@ -67,6 +67,7 @@ export class FeedView extends ItemView implements PageHolder {
 
 	override async onClose(): Promise<void> {
 		this.clearUndo();
+		this.takeDown();
 		this.contentEl.empty();
 	}
 
@@ -158,15 +159,17 @@ export class FeedView extends ItemView implements PageHolder {
 	}
 
 	private put(sheet: FullSheet): void {
+		this.sheet?.unmount();
 		this.page?.remove();
 		this.page = this.contentEl.createDiv("ft-page");
 		this.contentEl.addClass("has-page");
 		this.pageState = sheet.descriptor();
 		this.sheet = sheet;
-		sheet.mount(this.page);
+		sheet.mount(this.page, this);
 	}
 
 	private takeDown(): void {
+		this.sheet?.unmount();
 		this.page?.remove();
 		this.page = null;
 		this.sheet = null;

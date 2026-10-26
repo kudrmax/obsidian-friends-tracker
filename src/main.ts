@@ -29,13 +29,10 @@ export default class FriendsTrackerPlugin extends Plugin implements SettingsHost
 		const repository = new FrontmatterPersonRepository(this.app, () => this.config, () => this.config.properties);
 		this.repository = repository;
 		const service = new PeopleService(repository, new DayStartClock(() => this.config.dayStartHour));
-		const host = new PageHost(
-			async () => {
-				await this.openView(FEED_VIEW);
-				return this.feedViews()[0] ?? null;
-			},
-			() => this.feedViews()[0] ?? null,
-		);
+		const host = new PageHost(async () => {
+			await this.openView(FEED_VIEW);
+			return this.feedViews()[0] ?? null;
+		});
 		const ui: UiContext = {
 			service,
 			repository,

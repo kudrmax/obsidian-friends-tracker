@@ -10,13 +10,21 @@ export function samePage(a: PageDescriptor | null, b: PageDescriptor | null): bo
 	return JSON.stringify(a) === JSON.stringify(b);
 }
 
+/** Something that holds a sheet as a page in place of its own content: the Friends view. */
+export interface PageHolder {
+	showPage(sheet: FullSheet): void;
+	updatePage(sheet: FullSheet): void;
+	/** Takes the pages down and shows the list again. */
+	hidePage(): void;
+}
+
 /**
  * A screen of its own: Who, How and Edit. It is a page inside the Friends tab, on a phone and a computer alike, so the
- * tab's back and forward arrows walk through it. The sheet only fills its content and asks to be closed; the page
- * holder does the rest.
+ * tab's back and forward arrows walk through it. The sheet only fills its content and asks to be closed; the holder it
+ * is mounted in does the rest, whether the sheet was just opened or rebuilt from the tab's history.
  */
 export abstract class FullSheet {
-	private host: PageHost | null = null;
+	private holder: PageHolder | null = null;
 
 	protected constructor(
 		protected readonly app: App,
@@ -29,56 +37,40 @@ export abstract class FullSheet {
 	abstract descriptor(): PageDescriptor;
 
 	open(): void {
-		this.host = this.hosts();
-		this.host.show(this);
+		this.hosts().show(this);
 	}
 
+	/** Back to the list. A sheet that no longer shows has nothing to close. */
 	close(): void {
-		this.host?.hide(this);
-		this.host = null;
+		this.holder?.hidePage();
 	}
 
 	/** The page's description changed (what was typed, say): the tab's history should remember it as it is now. */
 	protected changed(): void {
-		this.host?.update(this);
+		this.holder?.updatePage(this);
 	}
 
 	/** The people changed while the sheet shows: redraw what depends on them. Nothing, unless a sheet says otherwise. */
 	refresh(): void {}
 
 	/** The holder calls this with the element the sheet owns while it is shown. */
-	mount(content: HTMLElement): void {
+	mount(content: HTMLElement, holder: PageHolder): void {
+		this.holder = holder;
 		content.empty();
 		this.fill(content);
 	}
+
+	/** The holder took the page down: whatever the sheet still finishes (a write under way) no longer steers the tab. */
+	unmount(): void {
+		this.holder = null;
+	}
 }
 
-/** Something that can hold a sheet as a page in place of its own content: the Friends view. */
-export interface PageHolder {
-	showPage(sheet: FullSheet): void;
-	updatePage(sheet: FullSheet): void;
-	hidePage(): void;
-}
-
-/**
- * Opens sheets as pages in the Friends tab. Showing a page opens that tab when it isn't there; an update or a close
- * concerns the tab already showing the page and touches nothing else, so typing never re-opens or re-focuses the tab.
- */
+/** Opens sheets as pages in the Friends tab, opening that tab when it isn't there. */
 export class PageHost {
-	constructor(
-		private readonly open: () => Promise<PageHolder | null>,
-		private readonly current: () => PageHolder | null,
-	) {}
+	constructor(private readonly open: () => Promise<PageHolder | null>) {}
 
 	show(sheet: FullSheet): void {
 		void this.open().then((holder) => holder?.showPage(sheet));
-	}
-
-	update(sheet: FullSheet): void {
-		this.current()?.updatePage(sheet);
-	}
-
-	hide(_sheet: FullSheet): void {
-		this.current()?.hidePage();
 	}
 }
