@@ -152,10 +152,10 @@ export function sheetHeader(parent: HTMLElement, options: SheetHeaderOptions): H
 	return el;
 }
 
-/** The round "+" over the feed. */
-export function fab(parent: HTMLElement, label: string, onClick: () => void): HTMLButtonElement {
+/** The round "+" over the feed, or a quieter round button beside it. */
+export function fab(parent: HTMLElement, label: string, onClick: () => void, name: IconName = "plus"): HTMLButtonElement {
 	const button = parent.createEl("button", { cls: "pt-fab", attr: { type: "button", "aria-label": label } });
-	icon(button, "plus");
+	icon(button, name);
 	button.addEventListener("click", onClick);
 	return button;
 }

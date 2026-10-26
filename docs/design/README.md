@@ -11,11 +11,11 @@ This document wins over `docs/superpowers/specs/2026-10-26-people-tracker-design
 3. **Nothing extra.** A screen shows only what its job needs. No "last seen" on the screen that records an interaction, no date next to the person.
 4. **Facts have places, never separators.** Never "41 days · Call". A fact gets its own row, column or line.
 5. **Minimal and native.** Dark Obsidian theme, system font, Obsidian's accent (#a882ff in the mockups) only for Meeting and for accent text; everything else greys.
-6. **Mobile first.** Every screen is drawn at 390 pt; desktop is the same screen in a wider tab.
+6. **Mobile first.** Every screen is drawn at 390 pt; desktop is the same screen in a wider tab. On a computer Who, How and Edit are pages inside the People tab (the list steps aside until the sheet closes), never pop-ups; on a phone they are full-screen sheets.
 
 ## Feed (`Main.dc.html`) — the main screen
 
-- Title "People" (30 px bold). A stats icon button in the top-right. A round white "+" (56 px) bottom-right, over a fade; the list scrolls under it.
+- Title "People" (30 px bold). Two round buttons (56 px) bottom-right over a fade: the white "+" and, 12 px left of it, a quiet grey one with the stats icon. The list scrolls under them.
 - Days are groups: "Today  Sun, 26 Oct" / "Friday  24 Oct" — day name 15 px semibold, date 13 px grey, 8 px apart, on one line. Groups are 12 px apart with a hairline above each but the first. Empty days don't appear.
 - Row: format icon in a circle (Meeting: accent-tinted circle with accent icon; Call and Text: grey circle, grey icon), the person's name, under it the format and its qualifiers as one grey line ("Meeting, one on one", "Call, shared activity", "Text"), a faint chevron. Two interactions with the same person the same day are two rows. Tap → Edit.
 - The "+" → Who.

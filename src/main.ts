@@ -1,4 +1,4 @@
-import { Plugin, TFile } from "obsidian";
+import { Platform, Plugin, TFile } from "obsidian";
 import { FeedRow, PeopleService } from "./application/PeopleService";
 import { DayStartClock } from "./domain/Clock";
 import { FrontmatterPersonRepository } from "./infrastructure/FrontmatterPersonRepository";
@@ -9,6 +9,7 @@ import { FEED_VIEW, FeedView } from "./ui/FeedView";
 import { HowSheet } from "./ui/HowSheet";
 import { PersonNotes } from "./ui/PersonNotes";
 import { SettingsTab } from "./ui/SettingsTab";
+import { ModalHost, PageHost, SheetHost } from "./ui/sheet";
 import { STATS_VIEW, StatsView } from "./ui/StatsView";
 import { UiContext, UndoOffer } from "./ui/UiContext";
 import { WhoSheet } from "./ui/WhoSheet";
@@ -28,6 +29,12 @@ export default class PeopleTrackerPlugin extends Plugin implements SettingsHost 
 		const repository = new FrontmatterPersonRepository(this.app, () => this.config, () => this.config.properties);
 		this.repository = repository;
 		const service = new PeopleService(repository, new DayStartClock(() => this.config.dayStartHour));
+		const host: SheetHost = Platform.isMobile
+			? new ModalHost(this.app)
+			: new PageHost(async () => {
+					await this.openView(FEED_VIEW);
+					return this.feedViews()[0] ?? null;
+				});
 		const ui: UiContext = {
 			service,
 			repository,
@@ -39,6 +46,7 @@ export default class PeopleTrackerPlugin extends Plugin implements SettingsHost 
 			logWith: (person, query) => new HowSheet(this.app, ui, person, undefined, query).open(),
 			editInteraction: (row: FeedRow) => new EditSheet(this.app, ui, row).open(),
 			offerUndo: (offer: UndoOffer) => this.feedViews().forEach((view) => view.offerUndo(offer)),
+			sheetHost: () => host,
 		};
 		this.listPaths = () => repository.list().map((entry) => entry.path);
 		this.peoplePaths = new Set(this.listPaths());

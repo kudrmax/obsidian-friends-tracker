@@ -2,8 +2,9 @@ import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
 import { FeedDay, FeedRow } from "../application/PeopleService";
 import { describe } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
-import { KIND_ICONS, dayHeader, fab, iconButton, row } from "./components";
+import { KIND_ICONS, dayHeader, fab, row } from "./components";
 import { nextPage, pagesAvailable, pagesShown } from "./feed";
+import { PageHolder } from "./sheet";
 import { dayDate, dayName } from "./format";
 import { UiContext, UndoOffer } from "./UiContext";
 
@@ -14,12 +15,13 @@ const ROWS_BEFORE_END = 5;
 export const UNDO_MS = 5000;
 
 /** The main screen: every interaction logged, grouped by day, newest first, with the "+" to log another. */
-export class FeedView extends ItemView {
+export class FeedView extends ItemView implements PageHolder {
 	private shown: FeedDay[] = [];
 	private list: HTMLElement | null = null;
 	private scroller: HTMLElement | null = null;
 	private undoEl: HTMLElement | null = null;
 	private undoTimer: number | null = null;
+	private page: HTMLElement | null = null;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -44,16 +46,13 @@ export class FeedView extends ItemView {
 		const root = this.contentEl;
 		root.empty();
 		root.addClass("people-tracker", "pt-view", "pt-feed");
-		const header = root.createDiv("pt-sheet-header pt-feed-header");
-		header.createDiv("pt-sheet-left");
-		header.createDiv("pt-sheet-middle");
-		iconButton(header.createDiv("pt-sheet-right"), "bar-chart-3", "Stats", () => this.ui.openStats());
 		this.scroller = root.createDiv("pt-scroll");
 		const column = this.scroller.createDiv("pt-column");
 		column.createEl("h1", { cls: "pt-title", text: "People" });
 		this.list = column.createDiv("pt-feed-list");
 		this.scroller.addEventListener("scroll", () => this.maybeLoadMore());
 		root.createDiv("pt-fade");
+		fab(root, "Stats", () => this.ui.openStats(), "bar-chart-3").addClass("is-quiet");
 		fab(root, "Log an interaction", () => this.ui.newInteraction());
 		this.refresh();
 	}
@@ -112,6 +111,20 @@ export class FeedView extends ItemView {
 		this.pagesLoaded = pages + 1;
 		this.render();
 		return true;
+	}
+
+	/** On a computer a sheet takes the tab over: the list steps aside until the sheet closes. */
+	showPage(render: (content: HTMLElement) => void): void {
+		this.hidePage();
+		this.page = this.contentEl.createDiv("pt-page");
+		this.contentEl.addClass("has-page");
+		render(this.page);
+	}
+
+	hidePage(): void {
+		this.page?.remove();
+		this.page = null;
+		this.contentEl.removeClass("has-page");
 	}
 
 	/** Offers to undo what was just logged, for a few seconds, over the "+". */

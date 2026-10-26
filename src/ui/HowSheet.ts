@@ -45,7 +45,7 @@ export class HowSheet extends FullSheet {
 		/** What was typed on Who, so going back shows the same list. */
 		private readonly query = "",
 	) {
-		super(app);
+		super(app, () => ui.sheetHost());
 		this.state = initial ?? { date: ui.service.today() };
 	}
 

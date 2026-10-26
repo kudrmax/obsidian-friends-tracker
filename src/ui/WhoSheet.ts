@@ -15,7 +15,7 @@ export class WhoSheet extends FullSheet {
 		private readonly ui: UiContext,
 		initialQuery = "",
 	) {
-		super(app);
+		super(app, () => ui.sheetHost());
 		this.query = initialQuery;
 	}
 

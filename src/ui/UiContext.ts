@@ -1,6 +1,7 @@
 import { FeedRow, PeopleService } from "../application/PeopleService";
 import { PersonRepository } from "../application/ports";
 import { PeopleSettings } from "../settings";
+import { SheetHost } from "./sheet";
 
 export interface UiContext {
 	readonly service: PeopleService;
@@ -16,6 +17,8 @@ export interface UiContext {
 	editInteraction(row: FeedRow): void;
 	/** Shows the undo line over the feed for what was just logged. */
 	offerUndo(offer: UndoOffer): void;
+	/** Where a sheet opens: a modal on a phone, a page in the People tab on a computer. */
+	sheetHost(): SheetHost;
 }
 
 export interface UndoOffer {

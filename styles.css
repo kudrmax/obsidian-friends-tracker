@@ -197,6 +197,15 @@ body {
 /* The "+" over the feed, and the fade the list scrolls under. */
 .people-tracker .pt-fab { position: absolute; right: var(--pt-gutter); bottom: var(--pt-fab-bottom); z-index: var(--pt-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--pt-fab); height: var(--pt-fab); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); corner-shape: var(--pt-corner); background: var(--pt-strong); box-shadow: var(--pt-fab-shadow); color: var(--pt-on-strong); cursor: pointer; }
 .pt-fab .pt-icon svg { width: var(--pt-space-24); height: var(--pt-space-24); }
+/* The quiet one stands left of the "+": the surface's grey, the text's colour. */
+.people-tracker .pt-fab.is-quiet { right: calc(var(--pt-gutter) + var(--pt-fab) + var(--pt-space-12)); background: var(--pt-surface); color: var(--pt-text); }
+/* With no header row the title keeps its distance from the top. */
+.pt-feed .pt-column > .pt-title { padding-top: var(--pt-space-20); }
+/* On a computer a sheet is a page inside the People tab: the list, its fade and its buttons step aside. */
+.pt-view.has-page > .pt-scroll, .pt-view.has-page > .pt-fade, .pt-view.has-page > .pt-fab, .pt-view.has-page > .pt-undo { display: none; }
+.pt-page { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.pt-page .pt-sheet-header { box-sizing: border-box; width: 100%; max-width: var(--pt-column); margin: 0 auto; padding-top: var(--pt-space-20); }
+.pt-page .pt-sheet-body { box-sizing: border-box; width: 100%; max-width: var(--pt-column); margin: 0 auto; }
 .pt-fade { position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--pt-layer-fade); height: var(--pt-fade); background: linear-gradient(to bottom, var(--pt-fade-from), var(--pt-bg) var(--pt-fade-stop)); pointer-events: none; }
 
 /* On a phone the "+", the undo line and the list's end sit above Obsidian's bar. */
@@ -253,7 +262,7 @@ body {
 .pt-more .pt-icon svg { width: var(--pt-chevron); height: var(--pt-chevron); }
 
 /* The undo line over the feed after something is logged. */
-.people-tracker .pt-undo { position: absolute; left: var(--pt-gutter); right: var(--pt-space-104); bottom: var(--pt-fab-bottom); z-index: var(--pt-layer-fab); display: flex; align-items: center; gap: var(--pt-space-12); height: var(--pt-button); padding: 0 var(--pt-space-8) 0 var(--pt-space-16); border-radius: var(--pt-radius-capsule); corner-shape: var(--pt-corner); background: var(--pt-surface); box-shadow: var(--pt-fab-shadow); }
+.people-tracker .pt-undo { position: absolute; left: var(--pt-gutter); right: calc(var(--pt-gutter) + 2 * var(--pt-fab) + 2 * var(--pt-space-12)); bottom: var(--pt-fab-bottom); z-index: var(--pt-layer-fab); display: flex; align-items: center; gap: var(--pt-space-12); height: var(--pt-button); padding: 0 var(--pt-space-8) 0 var(--pt-space-16); border-radius: var(--pt-radius-capsule); corner-shape: var(--pt-corner); background: var(--pt-surface); box-shadow: var(--pt-fab-shadow); }
 .pt-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--pt-font-capsule); }
 .people-tracker .pt-undo-button { margin: 0; padding: 0 var(--pt-space-8); border: none; background: transparent; box-shadow: none; color: var(--pt-accent-text); font-size: var(--pt-font-capsule); font-weight: var(--pt-weight-semibold); cursor: pointer; }
 
