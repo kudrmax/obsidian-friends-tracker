@@ -2,6 +2,7 @@ import { Labels } from "../domain/Interaction";
 import { MonthBar } from "../domain/Stats";
 import { DESIGN } from "./design";
 import { monthLetter } from "./format";
+import { ANIMATION, play } from "./motion";
 
 const LAYERS = ["text", "call", "meeting", "wholeDay"] as const;
 type Layer = (typeof LAYERS)[number];
@@ -23,8 +24,8 @@ export function barHeights(bars: readonly MonthBar[], max: number): number[][] {
 	});
 }
 
-/** Twelve months as stacked bars, their letters under them and a legend of the layers. */
-export function monthChart(parent: HTMLElement, bars: readonly MonthBar[], labels: Labels): HTMLElement {
+/** Twelve months as stacked bars, their letters under them and a legend of the layers; the bars grow from `grow` ms in, when given. */
+export function monthChart(parent: HTMLElement, bars: readonly MonthBar[], labels: Labels, grow: number | null = null): HTMLElement {
 	const el = parent.createDiv("ft-month-chart");
 	const chart = el.createDiv("ft-chart");
 	const heights = barHeights(bars, DESIGN.chart);
@@ -37,6 +38,11 @@ export function monthChart(parent: HTMLElement, bars: readonly MonthBar[], label
 			piece.style.setProperty("height", `${height}px`);
 		});
 		column.setAttribute("aria-label", `${bar.year}-${bar.month}: ${bar.text + bar.call + bar.meeting + bar.wholeDay}`);
+		if (grow !== null) {
+			column.style.setProperty("--ft-bar-index", String(index));
+			column.style.setProperty("--ft-motion-offset", `${Math.round(grow)}ms`);
+			play(column, "is-growing", ANIMATION.grow);
+		}
 	});
 	const months = el.createDiv("ft-months");
 	for (const bar of bars) months.createSpan({ text: monthLetter(bar.month) });

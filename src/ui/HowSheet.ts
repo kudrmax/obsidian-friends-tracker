@@ -7,6 +7,7 @@ import { LocalTime } from "../domain/LocalTime";
 import { KIND_ICONS, QUALIFIER_ICONS, forkRow, iconButton, row, sheetHeader, subtleButton } from "./components";
 import { longDate } from "./format";
 import { HowState, isComplete, toInteraction, withKind } from "./howState";
+import { Arrivals } from "./motion";
 import { FullSheet, PageDescriptor } from "./sheet";
 import { UiContext } from "./UiContext";
 
@@ -16,17 +17,17 @@ export interface HowPerson {
 }
 
 /** The forks the How screen asks, for a state: the kind, then what the kind needs. */
-export function renderForks(parent: HTMLElement, state: HowState, labels: Labels, onChange: (next: HowState) => void): void {
-	forkRow<Kind>(parent, "How", KINDS.map((kind) => ({ value: kind, text: labels[kind], icon: KIND_ICONS[kind] })), state.kind, (kind) => onChange(withKind(state, kind)));
+export function renderForks(parent: HTMLElement, state: HowState, labels: Labels, onChange: (next: HowState) => void, arrivals?: Arrivals): void {
+	forkRow<Kind>(parent, "How", KINDS.map((kind) => ({ value: kind, text: labels[kind], icon: KIND_ICONS[kind] })), state.kind, (kind) => onChange(withKind(state, kind)), arrivals);
 	if (state.kind === "call") {
 		const purposes: Purpose[] = ["talk", "activity"];
-		forkRow<Purpose>(parent, "What for", purposes.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.purpose, (purpose) => onChange({ ...state, purpose }));
+		forkRow<Purpose>(parent, "What for", purposes.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.purpose, (purpose) => onChange({ ...state, purpose }), arrivals);
 	}
 	if (state.kind === "meeting") {
 		const companies: Company[] = ["one_on_one", "group"];
-		forkRow<Company>(parent, "Company", companies.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.company, (company) => onChange({ ...state, company }));
+		forkRow<Company>(parent, "Company", companies.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.company, (company) => onChange({ ...state, company }), arrivals);
 		const lengths: Length[] = ["some_time", "whole_day"];
-		forkRow<Length>(parent, "Length", lengths.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.length, (length) => onChange({ ...state, length }));
+		forkRow<Length>(parent, "Length", lengths.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.length, (length) => onChange({ ...state, length }), arrivals);
 	}
 }
 
@@ -39,6 +40,7 @@ export class HowSheet extends FullSheet {
 	private timeButton: HTMLButtonElement | null = null;
 	/** A write is under way: a second tap must not start another. */
 	private busy = false;
+	private readonly arrivals = new Arrivals();
 
 	constructor(
 		app: App,
@@ -144,10 +146,17 @@ export class HowSheet extends FullSheet {
 		const forks = this.forks;
 		if (!forks) return;
 		forks.empty();
-		renderForks(forks, this.state, this.ui.settings().labels, (next) => {
-			this.state = next;
-			this.render();
-		});
+		this.arrivals.begin();
+		renderForks(
+			forks,
+			this.state,
+			this.ui.settings().labels,
+			(next) => {
+				this.state = next;
+				this.render();
+			},
+			this.arrivals,
+		);
 		if (this.save) this.save.disabled = !isComplete(this.state);
 		this.dateButton?.querySelector("span")?.setText(this.dateText());
 		this.timeButton?.querySelector("span")?.setText(this.timeText());

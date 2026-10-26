@@ -6,6 +6,7 @@ import { byMonth, daysSince, usualGap } from "../domain/Stats";
 import { EditSheet } from "./EditSheet";
 import { daysAgo, shortDate } from "./format";
 import { monthChart } from "./MonthChart";
+import { Debut } from "./motion";
 import { UiContext } from "./UiContext";
 
 const RECENT_SHOWN = 3;
@@ -21,6 +22,8 @@ const opened = new Set<string>();
  */
 export class PersonBlock {
 	readonly el: HTMLElement;
+	/** The chart grows when the panel first shows a person, and when it is unfolded. */
+	private readonly debut = new Debut();
 
 	constructor(
 		private readonly app: App,
@@ -38,6 +41,7 @@ export class PersonBlock {
 
 	moveTo(path: string): void {
 		this.path = path;
+		this.debut.restart();
 		this.render();
 	}
 
@@ -67,8 +71,10 @@ export class PersonBlock {
 		setIcon(fold, "right-triangle");
 		heading.createDiv({ cls: "metadata-properties-title", text: "Person" });
 		heading.addEventListener("click", () => {
-			if (folded.has(this.path)) folded.delete(this.path);
-			else folded.add(this.path);
+			if (folded.has(this.path)) {
+				folded.delete(this.path);
+				this.debut.restart();
+			} else folded.add(this.path);
 			this.render();
 		});
 	}
@@ -100,7 +106,7 @@ export class PersonBlock {
 
 	private renderChart(rows: HTMLElement, person: Person): void {
 		const cell = this.property(rows, "calendar", "by month", true);
-		monthChart(cell, byMonth(person.interactions(), this.ui.service.today()), this.ui.settings().labels);
+		monthChart(cell, byMonth(person.interactions(), this.ui.service.today()), this.ui.settings().labels, this.debut.offset());
 	}
 
 	private renderRecent(rows: HTMLElement, person: Person): void {

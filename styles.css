@@ -143,6 +143,22 @@ body {
 	--ft-layer-fade: 2;
 	--ft-layer-fab: 3;
 
+	/*
+	 * Motion. What arrives rises a little and fades in, what leaves sinks and fades out, faster; a press shrinks what is
+	 * pressed. Only transform and opacity move, and nothing moves for a reader who asks for reduced motion.
+	 */
+	--ft-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+	--ft-ease-in: cubic-bezier(0.4, 0, 1, 1);
+	--ft-duration-press: 120ms;
+	--ft-duration-fade: 160ms;
+	--ft-duration-enter: 240ms;
+	--ft-duration-grow: 420ms;
+	--ft-duration-glow: 1200ms;
+	--ft-stagger: 20ms;
+	--ft-rise: 8px;
+	--ft-press-scale: 0.97;
+	--ft-press-scale-round: 0.92;
+	--ft-pop-scale: 0.94;
 }
 
 /* The views and the sheets share one ground and, on a phone, one font. */
@@ -342,3 +358,31 @@ body {
 	.friends-tracker .ft-undo-button:hover { background: transparent; opacity: var(--ft-hover-strong); }
 }
 .friends-tracker :is(.ft-subtle, .ft-more, .ft-undo-button):active, .ft-person-panel .ft-more:active { opacity: var(--ft-pressed); }
+
+@keyframes ft-arrive { from { opacity: 0; transform: translateY(var(--ft-rise)); } }
+@keyframes ft-leave { to { opacity: 0; transform: translateY(var(--ft-rise)); } }
+@keyframes ft-fade-in { from { opacity: 0; } }
+@keyframes ft-pop { from { transform: scale(var(--ft-pop-scale)); } }
+@keyframes ft-come-back { from { opacity: 0; transform: scale(var(--ft-pop-scale)); } }
+@keyframes ft-grow { from { transform: scaleY(0); } }
+@keyframes ft-glow { from { opacity: 1; } to { opacity: 0; } }
+
+/* What moves, only for a reader who hasn't asked for less motion. The code puts the classes on for one run. */
+@media (prefers-reduced-motion: no-preference) {
+	.friends-tracker :is(.ft-capsule, .ft-icon-button, .ft-fab, .ft-picker-cell) { transition: transform var(--ft-duration-press) var(--ft-ease-out), background var(--ft-duration-fade) var(--ft-ease-out), opacity var(--ft-duration-fade) var(--ft-ease-out); }
+	.friends-tracker :is(.ft-capsule, .ft-picker-cell):not(:disabled):active { transform: scale(var(--ft-press-scale)); }
+	.friends-tracker :is(.ft-icon-button, .ft-fab):not(:disabled):active { transform: scale(var(--ft-press-scale-round)); }
+	.friends-tracker .ft-search .ft-search-clear { transition: opacity var(--ft-duration-fade) var(--ft-ease-out); }
+
+	.friends-tracker :is(.ft-page.is-entering, .ft-undo.is-arriving, .ft-day.is-arriving, .ft-fork.is-arriving, .ft-numbers.is-arriving, .ft-row.is-arriving) { animation: ft-arrive var(--ft-duration-enter) var(--ft-ease-out) both; animation-delay: calc(-1 * var(--ft-motion-offset, 0ms)); }
+	/* A row just logged or changed in the feed glows for a moment. */
+	.ft-feed .ft-row.is-arriving { position: relative; }
+	.ft-feed .ft-row.is-arriving::before { content: ""; position: absolute; inset: 0; border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-hover); pointer-events: none; animation: ft-glow var(--ft-duration-glow) var(--ft-ease-in) both; animation-delay: calc(-1 * var(--ft-motion-offset, 0ms)); }
+	.friends-tracker .ft-capsule.is-arriving { animation: ft-pop var(--ft-duration-enter) var(--ft-ease-out); animation-delay: calc(-1 * var(--ft-motion-offset, 0ms)); }
+	.friends-tracker .ft-scroll.is-returning { animation: ft-fade-in var(--ft-duration-enter) var(--ft-ease-out) both; }
+	.friends-tracker .ft-fab.is-returning { animation: ft-come-back var(--ft-duration-enter) var(--ft-ease-out) both; }
+	.ft-bar { transform-origin: bottom; }
+	.ft-bar.is-growing { animation: ft-grow var(--ft-duration-grow) var(--ft-ease-out) both; animation-delay: calc(var(--ft-bar-index) * var(--ft-stagger) - var(--ft-motion-offset, 0ms)); }
+	.friends-tracker .ft-undo.is-leaving { animation: ft-leave var(--ft-duration-fade) var(--ft-ease-in) both; }
+}
+.friends-tracker .ft-undo.is-leaving { pointer-events: none; }
