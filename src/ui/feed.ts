@@ -17,7 +17,7 @@ export function nextPage(shown: FeedDay[], service: Pick<PeopleService, "feed">,
 }
 
 /** How many pages `shown` must cover for its last day to be on one, given pages are cut from today. */
-function pagesShown(shown: FeedDay[], today: LocalDate): number {
+export function pagesShown(shown: FeedDay[], today: LocalDate): number {
 	const last = shown[shown.length - 1];
 	if (!last) return 0;
 	return Math.floor(today.daysSince(last.date) / PAGE_DAYS) + 1;

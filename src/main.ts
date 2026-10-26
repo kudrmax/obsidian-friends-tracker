@@ -18,6 +18,7 @@ const DAY_CHECK_MS = 60_000;
 export default class PeopleTrackerPlugin extends Plugin implements SettingsHost {
 	config: PeopleSettings = loadSettings(null);
 	private notes: PersonNotes | null = null;
+	private repository: FrontmatterPersonRepository | null = null;
 	/** People as of the last refresh, so a note that just stopped being a person (lost its tag) still refreshes the views. */
 	private peoplePaths = new Set<string>();
 	private listPaths: () => string[] = () => [];
@@ -25,15 +26,17 @@ export default class PeopleTrackerPlugin extends Plugin implements SettingsHost 
 	override async onload(): Promise<void> {
 		this.config = loadSettings(await this.loadData());
 		const repository = new FrontmatterPersonRepository(this.app, () => this.config, () => this.config.properties);
+		this.repository = repository;
 		const service = new PeopleService(repository, new DayStartClock(() => this.config.dayStartHour));
 		const ui: UiContext = {
 			service,
 			repository,
 			settings: () => this.config,
 			openPerson: (path) => void this.openPerson(path),
+			openFeed: () => void this.openView(FEED_VIEW),
 			openStats: () => void this.openView(STATS_VIEW),
-			newInteraction: () => new WhoSheet(this.app, ui).open(),
-			logWith: (person) => new HowSheet(this.app, ui, person).open(),
+			newInteraction: (query) => new WhoSheet(this.app, ui, query).open(),
+			logWith: (person, query) => new HowSheet(this.app, ui, person, undefined, query).open(),
 			editInteraction: (row: FeedRow) => new EditSheet(this.app, ui, row).open(),
 			offerUndo: (offer: UndoOffer) => this.feedViews().forEach((view) => view.offerUndo(offer)),
 		};
@@ -70,6 +73,7 @@ export default class PeopleTrackerPlugin extends Plugin implements SettingsHost 
 		this.addSettingTab(new SettingsTab(this.app, this));
 
 		const refreshIfPerson = (...paths: string[]) => {
+			repository.invalidate();
 			if (paths.some((path) => this.peoplePaths.has(path) || repository.contains(path))) this.refreshViews();
 		};
 		this.registerEvent(this.app.metadataCache.on("changed", (file) => refreshIfPerson(file.path)));
@@ -81,6 +85,7 @@ export default class PeopleTrackerPlugin extends Plugin implements SettingsHost 
 
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.config);
+		this.repository?.invalidate();
 		this.refreshViews();
 	}
 

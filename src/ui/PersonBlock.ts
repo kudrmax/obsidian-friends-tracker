@@ -1,4 +1,5 @@
 import { App, setIcon } from "obsidian";
+import { moreButton } from "./components";
 import { Interaction, describe } from "../domain/Interaction";
 import { Person } from "../domain/Person";
 import { byMonth, daysSince, usualGap } from "../domain/Stats";
@@ -91,10 +92,10 @@ export class PersonBlock {
 		const today = this.ui.service.today();
 		const since = daysSince(person, today);
 		const gap = usualGap(person, today);
-		const thisYear = person.interactions().filter((i) => !i.date.isBefore(today.addDays(-364))).length;
+		const pastYear = person.interactions().filter((i) => !i.date.isBefore(today.addDays(-364))).length;
 		this.text(rows, "clock", "last seen", since === undefined ? "never" : daysAgo(since));
 		this.text(rows, "align-justify", "usual gap", gap === undefined ? "—" : `${gap} ${gap === 1 ? "day" : "days"}`);
-		this.text(rows, "bar-chart-3", "this year", `${thisYear} ${thisYear === 1 ? "interaction" : "interactions"}`);
+		this.text(rows, "bar-chart-3", "past year", `${pastYear} ${pastYear === 1 ? "interaction" : "interactions"}`);
 	}
 
 	private renderChart(rows: HTMLElement, person: Person): void {
@@ -118,10 +119,7 @@ export class PersonBlock {
 			line.addEventListener("click", () => new EditSheet(this.app, this.ui, { path: this.path, name: person.name, index, interaction }).open());
 		});
 		if (interactions.length <= RECENT_SHOWN) return;
-		const more = list.createEl("button", { cls: "pt-more", attr: { type: "button", "aria-expanded": String(open) } });
-		setIcon(more.createSpan("pt-icon"), open ? "chevron-down" : "chevron-right");
-		more.createSpan({ text: open ? "Fewer" : `All ${interactions.length}` });
-		more.addEventListener("click", () => {
+		moreButton(list, open, open ? "Fewer" : `All ${interactions.length}`, () => {
 			if (open) opened.delete(this.path);
 			else opened.add(this.path);
 			this.render();

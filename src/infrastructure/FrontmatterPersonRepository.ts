@@ -5,6 +5,9 @@ import { Person } from "../domain/Person";
 import { Frontmatter, PersonDecodeError, PropertyNames, decodePerson, encodePerson } from "./PersonCodec";
 
 export class FrontmatterPersonRepository implements PersonRepository {
+	/** The last listing, kept until a note changes; decoding every person on every call would be too slow for a big vault. */
+	private listed: PersonEntry[] | null = null;
+
 	constructor(
 		private readonly app: App,
 		private readonly scope: () => PeopleScope,
@@ -19,6 +22,16 @@ export class FrontmatterPersonRepository implements PersonRepository {
 	}
 
 	list(): PersonEntry[] {
+		if (!this.listed) this.listed = this.listNow();
+		return this.listed;
+	}
+
+	/** Forgets the listing: a note changed, or the settings did. */
+	invalidate(): void {
+		this.listed = null;
+	}
+
+	private listNow(): PersonEntry[] {
 		if (this.scope().source === "tag") return this.app.vault.getMarkdownFiles().filter((file) => this.hasTag(file)).map((file) => this.read(file));
 		const folder = this.folder();
 		if (!folder) return [];
@@ -41,6 +54,7 @@ export class FrontmatterPersonRepository implements PersonRepository {
 			encodePerson(updated, frontmatter, this.keys());
 		});
 		if (!updated) throw new DomainError("Person not found");
+		this.invalidate();
 		return updated;
 	}
 
@@ -54,6 +68,7 @@ export class FrontmatterPersonRepository implements PersonRepository {
 			encodePerson(person, frontmatter, this.keys());
 			if (this.scope().source === "tag") frontmatter.tags = [this.tagName()];
 		});
+		this.invalidate();
 		return path;
 	}
 

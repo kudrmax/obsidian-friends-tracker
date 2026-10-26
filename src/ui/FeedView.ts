@@ -3,7 +3,7 @@ import { FeedDay, FeedRow } from "../application/PeopleService";
 import { describe } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
 import { KIND_ICONS, dayHeader, fab, iconButton, row } from "./components";
-import { PAGE_DAYS, nextPage, pagesAvailable } from "./feed";
+import { nextPage, pagesAvailable, pagesShown } from "./feed";
 import { dayDate, dayName } from "./format";
 import { UiContext, UndoOffer } from "./UiContext";
 
@@ -88,7 +88,17 @@ export class FeedView extends ItemView {
 	/** A sparse feed may not reach the bottom of the screen, so no scroll ever asks for more: keep adding pages until it does. */
 	private fillScreen(): void {
 		const scroller = this.scroller;
-		if (!scroller) return;
+		/* A view that isn't laid out yet measures as empty; it asks again once it is drawn. */
+		if (!scroller || scroller.clientHeight === 0) {
+			if (scroller) window.requestAnimationFrame(() => this.fillScreenNow());
+			return;
+		}
+		this.fillScreenNow();
+	}
+
+	private fillScreenNow(): void {
+		const scroller = this.scroller;
+		if (!scroller || scroller.clientHeight === 0) return;
 		while (scroller.scrollHeight <= scroller.clientHeight && this.loadMore()) {
 			/* each page drawn makes the list taller, until there are no pages left */
 		}
@@ -131,9 +141,7 @@ export class FeedView extends ItemView {
 	private pagesLoaded = 0;
 
 	private pagesShown(): number {
-		const last = this.shown[this.shown.length - 1];
-		const fromDays = last ? Math.floor(this.ui.service.today().daysSince(last.date) / PAGE_DAYS) + 1 : 0;
-		return Math.max(fromDays, this.pagesLoaded);
+		return Math.max(pagesShown(this.shown, this.ui.service.today()), this.pagesLoaded);
 	}
 
 	private render(): void {

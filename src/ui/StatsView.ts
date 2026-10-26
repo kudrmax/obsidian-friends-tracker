@@ -1,7 +1,8 @@
-import { ItemView, ViewStateResult, WorkspaceLeaf, setIcon } from "obsidian";
+import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Interaction } from "../domain/Interaction";
+import { Person } from "../domain/Person";
 import { Behind, Often, Period, byMonth, fallingBehind, mostOften, totals } from "../domain/Stats";
-import { forkRow, iconButton, row, sectionLabel } from "./components";
+import { forkRow, iconButton, moreButton, row, sectionLabel } from "./components";
 import { monthChart } from "./MonthChart";
 import { UiContext } from "./UiContext";
 
@@ -19,6 +20,8 @@ export class StatsView extends ItemView {
 	private period: Period = "month";
 	private behindOpen = false;
 	private body: HTMLElement | null = null;
+	/** Where each person shown lives, so a tap opens the right note. */
+	private paths = new Map<Person, string>();
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -79,7 +82,8 @@ export class StatsView extends ItemView {
 		});
 		periods.addClass("pt-periods");
 		const today = this.ui.service.today();
-		const people = this.ui.service.people();
+		this.paths = new Map(this.ui.repository.list().flatMap((entry) => (entry.kind === "ok" ? [[entry.person, entry.path] as const] : [])));
+		const people = [...this.paths.keys()];
 		this.renderNumbers(body, totals(people, this.period, today));
 		sectionLabel(body, "By month");
 		const all: Interaction[] = people.flatMap((person) => [...person.interactions()]);
@@ -114,14 +118,11 @@ export class StatsView extends ItemView {
 				title: item.person.name,
 				subtitle: `Usually every ${item.usual} ${item.usual === 1 ? "day" : "days"}`,
 				trailing: { text: `${item.days} days`, strong: true },
-				onClick: () => this.openPerson(item.person.name),
+				onClick: () => this.openPerson(item.person),
 			});
 		}
 		if (behind.length <= LIST_SHOWN) return;
-		const more = parent.createEl("button", { cls: "pt-more", attr: { type: "button", "aria-expanded": String(this.behindOpen) } });
-		setIcon(more.createSpan("pt-icon"), this.behindOpen ? "chevron-down" : "chevron-right");
-		more.createSpan({ text: this.behindOpen ? "Fewer" : `${behind.length - LIST_SHOWN} more` });
-		more.addEventListener("click", () => {
+		moreButton(parent, this.behindOpen, this.behindOpen ? "Fewer" : `${behind.length - LIST_SHOWN} more`, () => {
 			this.behindOpen = !this.behindOpen;
 			this.refresh();
 		});
@@ -135,14 +136,14 @@ export class StatsView extends ItemView {
 				circle: { initial: item.person.name.slice(0, 1).toUpperCase() },
 				title: item.person.name,
 				trailing: { text: String(item.count), strong: true },
-				onClick: () => this.openPerson(item.person.name),
+				onClick: () => this.openPerson(item.person),
 			});
 		}
 	}
 
 	/** Opens the person's note by name; the repository knows the path. */
-	private openPerson(name: string): void {
-		const entry = this.ui.repository.list().find((candidate) => candidate.kind === "ok" && candidate.person.name === name);
-		if (entry) this.ui.openPerson(entry.path);
+	private openPerson(person: Person): void {
+		const path = this.paths.get(person);
+		if (path) this.ui.openPerson(path);
 	}
 }

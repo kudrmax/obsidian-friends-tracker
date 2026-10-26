@@ -34,12 +34,16 @@ export class HowSheet extends FullSheet {
 	private forks: HTMLElement | null = null;
 	private save: HTMLButtonElement | null = null;
 	private dateButton: HTMLButtonElement | null = null;
+	/** A write is under way: a second tap must not start another. */
+	private busy = false;
 
 	constructor(
 		app: App,
 		protected readonly ui: UiContext,
 		protected readonly person: HowPerson,
 		initial?: HowState,
+		/** What was typed on Who, so going back shows the same list. */
+		private readonly query = "",
 	) {
 		super(app);
 		this.state = initial ?? { date: ui.service.today() };
@@ -55,7 +59,7 @@ export class HowSheet extends FullSheet {
 
 	protected back(): void {
 		this.close();
-		this.ui.newInteraction();
+		this.ui.newInteraction(this.query);
 	}
 
 	protected fill(content: HTMLElement): void {
@@ -91,13 +95,19 @@ export class HowSheet extends FullSheet {
 		});
 	}
 
-	/** Runs an action that writes the note; on success the sheet closes, on failure it stays with a notice. */
+	/** Runs an action that writes the note, with ✓ held down meanwhile; on success the sheet closes, on failure it stays with a notice. */
 	protected async run(action: () => Promise<unknown>): Promise<void> {
+		if (this.busy) return;
+		this.busy = true;
+		if (this.save) this.save.disabled = true;
 		try {
 			await action();
 			this.close();
 		} catch (error) {
 			new Notice(error instanceof Error ? error.message : String(error));
+			if (this.save) this.save.disabled = !isComplete(this.state);
+		} finally {
+			this.busy = false;
 		}
 	}
 

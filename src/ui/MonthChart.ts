@@ -7,16 +7,19 @@ const LAYERS = ["text", "call", "meeting", "wholeDay"] as const;
 type Layer = (typeof LAYERS)[number];
 const LAYER_CLASS: Record<Layer, string> = { text: "pt-bar-text", call: "pt-bar-call", meeting: "pt-bar-meeting", wholeDay: "pt-bar-whole" };
 
+/** The least a layer with anything in it is drawn at, so a quiet month still shows. */
+const MIN_LAYER = 1;
+
 /**
  * Each month's four layers in pixels, the fullest month reaching `max`: a layer's share of its month's total, floored
- * so a month never overshoots.
+ * so a month never overshoots, but never under a pixel while it holds something.
  */
 export function barHeights(bars: readonly MonthBar[], max: number): number[][] {
 	const total = (bar: MonthBar) => LAYERS.reduce((sum, layer) => sum + bar[layer], 0);
 	const fullest = Math.max(0, ...bars.map(total));
 	return bars.map((bar) => {
 		if (fullest === 0) return LAYERS.map(() => 0);
-		return LAYERS.map((layer) => Math.floor((bar[layer] * max) / fullest));
+		return LAYERS.map((layer) => (bar[layer] === 0 ? 0 : Math.max(MIN_LAYER, Math.floor((bar[layer] * max) / fullest))));
 	});
 }
 

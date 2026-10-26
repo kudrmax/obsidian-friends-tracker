@@ -64,11 +64,15 @@ export class Person {
 		return this.with(this.splice(index, 0, interaction, {}));
 	}
 
+	/** Changes the interaction at `index`; it keeps its place while its day stays, and its extras either way. */
 	replaceAt(index: number, expected: Interaction, next: Interaction, today: LocalDate): Person {
 		if (next.date.isAfter(today)) throw new DomainError("Can't log a day in the future");
 		this.expect(index, expected);
 		const extras = this.extra[index] ?? {};
-		return this.with(this.splice(index, 1)).add(next, today).attach(next, extras);
+		if (next.date.equals(expected.date)) return this.with(this.splice(index, 1, next, extras));
+		const without = this.with(this.splice(index, 1));
+		const at = without.state.interactions.findIndex((other) => other.date.isBefore(next.date));
+		return without.with(without.splice(at < 0 ? without.state.interactions.length : at, 0, next, extras));
 	}
 
 	removeAt(index: number, expected: Interaction): Person {
@@ -92,14 +96,6 @@ export class Person {
 			all.splice(index, remove);
 		}
 		return { interactions, extras: all };
-	}
-
-	/** Gives the just-added interaction (first with its date) the extras it had before being replaced. */
-	private attach(interaction: Interaction, extras: Extras): Person {
-		const index = this.state.interactions.findIndex((other) => sameInteraction(other, interaction));
-		const all = [...this.extra];
-		all[index] = extras;
-		return new Person(this.state, all);
 	}
 
 	private with(next: { interactions: Interaction[]; extras: Extras[] }): Person {

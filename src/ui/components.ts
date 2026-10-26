@@ -160,6 +160,15 @@ export function fab(parent: HTMLElement, label: string, onClick: () => void): HT
 	return button;
 }
 
+/** The quiet button under a cut list that shows the rest, or folds it again. */
+export function moreButton(parent: HTMLElement, open: boolean, text: string, onClick: () => void): HTMLButtonElement {
+	const button = parent.createEl("button", { cls: "pt-more", attr: { type: "button", "aria-expanded": String(open) } });
+	icon(button, open ? "chevron-down" : "chevron-right");
+	button.createSpan({ text });
+	button.addEventListener("click", onClick);
+	return button;
+}
+
 /** A text under a title that opens something when tapped, drawn as grey text with a small chevron. */
 export function subtleButton(parent: HTMLElement, text: string, label: string, onClick: () => void): HTMLButtonElement {
 	const button = parent.createEl("button", { cls: "pt-subtle", attr: { type: "button", "aria-label": label } });

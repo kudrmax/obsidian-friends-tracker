@@ -11,6 +11,11 @@ describe("barHeights", () => {
 		expect(heights[1].reduce((a, b) => a + b)).toBe(64);
 	});
 
+	it("never lets a month with interactions vanish", () => {
+		const heights = barHeights([bar(1, 0, 0, 0), bar(60, 0, 0, 0)], 64);
+		expect(heights[0]).toEqual([1, 0, 0, 0]);
+	});
+
 	it("keeps the layers in proportion, in whole pixels, never over the chart", () => {
 		const heights = barHeights([bar(1, 1, 1, 1), bar(4, 2, 1, 1)], 64);
 		expect(heights[1]).toEqual([32, 16, 8, 8]);

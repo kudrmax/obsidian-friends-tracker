@@ -144,5 +144,6 @@ export class PersonNotes extends Component {
 				.setIcon("users")
 				.onClick(() => this.ui.logWith({ path: file.path, name: person.name })),
 		);
+		menu.addItem((item) => item.setTitle("Open people").setIcon("list").onClick(() => this.ui.openFeed()));
 	}
 }

@@ -32,6 +32,16 @@ describe("Person", () => {
 		expect(person.replaceAt(0, call("2026-10-24"), text("2026-10-23"), today).interactions()).toEqual([text("2026-10-23")]);
 	});
 
+	it("keeps an edited interaction in its place when its day stays, and its extras with it", () => {
+		const person = Person.restore({ name: "Misha", interactions: [call("2026-10-24"), text("2026-10-24"), call("2026-10-21")], extras: [{}, { mood: "good" }, {}] });
+		const edited = person.replaceAt(1, text("2026-10-24"), call("2026-10-24"), today);
+		expect(edited.interactions()).toEqual([call("2026-10-24"), call("2026-10-24"), call("2026-10-21")]);
+		expect(edited.extras()).toEqual([{}, { mood: "good" }, {}]);
+		const moved = person.replaceAt(1, text("2026-10-24"), text("2026-10-20"), today);
+		expect(moved.interactions()).toEqual([call("2026-10-24"), call("2026-10-21"), text("2026-10-20")]);
+		expect(moved.extras()).toEqual([{}, {}, { mood: "good" }]);
+	});
+
 	it("removes exactly one of two equal interactions", () => {
 		const person = Person.create("Misha").add(call("2026-10-24"), today).add(call("2026-10-24"), today);
 		expect(person.removeAt(1, call("2026-10-24")).interactions()).toEqual([call("2026-10-24")]);

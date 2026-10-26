@@ -7,10 +7,12 @@ export interface UiContext {
 	readonly repository: PersonRepository;
 	settings(): PeopleSettings;
 	openPerson(path: string): void;
+	openFeed(): void;
 	openStats(): void;
-	newInteraction(): void;
-	/** Opens the How step straight away for a person already known. */
-	logWith(person: { path: string; name: string }): void;
+	/** Opens Who, with `query` already typed when coming back from How. */
+	newInteraction(query?: string): void;
+	/** Opens the How step straight away for a person already known; `query` is what Who had typed, for the way back. */
+	logWith(person: { path: string; name: string }, query?: string): void;
 	editInteraction(row: FeedRow): void;
 	/** Shows the undo line over the feed for what was just logged. */
 	offerUndo(offer: UndoOffer): void;

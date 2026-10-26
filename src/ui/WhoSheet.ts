@@ -13,8 +13,10 @@ export class WhoSheet extends FullSheet {
 	constructor(
 		app: App,
 		private readonly ui: UiContext,
+		initialQuery = "",
 	) {
 		super(app);
+		this.query = initialQuery;
 	}
 
 	protected fill(content: HTMLElement): void {
@@ -23,6 +25,7 @@ export class WhoSheet extends FullSheet {
 		const search = body.createDiv("pt-search");
 		icon(search, "search");
 		const input = search.createEl("input", { type: "text", attr: { placeholder: "Name", "aria-label": "Search people", autocapitalize: "words" } });
+		input.value = this.query;
 		const clear = iconButton(search, "x", "Clear", () => {
 			input.value = "";
 			this.query = "";
@@ -100,7 +103,7 @@ export class WhoSheet extends FullSheet {
 
 	private pick(person: { path: string; name: string }): void {
 		this.close();
-		this.ui.logWith(person);
+		this.ui.logWith(person, this.query);
 	}
 
 	private async create(name: string): Promise<void> {
