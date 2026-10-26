@@ -26,8 +26,6 @@ body {
 	--ft-hover: var(--background-modifier-hover);
 	--ft-danger: var(--color-red);
 	--ft-up: var(--color-green);
-	--ft-shadow-rgb: 0, 0, 0;
-	--ft-fab-shadow: 0 2px 8px rgba(var(--ft-shadow-rgb), 0.35);
 	--ft-fade-from: rgba(var(--ft-bg-rgb), 0);
 	--ft-bg-rgb: var(--mono-rgb-0);
 	/* The chart's four layers: text faint, call halfway to the accent, meeting the accent, a whole day lighter still. */
@@ -195,7 +193,7 @@ body {
 .ft-subtle .ft-icon svg { width: var(--ft-icon-subtle); height: var(--ft-icon-subtle); }
 
 /* The "+" over the feed, and the fade the list scrolls under. */
-.friends-tracker .ft-fab { position: absolute; right: var(--ft-gutter); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--ft-fab); height: var(--ft-fab); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: var(--ft-strong); box-shadow: var(--ft-fab-shadow); color: var(--ft-on-strong); cursor: pointer; }
+.friends-tracker .ft-fab { position: absolute; right: var(--ft-gutter); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--ft-fab); height: var(--ft-fab); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: var(--ft-strong); color: var(--ft-on-strong); cursor: pointer; }
 .ft-fab .ft-icon svg { width: var(--ft-space-24); height: var(--ft-space-24); }
 /* The quiet one stands left of the "+": the surface's grey, the text's colour. */
 .friends-tracker .ft-fab.is-quiet { right: calc(var(--ft-gutter) + var(--ft-fab) + var(--ft-space-12)); background: var(--ft-surface); color: var(--ft-text); }
@@ -265,7 +263,7 @@ body {
 .ft-more .ft-icon svg { width: var(--ft-chevron); height: var(--ft-chevron); }
 
 /* The undo line over the feed after something is logged. */
-.friends-tracker .ft-undo { position: absolute; left: var(--ft-gutter); right: calc(var(--ft-gutter) + 2 * var(--ft-fab) + 2 * var(--ft-space-12)); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; gap: var(--ft-space-12); height: var(--ft-button); padding: 0 var(--ft-space-8) 0 var(--ft-space-16); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-surface); box-shadow: var(--ft-fab-shadow); }
+.friends-tracker .ft-undo { position: absolute; left: var(--ft-gutter); right: calc(var(--ft-gutter) + 2 * var(--ft-fab) + 2 * var(--ft-space-12)); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; gap: var(--ft-space-12); height: var(--ft-button); padding: 0 var(--ft-space-8) 0 var(--ft-space-16); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-surface); }
 .ft-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--ft-font-capsule); }
 .friends-tracker .ft-undo-button { margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; }
 
