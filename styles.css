@@ -132,6 +132,9 @@ body {
 .pt-icon { display: inline-flex; }
 .pt-icon svg { width: var(--pt-icon); height: var(--pt-icon); stroke-width: var(--pt-stroke); }
 
+/* A view fills its leaf; the "+" and the fade sit over its list. */
+.pt-view { position: relative; display: flex; flex-direction: column; height: 100%; padding: 0; }
+
 /* A row: the circle, the name with its line, and what stands on the right. */
 .pt-row { display: flex; align-items: center; gap: var(--pt-space-12); width: 100%; height: var(--pt-row); margin: 0; padding: 0; border: none; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: default; }
 button.pt-row { cursor: pointer; -webkit-tap-highlight-color: transparent; }
