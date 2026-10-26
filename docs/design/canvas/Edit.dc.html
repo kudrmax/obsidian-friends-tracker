@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>People · Edit interaction</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#1e1e1e}
+a{color:#a88bfa}a:hover{color:#c4b1ff}
+button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; display: flex; flex-direction: column; background: #1e1e1e; color: #dadada; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif; overflow: hidden">
+
+  <div style="height: 48px; flex: 0 0 auto; margin-top: 44px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 8px">
+    <a href="Main.dc.html" aria-label="Cancel" style="justify-self: start; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #dadada"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></a>
+    <span style="display: flex; flex-direction: column; align-items: center; gap: 1px"><span style="font-size: 17px; line-height: 20px; font-weight: 600; color: #dadada">Edit interaction</span><button type="button" style="display: inline-flex; align-items: center; gap: 3px; height: 17px; padding: 0; border: none; background: transparent; color: #8a8a8a; font-size: 13px; line-height: 17px; cursor: pointer">Sunday, 19 Oct<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></span>
+    <span style="justify-self: end; display: flex; align-items: center; gap: 4px">
+    <a href="Main.dc.html" aria-label="Delete interaction" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #fb6b70"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></a>
+    <a href="Main.dc.html" aria-label="Save" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #dadada; color: #1e1e1e"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></a>
+    </span>
+  </div>
+
+  <main style="flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 12px 20px 0">
+
+    <div style="display: flex; align-items: center; gap: 12px; height: 60px">
+      <span style="width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: #2b2b2b; color: #b3b3b3; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">K</span>
+      <span style="flex: 1 1 auto; min-width: 0; font-size: 17px; line-height: 22px; letter-spacing: -0.01em; color: #dadada">Katya</span>
+    </div>
+
+    <div style="display: flex; align-items: flex-end; height: 36px; margin-top: 8px; padding-bottom: 8px; box-sizing: border-box; font-size: 13px; font-weight: 600; color: #8a8a8a">How</div>
+    <div style="display: flex; gap: 8px">
+      <button type="button" aria-pressed="false" style="flex: 1 1 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; border-radius: 22px; background: #2b2b2b; color: #dadada; font-size: 15px; font-weight: 500; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.6-4.6A8 8 0 1 1 21 12z"></path></svg>Text</button>
+      <button type="button" aria-pressed="false" style="flex: 1 1 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; border-radius: 22px; background: #2b2b2b; color: #dadada; font-size: 15px; font-weight: 500; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 5a2 2 0 0 1 2-2"></path></svg>Call</button>
+      <button type="button" aria-pressed="true" style="flex: 1 1 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; border-radius: 22px; background: #dadada; color: #1e1e1e; font-size: 15px; font-weight: 600; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4.5-6.2"></path></svg>Meeting</button>
+    </div>
+
+    <div style="display: flex; align-items: flex-end; height: 36px; margin-top: 16px; padding-bottom: 8px; box-sizing: border-box; font-size: 13px; font-weight: 600; color: #8a8a8a">Company</div>
+    <div style="display: flex; gap: 8px">
+      <button type="button" aria-pressed="true" style="flex: 1 1 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; border-radius: 22px; background: #dadada; color: #1e1e1e; font-size: 15px; font-weight: 600; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>One on one</button>
+      <button type="button" aria-pressed="false" style="flex: 1 1 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; border-radius: 22px; background: #2b2b2b; color: #dadada; font-size: 15px; font-weight: 500; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"></circle><circle cx="17" cy="9" r="2.5"></circle><path d="M2 20a6 6 0 0 1 12 0M15 20a4.5 4.5 0 0 1 7 -3.5"></path></svg>In company</button>
+    </div>
+
+    <div style="display: flex; align-items: flex-end; height: 36px; margin-top: 16px; padding-bottom: 8px; box-sizing: border-box; font-size: 13px; font-weight: 600; color: #8a8a8a">Length</div>
+    <div style="display: flex; gap: 8px">
+      <button type="button" aria-pressed="false" style="flex: 1 1 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; border-radius: 22px; background: #2b2b2b; color: #dadada; font-size: 15px; font-weight: 500; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Some time</button>
+      <button type="button" aria-pressed="true" style="flex: 1 1 0; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; border-radius: 22px; background: #dadada; color: #1e1e1e; font-size: 15px; font-weight: 600; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>Whole day</button>
+    </div>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
