@@ -46,7 +46,8 @@ export class DatePicker extends Modal {
 		for (let date = first; date.month === this.month; date = date.addDays(1)) {
 			const day = date;
 			const button = grid.createEl("button", { cls: "ft-picker-cell", text: String(day.day), attr: { type: "button" } });
-			button.toggleClass("is-picked", day.equals(this.value));
+			button.toggleClass("is-on", day.equals(this.value));
+			button.setAttribute("aria-pressed", String(day.equals(this.value)));
 			button.toggleClass("is-today", day.equals(this.max));
 			button.disabled = day.isAfter(this.max);
 			button.addEventListener("click", () => {
