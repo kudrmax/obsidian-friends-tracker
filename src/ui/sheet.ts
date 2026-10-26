@@ -16,6 +16,10 @@ export interface PageHolder {
 	updatePage(sheet: FullSheet): void;
 	/** Takes the pages down and shows the list again. */
 	hidePage(): void;
+	/** The page the tab's back arrow leads to: a page, null for the list, undefined for anything else or nothing. */
+	previousPage(): PageDescriptor | null | undefined;
+	/** One step back, as the tab's back arrow. */
+	goBack(): void;
 }
 
 /**
@@ -48,6 +52,15 @@ export abstract class FullSheet {
 	/** The page's description changed (what was typed, say): the tab's history should remember it as it is now. */
 	protected changed(): void {
 		this.holder?.updatePage(this);
+	}
+
+	/** The page the tab's back arrow leads to from here; undefined when it leads out of the Friends pages. */
+	protected previousPage(): PageDescriptor | null | undefined {
+		return this.holder?.previousPage();
+	}
+
+	protected goBack(): void {
+		this.holder?.goBack();
 	}
 
 	/** The people changed while the sheet shows: redraw what depends on them. Nothing, unless a sheet says otherwise. */

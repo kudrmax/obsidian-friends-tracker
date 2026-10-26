@@ -6,6 +6,7 @@ import { KIND_ICONS, dayHeader, fab, row } from "./components";
 import { nextPage, pagesAvailable, pagesShown } from "./feed";
 import { FullSheet, PageDescriptor, PageHolder, samePage } from "./sheet";
 import { dayDate, dayName } from "./format";
+import { TabHistory } from "./TabHistory";
 import { UiContext, UndoOffer } from "./UiContext";
 
 export const FEED_VIEW = "friends-tracker-feed";
@@ -30,12 +31,14 @@ export class FeedView extends ItemView implements PageHolder {
 	private pageState: PageDescriptor | null = null;
 	/** The sheet whose page was just asked for, so setState shows that very instance. */
 	private pending: FullSheet | null = null;
+	private readonly history: TabHistory;
 
 	constructor(
 		leaf: WorkspaceLeaf,
 		private readonly ui: UiContext,
 	) {
 		super(leaf);
+		this.history = new TabHistory(leaf, FEED_VIEW);
 	}
 
 	override getViewType(): string {
@@ -62,6 +65,7 @@ export class FeedView extends ItemView implements PageHolder {
 		root.createDiv("ft-fade");
 		fab(root, "Stats", () => this.ui.openStats(), "bar-chart-3").addClass("is-quiet");
 		fab(root, "Log an interaction", () => this.ui.newInteraction());
+		this.registerEvent(this.history.onChange(() => this.showHistory()));
 		this.refresh();
 	}
 
@@ -135,7 +139,8 @@ export class FeedView extends ItemView implements PageHolder {
 		const page = ((state as { page?: unknown } | null)?.page ?? null) as PageDescriptor | null;
 		await super.setState(state, result);
 		if (samePage(page, this.pageState)) return;
-		result.history = true;
+		/* A change of page is a step in the tab's history, unless it asks to replace the step it is on. */
+		result.history = (state as { replace?: unknown } | null)?.replace !== true;
 		const pending = this.pending;
 		this.pending = null;
 		const sheet = page ? (pending && samePage(pending.descriptor(), page) ? pending : this.ui.sheetFor(page)) : null;
@@ -153,9 +158,36 @@ export class FeedView extends ItemView implements PageHolder {
 		if (this.pageState) this.pageState = sheet.descriptor();
 	}
 
+	/**
+	 * Back to the list the pages were opened over, forgetting them, so the back arrow never leads into a sheet already
+	 * done with. A page with no list behind it (restored on start) is replaced by the list.
+	 */
 	hidePage(): void {
 		if (!this.pageState) return;
-		void this.leaf.setViewState({ type: FEED_VIEW, active: true, state: { page: null } });
+		void this.leavePages();
+	}
+
+	private async leavePages(): Promise<void> {
+		if (!(await this.history.backToList()) && this.pageState) {
+			await this.leaf.setViewState({ type: FEED_VIEW, active: true, state: { page: null, replace: true } });
+			this.history.dropForward();
+		}
+	}
+
+	/**
+	 * The phone's back and forward buttons are drawn from the tab's history only when the active tab changes; the pages
+	 * change it within the same tab, so say so, or the buttons look disabled with pages behind them.
+	 */
+	private showHistory(): void {
+		if (this.app.workspace.getMostRecentLeaf() === this.leaf) this.app.workspace.trigger("active-leaf-change", this.leaf);
+	}
+
+	previousPage(): PageDescriptor | null | undefined {
+		return this.history.previous();
+	}
+
+	goBack(): void {
+		void this.history.back();
 	}
 
 	private put(sheet: FullSheet): void {

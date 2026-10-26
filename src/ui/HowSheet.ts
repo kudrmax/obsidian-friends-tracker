@@ -64,8 +64,10 @@ export class HowSheet extends FullSheet {
 		return "chevron-left";
 	}
 
+	/** Back to Who: the step behind in the tab's history when it is Who, a fresh Who when How was opened straight away. */
 	protected back(): void {
-		this.ui.newInteraction(this.query);
+		if (this.previousPage()?.kind === "who") this.goBack();
+		else this.ui.newInteraction(this.query);
 	}
 
 	protected fill(content: HTMLElement): void {

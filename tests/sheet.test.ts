@@ -7,6 +7,8 @@ function holder(log: string[]): PageHolder {
 		showPage: () => log.push("show"),
 		updatePage: () => log.push("update"),
 		hidePage: () => log.push("hide"),
+		previousPage: () => undefined,
+		goBack: () => log.push("back"),
 	};
 }
 
