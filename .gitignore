@@ -2,3 +2,4 @@ node_modules
 main.js
 .superpowers
 .DS_Store
+.worktrees
