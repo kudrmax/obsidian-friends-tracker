@@ -44,9 +44,20 @@ The How screen with everything filled in: title "Edit interaction", the interact
 
 ## Person note (`Person.dc.html`)
 
-A panel inside the note's Properties area, above the text, collapsible under the heading "Person": rows `last seen` (days ago), `usual gap` (days), `this year` (count), `by month` (a 12-month stacked bar chart by format with a legend: Text, Call, Meeting, Whole day), `recent` (three latest as date · dot · format with qualifiers, then "All N" that expands the list in place).
+A panel inside the note's Properties area, above the text, collapsible under the heading "Person". Rows, top to bottom; a row with nothing to say is left out, except `last seen` (approved 2026-10-27, replacing the board's `this year` row):
 
-**Built from Obsidian's own Properties classes** (`metadata-container`, `metadata-properties-heading`, `metadata-property`, `metadata-property-key`, `metadata-property-icon`, `metadata-property-key-input`, `metadata-property-value`, `metadata-input-longtext`), exactly as `HabitBlock` in Marble Habit Tracker, so it is pixel-identical to the real Properties next to it. Own CSS only for the chart and the recent list, reading Obsidian's variables. The mockup is approximate; the real Properties panel is the reference.
+- `last seen` — days since the last **meeting**, "never" without one.
+- `last contact` — days since the last interaction of any kind; only when it is later than the last meeting.
+- The row that shows the latest contact turns red when the silence is longer than the usual gap, as on Stats' "Falling behind"; its tooltip says "41 days ago, usually every 19 days". No extra text: a fact has its place.
+- `usual gap` — days, as on Stats.
+- `past year` — interactions in the last 365 days, then the difference with the 365 before in small green (+) or red (−), as on Stats.
+- `since` — the first logged interaction, always with its year ("12 Mar 2023").
+- `by week` / `by month` / `by year` — a fork of three small capsules (Weeks · Months · Years, 28 px, Months by default) over the stacked bar chart by format: twelve weeks from Monday labelled by the Monday's day, twelve months by letter, or the years from the first interaction on (the last twelve) labelled by year, left-aligned in twelve places so a bar is as wide in every range. The legend gives each format's count over the bars shown. The choice is the same for every person and lasts while Obsidian is open; the bars grow again when it changes.
+- `recent` — three latest as date · dot · format with qualifiers, then "All N" that expands the list in place.
+
+A person with no interactions shows `last seen: never` alone.
+
+**Built from Obsidian's own Properties classes** (`metadata-container`, `metadata-properties-heading`, `metadata-property`, `metadata-property-key`, `metadata-property-icon`, `metadata-property-key-input`, `metadata-property-value`, `metadata-input-longtext`), exactly as `HabitBlock` in Marble Habit Tracker, so it is pixel-identical to the real Properties next to it. Own CSS only for the chart, its range fork and the recent list, reading Obsidian's variables. The mockup is approximate; the real Properties panel is the reference.
 
 ## Stats (`Stats.dc.html`)
 
