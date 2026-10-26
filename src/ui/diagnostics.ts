@@ -1,8 +1,13 @@
 import { App } from "obsidian";
 
 /** Temporary, for the phone bug of 2026-10-27: what the screen looks like while the keyboard is up. Removed once found. */
+export const diagLog: string[] = [];
+export function diag(line: string): void {
+	diagLog.push(`${new Date().toISOString().slice(11, 23)} ${line}`);
+}
+
 export async function writeLayoutDiagnostics(app: App, from: HTMLElement): Promise<void> {
-	const lines: string[] = [`# Friends Tracker diagnostics (${new Date().toISOString()})`, ""];
+	const lines: string[] = [`# Friends Tracker diagnostics (${new Date().toISOString()})`, "", "## Log", ...diagLog.map((l) => `- ${l}`), ""];
 	const vars = ["--keyboard-height", "--mobile-toolbar-height", "--view-top-spacing", "--view-bottom-spacing", "--safe-area-inset-top", "--safe-area-inset-bottom", "--header-height", "--view-header-height", "--navbar-height"];
 	const root = getComputedStyle(document.documentElement);
 	const body = getComputedStyle(document.body);

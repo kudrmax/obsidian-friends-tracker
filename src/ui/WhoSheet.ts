@@ -1,10 +1,10 @@
 import { App, Notice } from "obsidian";
-import { PersonHit } from "../application/PeopleService";
+import { PeopleService, PersonHit } from "../application/PeopleService";
 import { icon, iconButton, row, sectionLabel, sheetHeader } from "./components";
 import { shortDate } from "./format";
 import { FullSheet, PageDescriptor } from "./sheet";
 import { UiContext } from "./UiContext";
-import { writeLayoutDiagnostics } from "./diagnostics";
+import { diag, writeLayoutDiagnostics } from "./diagnostics";
 
 /** Step one of logging an interaction: who it was with. */
 export class WhoSheet extends FullSheet {
@@ -38,17 +38,23 @@ export class WhoSheet extends FullSheet {
 			this.render();
 		});
 		clear.addClass("ft-search-clear");
-		input.addEventListener("input", () => {
+		for (const type of ["focus", "blur", "keydown", "beforeinput", "compositionstart", "compositionend", "change"]) {
+			input.addEventListener(type, (event) => diag(`${type} value=${JSON.stringify(input.value)} ${"data" in event ? "data=" + JSON.stringify((event as InputEvent).data) : ""} ${"inputType" in event ? (event as InputEvent).inputType : ""}`));
+		}
+		input.addEventListener("input", (event) => {
+			diag(`input value=${JSON.stringify(input.value)} query=${JSON.stringify(this.query)} inputType=${(event as InputEvent).inputType} data=${JSON.stringify((event as InputEvent).data)}`);
 			if (input.value === this.query) return;
 			this.query = input.value;
 			this.changed();
 			this.render();
 		});
 		this.results = body.createDiv("ft-search-results");
+		diag(`fill: query=${JSON.stringify(this.query)} people=${this.ui.service.people().length} listed=${this.ui.repository.list().length} md=${this.app.vault.getMarkdownFiles().length} source=${this.ui.settings().source} tag=${this.ui.settings().tag}`);
 		this.render();
 		window.setTimeout(() => input.focus());
 		/* temporary: the phone bug of 2026-10-27 */
 		window.setTimeout(() => void writeLayoutDiagnostics(this.app, content), 1500);
+		window.setTimeout(() => void writeLayoutDiagnostics(this.app, content), 5000);
 	}
 
 	private render(): void {
@@ -56,7 +62,14 @@ export class WhoSheet extends FullSheet {
 		if (!results) return;
 		results.empty();
 		const typed = this.query.trim();
-		const found = this.ui.service.searchPeople(typed);
+		let found: ReturnType<PeopleService["searchPeople"]>;
+		try {
+			found = this.ui.service.searchPeople(typed);
+		} catch (error) {
+			diag(`render THREW: ${error instanceof Error ? error.stack ?? error.message : String(error)}`);
+			throw error;
+		}
+		diag(`render typed=${JSON.stringify(typed)} recent=${found.recent.length} everyone=${found.everyone.length} exact=${found.exact} attached=${results.isConnected}`);
 		if (typed && !found.exact) {
 			row(results, {
 				circle: { icon: "plus", strong: true },
