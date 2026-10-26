@@ -197,7 +197,10 @@ button.pt-row:active { background: var(--pt-hover); }
 .pt-search input:focus { box-shadow: none; }
 .pt-search .pt-icon-button { width: var(--pt-button); height: var(--pt-search); color: var(--pt-muted); }
 
-/* Big numbers on Stats. */
+/* The period on Stats, and its big numbers. */
+.pt-periods { margin-top: var(--pt-space-20); }
+.pt-stats .pt-month-chart { margin-top: var(--pt-space-4); }
+
 .pt-numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: var(--pt-space-28); }
 .pt-number-line { display: flex; align-items: baseline; gap: var(--pt-space-8); }
 .pt-number { font-size: var(--pt-font-number); line-height: var(--pt-leading-one); font-weight: var(--pt-weight-bold); letter-spacing: var(--pt-tracking-number); }
