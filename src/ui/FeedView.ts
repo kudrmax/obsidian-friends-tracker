@@ -24,6 +24,8 @@ export class FeedView extends ItemView implements PageHolder {
 	private undoEl: HTMLElement | null = null;
 	private undoTimer: number | null = null;
 	private page: HTMLElement | null = null;
+	/** The sheet shown as the page, so a change in the notes reaches it too. */
+	private sheet: FullSheet | null = null;
 	/** What the tab's history knows the shown page as; null while the list shows. */
 	private pageState: PageDescriptor | null = null;
 	/** The sheet whose page was just asked for, so setState shows that very instance. */
@@ -77,6 +79,7 @@ export class FeedView extends ItemView implements PageHolder {
 		this.pagesLoaded = pages;
 		this.render();
 		this.fillScreen();
+		this.sheet?.refresh();
 	}
 
 	/** How many pages the notes hold at all. */
@@ -159,12 +162,14 @@ export class FeedView extends ItemView implements PageHolder {
 		this.page = this.contentEl.createDiv("ft-page");
 		this.contentEl.addClass("has-page");
 		this.pageState = sheet.descriptor();
+		this.sheet = sheet;
 		sheet.mount(this.page);
 	}
 
 	private takeDown(): void {
 		this.page?.remove();
 		this.page = null;
+		this.sheet = null;
 		this.pageState = null;
 		this.contentEl.removeClass("has-page");
 	}

@@ -48,6 +48,11 @@ export class WhoSheet extends FullSheet {
 		window.setTimeout(() => input.focus());
 	}
 
+	/** The notes changed (or the cache only now read them): the same search over the people as they are now. */
+	override refresh(): void {
+		this.render();
+	}
+
 	private render(): void {
 		const results = this.results;
 		if (!results) return;
