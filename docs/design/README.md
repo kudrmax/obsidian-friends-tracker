@@ -1,4 +1,4 @@
-# People Tracker — design
+# Friends Tracker — design
 
 Date: 2026-10-26. Status: approved by the author, screen by screen. Source canvas: https://claude.ai/artifact/SpAP7x3XMwad48RGXjCTkj — the `canvas/` folder holds the same screens as `.dc.html` files (`canvas.json` has the layout). Open a `.dc.html` in a browser to see the screen at 390×844; the `support.js` it references is not needed for these static boards.
 

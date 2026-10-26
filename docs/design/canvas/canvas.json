@@ -1,7 +1,7 @@
 {
   "v": 3,
   "createdOnFiles": { "v": 1, "at": "2026-10-26T16:40:00Z" },
-  "title": "People Tracker",
+  "title": "Friends Tracker",
   "launch": { "view": "canvas" },
   "pages": [],
   "boards": {
@@ -16,7 +16,7 @@
   },
   "order": ["Main.dc.html", "Who.dc.html", "How.dc.html", "HowCall.dc.html", "HowMeeting.dc.html", "Edit.dc.html", "Person.dc.html", "Stats.dc.html"],
   "notes": {
-    "t1": { "x": 0, "y": 0, "text": "People Tracker — phone, dark Obsidian theme", "kind": "title1", "maxW": 1800 },
+    "t1": { "x": 0, "y": 0, "text": "Friends Tracker — phone, dark Obsidian theme", "kind": "title1", "maxW": 1800 },
     "t2": { "x": 0, "y": 1300, "text": "New interaction — every fork", "kind": "title1", "maxW": 1800 },
     "t3": { "x": 0, "y": 2560, "text": "Person note", "kind": "title1", "maxW": 1800 },
     "n1": { "x": 470, "y": 2820, "w": 390, "text": "Approximate drawing. In code the block is built from Obsidian's own Properties classes (metadata-container, metadata-property, metadata-property-key, metadata-property-value…) exactly as HabitBlock in Marble Habit Tracker, so it is pixel-identical to the real Properties panel next to it. Own CSS only for the chart and the recent list.", "fill": "orange" }

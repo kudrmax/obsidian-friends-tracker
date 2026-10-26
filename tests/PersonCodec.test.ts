@@ -54,7 +54,7 @@ describe("decodePerson", () => {
 	});
 
 	it("is a person with no interactions when the property is missing", () => {
-		expect(decodePerson("Misha", { tags: ["people-tracker"] }).interactions()).toEqual([]);
+		expect(decodePerson("Misha", { tags: ["friend"] }).interactions()).toEqual([]);
 	});
 
 	it("refuses what it can't read, naming the problem", () => {
@@ -77,8 +77,8 @@ describe("encodePerson", () => {
 	});
 
 	it("keeps unknown fields of an interaction and unknown keys of the note", () => {
-		const out = roundTrip({ tags: ["people-tracker"], interactions: [{ date: "2026-10-24", kind: "text", mood: "good" }] });
-		expect(out.tags).toEqual(["people-tracker"]);
+		const out = roundTrip({ tags: ["friend"], interactions: [{ date: "2026-10-24", kind: "text", mood: "good" }] });
+		expect(out.tags).toEqual(["friend"]);
 		expect(out.interactions).toEqual([{ date: "2026-10-24", kind: "text", mood: "good" }]);
 	});
 

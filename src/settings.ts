@@ -15,8 +15,8 @@ export interface PeopleSettings {
 
 export const DEFAULT_SETTINGS: PeopleSettings = {
 	source: "tag",
-	tag: "people-tracker",
-	folder: "People",
+	tag: "friend",
+	folder: "Friends",
 	personBlock: true,
 	properties: DEFAULT_PROPERTY_NAMES,
 	labels: DEFAULT_LABELS,

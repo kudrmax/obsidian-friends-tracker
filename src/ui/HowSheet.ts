@@ -74,9 +74,9 @@ export class HowSheet extends FullSheet {
 				this.save = iconButton(parent, "check", "Save", () => void this.submit(), true);
 			},
 		});
-		const body = content.createDiv("pt-sheet-body");
+		const body = content.createDiv("ft-sheet-body");
 		row(body, { circle: { initial: this.person.name.slice(0, 1).toUpperCase() }, title: this.person.name });
-		this.forks = body.createDiv("pt-forks");
+		this.forks = body.createDiv("ft-forks");
 		this.render();
 	}
 

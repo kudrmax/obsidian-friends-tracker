@@ -6,7 +6,7 @@ import { forkRow, iconButton, moreButton, row, sectionLabel } from "./components
 import { monthChart } from "./MonthChart";
 import { UiContext } from "./UiContext";
 
-export const STATS_VIEW = "people-tracker-stats";
+export const STATS_VIEW = "friends-tracker-stats";
 const PERIODS: readonly { value: Period; text: string }[] = [
 	{ value: "week", text: "Week" },
 	{ value: "month", text: "Month" },
@@ -56,13 +56,13 @@ export class StatsView extends ItemView {
 	override async onOpen(): Promise<void> {
 		const root = this.contentEl;
 		root.empty();
-		root.addClass("people-tracker", "pt-view", "pt-stats");
-		const header = root.createDiv("pt-sheet-header");
-		iconButton(header.createDiv("pt-sheet-left"), "chevron-left", "Back", () => this.leaf.detach());
-		header.createDiv("pt-sheet-middle");
-		header.createDiv("pt-sheet-right");
-		const scroller = root.createDiv("pt-scroll");
-		this.body = scroller.createDiv("pt-column");
+		root.addClass("friends-tracker", "ft-view", "ft-stats");
+		const header = root.createDiv("ft-sheet-header");
+		iconButton(header.createDiv("ft-sheet-left"), "chevron-left", "Back", () => this.leaf.detach());
+		header.createDiv("ft-sheet-middle");
+		header.createDiv("ft-sheet-right");
+		const scroller = root.createDiv("ft-scroll");
+		this.body = scroller.createDiv("ft-column");
 		this.refresh();
 	}
 
@@ -74,13 +74,13 @@ export class StatsView extends ItemView {
 		const body = this.body;
 		if (!body) return;
 		body.empty();
-		body.createEl("h1", { cls: "pt-title", text: "Stats" });
+		body.createEl("h1", { cls: "ft-title", text: "Stats" });
 		const periods = forkRow<Period>(body, undefined, PERIODS, this.period, (period) => {
 			this.period = period;
 			void this.app.workspace.requestSaveLayout();
 			this.refresh();
 		});
-		periods.addClass("pt-periods");
+		periods.addClass("ft-periods");
 		const today = this.ui.service.today();
 		this.paths = new Map(this.ui.repository.list().flatMap((entry) => (entry.kind === "ok" ? [[entry.person, entry.path] as const] : [])));
 		const people = [...this.paths.keys()];
@@ -93,16 +93,16 @@ export class StatsView extends ItemView {
 	}
 
 	private renderNumbers(parent: HTMLElement, numbers: ReturnType<typeof totals>): void {
-		const grid = parent.createDiv("pt-numbers");
+		const grid = parent.createDiv("ft-numbers");
 		const cell = (value: number, delta: number, label: string) => {
 			const item = grid.createDiv();
-			const line = item.createDiv("pt-number-line");
-			line.createSpan({ cls: "pt-number", text: String(value) });
+			const line = item.createDiv("ft-number-line");
+			line.createSpan({ cls: "ft-number", text: String(value) });
 			if (delta !== 0) {
-				const sign = line.createSpan({ cls: "pt-delta", text: `${delta > 0 ? "+" : "−"}${Math.abs(delta)}` });
+				const sign = line.createSpan({ cls: "ft-delta", text: `${delta > 0 ? "+" : "−"}${Math.abs(delta)}` });
 				sign.addClass(delta > 0 ? "is-up" : "is-down");
 			}
-			item.createDiv({ cls: "pt-number-label", text: label });
+			item.createDiv({ cls: "ft-number-label", text: label });
 		};
 		cell(numbers.interactions, numbers.interactionsDelta, `interactions ${PERIOD_WORD[this.period]}`);
 		cell(numbers.people, numbers.peopleDelta, "people");

@@ -2,11 +2,11 @@ import { App, Component, MarkdownView, Menu, TAbstractFile, TFile, WorkspaceLeaf
 import { PersonBlock } from "./PersonBlock";
 import { UiContext } from "./UiContext";
 
-const NOTE_CLASS = "pt-person-note";
+const NOTE_CLASS = "ft-person-note";
 /** A property the person block already shows, hidden from the note's Properties panel. */
-const OWN_PROPERTY = "pt-own-property";
+const OWN_PROPERTY = "ft-own-property";
 /** A Properties panel with nothing but the plugin's own properties, hidden whole. */
-const ONLY_OWN = "pt-only-own";
+const ONLY_OWN = "ft-only-own";
 
 interface Placed {
 	readonly view: MarkdownView;
@@ -107,7 +107,7 @@ export class PersonNotes extends Component {
 		const settings = this.ui.settings();
 		const own = settings.properties.interactions.toLowerCase();
 		const tag = settings.tag.toLowerCase();
-		for (const container of view.contentEl.querySelectorAll<HTMLElement>(".metadata-container:not(.pt-person-panel)")) {
+		for (const container of view.contentEl.querySelectorAll<HTMLElement>(".metadata-container:not(.ft-person-panel)")) {
 			const properties = [...container.querySelectorAll<HTMLElement>(".metadata-property")];
 			for (const property of properties) {
 				const key = (property.dataset.propertyKey ?? "").toLowerCase();
@@ -144,6 +144,6 @@ export class PersonNotes extends Component {
 				.setIcon("users")
 				.onClick(() => this.ui.logWith({ path: file.path, name: person.name })),
 		);
-		menu.addItem((item) => item.setTitle("Open people").setIcon("list").onClick(() => this.ui.openFeed()));
+		menu.addItem((item) => item.setTitle("Open friends").setIcon("list").onClick(() => this.ui.openFeed()));
 	}
 }

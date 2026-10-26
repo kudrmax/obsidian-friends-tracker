@@ -8,7 +8,7 @@ import { PageHolder } from "./sheet";
 import { dayDate, dayName } from "./format";
 import { UiContext, UndoOffer } from "./UiContext";
 
-export const FEED_VIEW = "people-tracker-feed";
+export const FEED_VIEW = "friends-tracker-feed";
 /** How close to the bottom, in rows, the list gets before the next page is added. */
 const ROWS_BEFORE_END = 5;
 /** How long the undo line stays. */
@@ -35,7 +35,7 @@ export class FeedView extends ItemView implements PageHolder {
 	}
 
 	override getDisplayText(): string {
-		return "People";
+		return "Friends";
 	}
 
 	override getIcon(): string {
@@ -45,13 +45,13 @@ export class FeedView extends ItemView implements PageHolder {
 	override async onOpen(): Promise<void> {
 		const root = this.contentEl;
 		root.empty();
-		root.addClass("people-tracker", "pt-view", "pt-feed");
-		this.scroller = root.createDiv("pt-scroll");
-		const column = this.scroller.createDiv("pt-column");
-		column.createEl("h1", { cls: "pt-title", text: "People" });
-		this.list = column.createDiv("pt-feed-list");
+		root.addClass("friends-tracker", "ft-view", "ft-feed");
+		this.scroller = root.createDiv("ft-scroll");
+		const column = this.scroller.createDiv("ft-column");
+		column.createEl("h1", { cls: "ft-title", text: "Friends" });
+		this.list = column.createDiv("ft-feed-list");
 		this.scroller.addEventListener("scroll", () => this.maybeLoadMore());
-		root.createDiv("pt-fade");
+		root.createDiv("ft-fade");
 		fab(root, "Stats", () => this.ui.openStats(), "bar-chart-3").addClass("is-quiet");
 		fab(root, "Log an interaction", () => this.ui.newInteraction());
 		this.refresh();
@@ -116,7 +116,7 @@ export class FeedView extends ItemView implements PageHolder {
 	/** On a computer a sheet takes the tab over: the list steps aside until the sheet closes. */
 	showPage(render: (content: HTMLElement) => void): void {
 		this.hidePage();
-		this.page = this.contentEl.createDiv("pt-page");
+		this.page = this.contentEl.createDiv("ft-page");
 		this.contentEl.addClass("has-page");
 		render(this.page);
 	}
@@ -130,9 +130,9 @@ export class FeedView extends ItemView implements PageHolder {
 	/** Offers to undo what was just logged, for a few seconds, over the "+". */
 	offerUndo(offer: UndoOffer): void {
 		this.clearUndo();
-		const line = this.contentEl.createDiv({ cls: "pt-undo", attr: { role: "status" } });
-		line.createSpan({ cls: "pt-undo-text", text: offer.text });
-		line.createEl("button", { cls: "pt-undo-button", text: "Undo" }).addEventListener("click", () => {
+		const line = this.contentEl.createDiv({ cls: "ft-undo", attr: { role: "status" } });
+		line.createSpan({ cls: "ft-undo-text", text: offer.text });
+		line.createEl("button", { cls: "ft-undo-button", text: "Undo" }).addEventListener("click", () => {
 			this.clearUndo();
 			offer.undo().catch((error: unknown) => new Notice(error instanceof Error ? error.message : String(error)));
 		});
@@ -163,11 +163,11 @@ export class FeedView extends ItemView implements PageHolder {
 		list.empty();
 		const today = this.ui.service.today();
 		if (!this.shown.length) {
-			list.createDiv({ cls: "pt-empty", text: "No interactions yet" });
+			list.createDiv({ cls: "ft-empty", text: "No interactions yet" });
 			return;
 		}
 		for (const day of this.shown) {
-			const group = list.createDiv("pt-group");
+			const group = list.createDiv("ft-group");
 			dayHeader(group, dayName(day.date, today), dayDate(day.date, today));
 			for (const entry of day.rows) this.renderRow(group, entry);
 		}
@@ -187,7 +187,7 @@ export class FeedView extends ItemView implements PageHolder {
 	private maybeLoadMore(): void {
 		const scroller = this.scroller;
 		if (!scroller) return;
-		const rowHeight = scroller.querySelector<HTMLElement>(".pt-row")?.offsetHeight ?? 0;
+		const rowHeight = scroller.querySelector<HTMLElement>(".ft-row")?.offsetHeight ?? 0;
 		const left = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
 		if (left > rowHeight * ROWS_BEFORE_END) return;
 		this.loadMore();

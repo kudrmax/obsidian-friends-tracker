@@ -86,7 +86,7 @@ export class FrontmatterPersonRepository implements PersonRepository {
 		return this.scope().tag.replace(/^#/, "").trim();
 	}
 
-	/** The tag itself or any tag nested under it, like #people-tracker/family. */
+	/** The tag itself or any tag nested under it, like #friend/family. */
 	private hasTag(file: TFile): boolean {
 		const wanted = `#${this.tagName()}`.toLowerCase();
 		const cache = this.app.metadataCache.getFileCache(file);

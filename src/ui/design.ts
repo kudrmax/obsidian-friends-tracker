@@ -12,6 +12,6 @@ export const DESIGN = {
 export type DesignMeasure = keyof typeof DESIGN;
 
 export const DESIGN_TOKENS: Readonly<Record<DesignMeasure, string>> = {
-	row: "--pt-row",
-	chart: "--pt-chart",
+	row: "--ft-row",
+	chart: "--ft-chart",
 };

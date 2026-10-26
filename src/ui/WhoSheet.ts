@@ -21,8 +21,8 @@ export class WhoSheet extends FullSheet {
 
 	protected fill(content: HTMLElement): void {
 		sheetHeader(content, { left: { icon: "x", label: "Cancel", onClick: () => this.close() }, title: "New interaction" });
-		const body = content.createDiv("pt-sheet-body");
-		const search = body.createDiv("pt-search");
+		const body = content.createDiv("ft-sheet-body");
+		const search = body.createDiv("ft-search");
 		icon(search, "search");
 		const input = search.createEl("input", { type: "text", attr: { placeholder: "Name", "aria-label": "Search people", autocapitalize: "words", spellcheck: "false", autocomplete: "off" } });
 		input.value = this.query;
@@ -32,12 +32,12 @@ export class WhoSheet extends FullSheet {
 			input.focus();
 			this.render();
 		});
-		clear.addClass("pt-search-clear");
+		clear.addClass("ft-search-clear");
 		input.addEventListener("input", () => {
 			this.query = input.value;
 			this.render();
 		});
-		this.results = body.createDiv("pt-search-results");
+		this.results = body.createDiv("ft-search-results");
 		this.render();
 		window.setTimeout(() => input.focus());
 	}

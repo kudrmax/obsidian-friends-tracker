@@ -7,8 +7,8 @@ describe("loadSettings", () => {
 	it("uses defaults for missing data", () => {
 		expect(loadSettings(null)).toEqual({
 			source: "tag",
-			tag: "people-tracker",
-			folder: "People",
+			tag: "friend",
+			folder: "Friends",
 			personBlock: true,
 			properties: DEFAULT_PROPERTY_NAMES,
 			labels: DEFAULT_LABELS,
@@ -19,7 +19,7 @@ describe("loadSettings", () => {
 
 	it("falls back field by field on what it can't read", () => {
 		const settings = loadSettings({ tag: 5, dayStartHour: "x", folder: "Friends", personBlock: false });
-		expect(settings.tag).toBe("people-tracker");
+		expect(settings.tag).toBe("friend");
 		expect(settings.dayStartHour).toBe(4);
 		expect(settings.folder).toBe("Friends");
 		expect(settings.personBlock).toBe(false);

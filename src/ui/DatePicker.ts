@@ -22,7 +22,7 @@ export class DatePicker extends Modal {
 	}
 
 	override onOpen(): void {
-		this.modalEl.addClass("pt-date-picker", "people-tracker");
+		this.modalEl.addClass("ft-date-picker", "friends-tracker");
 		this.render();
 	}
 
@@ -33,19 +33,19 @@ export class DatePicker extends Modal {
 	private render(): void {
 		const root = this.contentEl;
 		root.empty();
-		const head = root.createDiv("pt-picker-head");
+		const head = root.createDiv("ft-picker-head");
 		iconButton(head, "chevron-left", "Previous month", () => this.step(-1));
-		head.createSpan({ cls: "pt-picker-title", text: `${MONTH_NAMES[this.month - 1]} ${this.year}` });
+		head.createSpan({ cls: "ft-picker-title", text: `${MONTH_NAMES[this.month - 1]} ${this.year}` });
 		const next = iconButton(head, "chevron-right", "Next month", () => this.step(1));
 		next.disabled = this.year > this.max.year || (this.year === this.max.year && this.month >= this.max.month);
-		const grid = root.createDiv("pt-picker-grid");
-		for (const letter of WEEKDAY_LETTERS) grid.createSpan({ cls: "pt-picker-weekday", text: letter });
+		const grid = root.createDiv("ft-picker-grid");
+		for (const letter of WEEKDAY_LETTERS) grid.createSpan({ cls: "ft-picker-weekday", text: letter });
 		const first = LocalDate.of(this.year, this.month, 1);
 		const lead = WEEKDAYS.indexOf(first.weekday());
 		for (let i = 0; i < lead; i++) grid.createSpan();
 		for (let date = first; date.month === this.month; date = date.addDays(1)) {
 			const day = date;
-			const button = grid.createEl("button", { cls: "pt-picker-day", text: String(day.day), attr: { type: "button" } });
+			const button = grid.createEl("button", { cls: "ft-picker-day", text: String(day.day), attr: { type: "button" } });
 			button.toggleClass("is-picked", day.equals(this.value));
 			button.toggleClass("is-today", day.equals(this.max));
 			button.disabled = day.isAfter(this.max);

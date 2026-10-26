@@ -2,7 +2,7 @@ import { App, Modal } from "obsidian";
 
 /**
  * A screen of its own: Who, How and Edit. On a phone it is a modal over the whole display; on a computer it is a page
- * inside the People tab. Which one is the host's business; the sheet only fills its content and asks to be closed.
+ * inside the Friends tab. Which one is the host's business; the sheet only fills its content and asks to be closed.
  */
 export abstract class FullSheet {
 	private host: SheetHost | null = null;
@@ -45,7 +45,7 @@ export class ModalHost implements SheetHost {
 	show(sheet: FullSheet): void {
 		const modal = new (class extends Modal {
 			override onOpen(): void {
-				this.modalEl.addClass("pt-sheet", "people-tracker");
+				this.modalEl.addClass("ft-sheet", "friends-tracker");
 				sheet.mount(this.contentEl);
 			}
 
@@ -63,13 +63,13 @@ export class ModalHost implements SheetHost {
 	}
 }
 
-/** Something that can hold a sheet as a page in place of its own content: the People view on a computer. */
+/** Something that can hold a sheet as a page in place of its own content: the Friends view on a computer. */
 export interface PageHolder {
 	showPage(render: (content: HTMLElement) => void): void;
 	hidePage(): void;
 }
 
-/** A computer's host: the sheet becomes a page inside the People tab, which it gets opened for that. */
+/** A computer's host: the sheet becomes a page inside the Friends tab, which it gets opened for that. */
 export class PageHost implements SheetHost {
 	constructor(private readonly holder: () => Promise<PageHolder | null>) {}
 

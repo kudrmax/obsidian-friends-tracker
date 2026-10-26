@@ -17,7 +17,7 @@ export interface UiContext {
 	editInteraction(row: FeedRow): void;
 	/** Shows the undo line over the feed for what was just logged. */
 	offerUndo(offer: UndoOffer): void;
-	/** Where a sheet opens: a modal on a phone, a page in the People tab on a computer. */
+	/** Where a sheet opens: a modal on a phone, a page in the Friends tab on a computer. */
 	sheetHost(): SheetHost;
 }
 

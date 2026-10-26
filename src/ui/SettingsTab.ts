@@ -46,10 +46,10 @@ export class SettingsTab extends PluginSettingTab {
 
 	private people(containerEl: HTMLElement): void {
 		const settings = this.host.config;
-		new Setting(containerEl).setName("People").setHeading();
+		new Setting(containerEl).setName("Friends").setHeading();
 		new Setting(containerEl)
-			.setName("Find people by")
-			.setDesc("A note is a person when it has the tag, or when it lives in the folder.")
+			.setName("Find friends by")
+			.setDesc("A note is a friend when it has the tag, or when it lives in the folder.")
 			.addDropdown((dropdown) =>
 				dropdown
 					.addOption("tag", "Tag")
@@ -63,7 +63,7 @@ export class SettingsTab extends PluginSettingTab {
 		if (settings.source === "tag") {
 			new Setting(containerEl)
 				.setName("Tag")
-				.setDesc("Notes with this tag, or a tag nested under it, are people.")
+				.setDesc("Notes with this tag, or a tag nested under it, are friends.")
 				.addText((text) => {
 					const save = (value: string) => void this.save((next) => (next.tag = value.trim().replace(/^#/, "") || DEFAULT_SETTINGS.tag));
 					text.setPlaceholder(`#${DEFAULT_SETTINGS.tag}`).setValue(`#${settings.tag}`).onChange(save);
@@ -71,11 +71,11 @@ export class SettingsTab extends PluginSettingTab {
 				});
 		}
 		new Setting(containerEl)
-			.setName(settings.source === "tag" ? "New people are saved to" : "Folder")
+			.setName(settings.source === "tag" ? "New friends are saved to" : "Folder")
 			.setDesc(
 				settings.source === "tag"
 					? "The folder where a person added from the search gets their note."
-					: "Every note in this folder is a person, and new people are saved here. Subfolders are ignored.",
+					: "Every note in this folder is a friend, and new friends are saved here. Subfolders are ignored.",
 			)
 			.addText((text) => {
 				const save = (value: string) => {

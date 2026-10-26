@@ -68,7 +68,7 @@ class Code {
 	/** Custom properties the code sets on elements, which the stylesheet then reads. */
 	get setProperties(): Set<string> {
 		const names = new Set<string>();
-		for (const { text } of this.files) for (const [, name] of text.matchAll(/["'`](--pt-[\w-]+)["'`]/g)) names.add(name);
+		for (const { text } of this.files) for (const [, name] of text.matchAll(/["'`](--ft-[\w-]+)["'`]/g)) names.add(name);
 		return names;
 	}
 }
@@ -108,8 +108,8 @@ describe("styles.css keeps to its design system", () => {
 					/\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(\s*[\d.]/i.test(value) ||
 					NAMED_COLORS.test(value) ||
 					/cubic-bezier|steps\(/.test(value) ||
-					(d.property === "font-weight" && !/^var\(--pt-weight-[\w-]+\)$/.test(d.value)) ||
-					(d.property === "font-family" && !/^var\(--pt-font-[\w-]+\)$/.test(d.value))
+					(d.property === "font-weight" && !/^var\(--ft-weight-[\w-]+\)$/.test(d.value)) ||
+					(d.property === "font-family" && !/^var\(--ft-font-[\w-]+\)$/.test(d.value))
 				);
 			})
 			.map(where);
@@ -122,8 +122,8 @@ describe("styles.css keeps to its design system", () => {
 			.filter((d) => d.property === "border-radius")
 			.filter((d) => {
 				const rest = d.value
-					.replace(/var\(--pt-radius-[\w-]+\)/g, "")
-					.replace(/var\((--pt-[\w-]+)\)/g, (match, name: string) => (runtime.has(name) ? "" : match))
+					.replace(/var\(--ft-radius-[\w-]+\)/g, "")
+					.replace(/var\((--ft-[\w-]+)\)/g, (match, name: string) => (runtime.has(name) ? "" : match))
 					.replace(/max\(|calc\(|\)|,|-|0px|\b0\b|\s/g, "");
 				return rest !== "";
 			})
@@ -134,7 +134,7 @@ describe("styles.css keeps to its design system", () => {
 	it("reads Obsidian's theme only through tokens", () => {
 		const offenders = sheet.rules
 			.filter((d) => !d.property.startsWith("--"))
-			.filter((d) => [...d.value.matchAll(/var\((--[\w-]+)/g)].some(([, name]) => !name.startsWith("--pt-")))
+			.filter((d) => [...d.value.matchAll(/var\((--[\w-]+)/g)].some(([, name]) => !name.startsWith("--ft-")))
 			.map(where);
 		expect(offenders).toEqual([]);
 	});
@@ -146,12 +146,12 @@ describe("styles.css keeps to its design system", () => {
 	it("defines every token once", () => {
 		const names = sheet.declarations.filter((d) => d.isToken).map((d) => d.property);
 		expect(names.filter((name, index) => names.indexOf(name) !== index)).toEqual([]);
-		expect(names.filter((name) => !name.startsWith("--pt-"))).toEqual([]);
+		expect(names.filter((name) => !name.startsWith("--ft-"))).toEqual([]);
 	});
 
 	it("reads only properties that are defined, in the stylesheet or by the code", () => {
 		const defined = new Set([...sheet.declarations.map((d) => d.property), ...code.setProperties]);
-		const missing = [...sheet.used].filter((name) => name.startsWith("--pt-") && !defined.has(name));
+		const missing = [...sheet.used].filter((name) => name.startsWith("--ft-") && !defined.has(name));
 		expect(missing).toEqual([]);
 	});
 

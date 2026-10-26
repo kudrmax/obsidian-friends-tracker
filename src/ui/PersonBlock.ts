@@ -9,7 +9,7 @@ import { monthChart } from "./MonthChart";
 import { UiContext } from "./UiContext";
 
 const RECENT_SHOWN = 3;
-const KIND_DOT: Record<Interaction["kind"], string> = { text: "pt-bar-text", call: "pt-bar-call", meeting: "pt-bar-meeting" };
+const KIND_DOT: Record<Interaction["kind"], string> = { text: "ft-bar-text", call: "ft-bar-call", meeting: "ft-bar-meeting" };
 
 /** Panels the reader folded, and panels whose whole list is open, remembered while Obsidian is open. */
 const folded = new Set<string>();
@@ -44,14 +44,14 @@ export class PersonBlock {
 	render(): void {
 		const panel = this.el;
 		panel.empty();
-		panel.className = "metadata-container pt-person-panel";
+		panel.className = "metadata-container ft-person-panel";
 		panel.toggleClass("is-collapsed", folded.has(this.path));
 		this.renderHeading(panel);
 		if (folded.has(this.path)) return;
 		const content = panel.createDiv("metadata-content");
 		const entry = this.ui.repository.get(this.path);
 		if (entry?.kind !== "ok") {
-			content.createDiv({ cls: "pt-panel-quiet", text: entry?.kind === "broken" ? `Can't read this person: ${entry.problem}` : "Person not found" });
+			content.createDiv({ cls: "ft-panel-quiet", text: entry?.kind === "broken" ? `Can't read this person: ${entry.problem}` : "Person not found" });
 			return;
 		}
 		const rows = content.createDiv("metadata-properties");
@@ -107,14 +107,14 @@ export class PersonBlock {
 		const interactions = person.interactions();
 		if (!interactions.length) return;
 		const cell = this.property(rows, "activity", "recent", true);
-		const list = cell.createDiv("pt-recent");
+		const list = cell.createDiv("ft-recent");
 		const open = opened.has(this.path);
 		const today = this.ui.service.today();
 		const labels = this.ui.settings().labels;
 		interactions.slice(0, open ? interactions.length : RECENT_SHOWN).forEach((interaction, index) => {
-			const line = list.createEl("button", { cls: "pt-recent-row", attr: { type: "button", "aria-label": "Edit this interaction" } });
-			line.createSpan({ cls: "pt-recent-date", text: shortDate(interaction.date, today) });
-			line.createSpan(`pt-dot ${interaction.kind === "meeting" && interaction.length === "whole_day" ? "pt-bar-whole" : KIND_DOT[interaction.kind]}`);
+			const line = list.createEl("button", { cls: "ft-recent-row", attr: { type: "button", "aria-label": "Edit this interaction" } });
+			line.createSpan({ cls: "ft-recent-date", text: shortDate(interaction.date, today) });
+			line.createSpan(`ft-dot ${interaction.kind === "meeting" && interaction.length === "whole_day" ? "ft-bar-whole" : KIND_DOT[interaction.kind]}`);
 			line.createSpan({ text: describe(interaction, labels) });
 			line.addEventListener("click", () => new EditSheet(this.app, this.ui, { path: this.path, name: person.name, index, interaction }).open());
 		});

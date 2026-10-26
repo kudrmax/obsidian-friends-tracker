@@ -16,7 +16,7 @@ import { WhoSheet } from "./ui/WhoSheet";
 
 const DAY_CHECK_MS = 60_000;
 
-export default class PeopleTrackerPlugin extends Plugin implements SettingsHost {
+export default class FriendsTrackerPlugin extends Plugin implements SettingsHost {
 	config: PeopleSettings = loadSettings(null);
 	private notes: PersonNotes | null = null;
 	private repository: FrontmatterPersonRepository | null = null;
@@ -55,8 +55,8 @@ export default class PeopleTrackerPlugin extends Plugin implements SettingsHost 
 
 		this.registerView(FEED_VIEW, (leaf) => new FeedView(leaf, ui));
 		this.registerView(STATS_VIEW, (leaf) => new StatsView(leaf, ui));
-		this.addRibbonIcon("users", "People", () => void this.openView(FEED_VIEW));
-		this.addCommand({ id: "open", name: "Open people", callback: () => void this.openView(FEED_VIEW) });
+		this.addRibbonIcon("users", "Friends", () => void this.openView(FEED_VIEW));
+		this.addCommand({ id: "open", name: "Open friends", callback: () => void this.openView(FEED_VIEW) });
 		this.addCommand({ id: "open-stats", name: "Open stats", callback: () => void this.openView(STATS_VIEW) });
 		this.addCommand({ id: "new", name: "New interaction", callback: () => ui.newInteraction() });
 		this.addCommand({

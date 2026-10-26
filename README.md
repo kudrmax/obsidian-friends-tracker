@@ -1,4 +1,4 @@
-# People Tracker
+# Friends Tracker
 
 Who you talked to and how, inside [Obsidian](https://obsidian.md). Every person is a note; every interaction is a line in its frontmatter.
 
