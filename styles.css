@@ -226,7 +226,7 @@ button.pt-row:active { background: var(--pt-hover); }
 .pt-person-panel .metadata-property.is-wide .metadata-property-value { padding: var(--pt-property-padding); padding-left: var(--pt-space-24); color: var(--pt-property-text); font-size: var(--pt-property-font); }
 .pt-person-panel .pt-legend { margin-top: var(--pt-space-8); }
 .pt-recent { display: flex; flex-direction: column; gap: var(--pt-space-8); }
-.pt-recent-row { display: grid; grid-template-columns: var(--pt-recent-date) var(--pt-recent-dot) minmax(0, 1fr); align-items: center; }
+.pt-recent-row { display: grid; grid-template-columns: var(--pt-recent-date) var(--pt-recent-dot) minmax(0, 1fr); align-items: center; width: 100%; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .pt-recent-date { color: var(--pt-muted); }
 .pt-dot { width: var(--pt-dot); height: var(--pt-dot); border-radius: var(--pt-radius-circle); }
 .pt-panel-quiet { padding-inline-start: var(--pt-space-6); color: var(--pt-faint); }
