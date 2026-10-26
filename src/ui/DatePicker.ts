@@ -22,7 +22,7 @@ export class DatePicker extends Modal {
 	}
 
 	override onOpen(): void {
-		this.modalEl.addClass("ft-date-picker", "friends-tracker");
+		this.modalEl.addClass("ft-picker", "ft-date-picker", "friends-tracker");
 		this.render();
 	}
 
@@ -45,7 +45,7 @@ export class DatePicker extends Modal {
 		for (let i = 0; i < lead; i++) grid.createSpan();
 		for (let date = first; date.month === this.month; date = date.addDays(1)) {
 			const day = date;
-			const button = grid.createEl("button", { cls: "ft-picker-day", text: String(day.day), attr: { type: "button" } });
+			const button = grid.createEl("button", { cls: "ft-picker-cell", text: String(day.day), attr: { type: "button" } });
 			button.toggleClass("is-picked", day.equals(this.value));
 			button.toggleClass("is-today", day.equals(this.max));
 			button.disabled = day.isAfter(this.max);

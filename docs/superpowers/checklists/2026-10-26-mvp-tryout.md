@@ -36,3 +36,8 @@ Left for Max to click through in the scratch Obsidian (it stays open): the same 
 - Every qualifier is written out (`company: one_on_one`, `length: some_time`, `purpose: talk` too); a record missing one is unreadable, nothing is guessed. Max's notes from 0.1.0 were migrated by a one-off script outside the plugin.
 - Checked in the scratch Obsidian, phone layout and desktop: feed ↔ Stats ↔ person note, feed → Who (typed query) → How → person note, back and forward through all of it, Edit from a feed row. Not checked: the phone's own keyboard (the reported "+" and caps bugs could not be reproduced in the emulated phone; the likely causes were removed).
 
+## 0.2.0 (2026-10-27): the time of day
+
+- Checked in the scratch Obsidian on the desktop: a new interaction opens with the current time under the title; the time picker (24 round hours, 12 round minutes in fives) changes it and closes on the minute; the note gets `time: "09:15"`; the feed shows the time before the chevron and orders the day 01:30 → 23:00 → 09:15 with day start 4, the untimed rows last; Edit shows the record's time; changing the kind keeps the time (found and fixed during the tryout).
+- Not checked on the phone layout: the picker is a plain modal like the date picker, so the same rules apply.
+

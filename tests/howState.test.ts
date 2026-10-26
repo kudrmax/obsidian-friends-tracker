@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DomainError } from "../src/domain/DomainError";
-import { HowState, isComplete, toInteraction } from "../src/ui/howState";
+import { LocalTime } from "../src/domain/LocalTime";
+import { HowState, fromInteraction, isComplete, toInteraction, withKind } from "../src/ui/howState";
 import { d } from "./support/dates";
 
 const date = d("2026-10-26");
@@ -25,5 +26,19 @@ describe("a new interaction's state", () => {
 		const state: HowState = { date, kind: "meeting", company: "one_on_one", length: "some_time", purpose: "activity" };
 		expect(toInteraction(state)).toEqual({ date, kind: "meeting", company: "one_on_one", length: "some_time" });
 		expect(() => toInteraction({ date, kind: "call" })).toThrow(DomainError);
+	});
+
+	it("carries the time of day both ways, and no time when a record has none", () => {
+		const time = LocalTime.of(18, 40);
+		expect(toInteraction({ date, time, kind: "text" })).toEqual({ date, time, kind: "text" });
+		expect(toInteraction({ date, kind: "call", purpose: "talk" })).toEqual({ date, kind: "call", purpose: "talk" });
+		expect(fromInteraction({ date, time, kind: "meeting", company: "group", length: "whole_day" })).toEqual({ date, time, kind: "meeting", company: "group", length: "whole_day" });
+		expect(fromInteraction({ date, kind: "text" }).time).toBeUndefined();
+	});
+
+	it("keeps the day and the time when the kind changes, and forgets the old kind's answers", () => {
+		const time = LocalTime.of(9, 15);
+		expect(withKind({ date, time, kind: "call", purpose: "activity" }, "meeting")).toEqual({ date, time, kind: "meeting" });
+		expect(withKind({ date, kind: "text" }, "call")).toEqual({ date, kind: "call" });
 	});
 });
