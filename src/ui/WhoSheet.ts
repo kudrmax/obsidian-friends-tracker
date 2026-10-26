@@ -23,8 +23,12 @@ export class WhoSheet extends FullSheet {
 		return { kind: "who", query: this.query };
 	}
 
+	dismiss(): void {
+		this.close();
+	}
+
 	protected fill(content: HTMLElement): void {
-		sheetHeader(content, { left: { icon: "x", label: "Cancel", onClick: () => this.close() }, title: "New interaction" });
+		sheetHeader(content, { left: { icon: "x", label: "Cancel", onClick: () => this.dismiss() }, title: "New interaction" });
 		const body = content.createDiv("ft-sheet-body");
 		const search = body.createDiv("ft-search");
 		icon(search, "search");

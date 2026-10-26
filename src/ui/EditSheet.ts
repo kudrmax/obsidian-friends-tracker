@@ -29,7 +29,7 @@ export class EditSheet extends HowSheet {
 		return "x";
 	}
 
-	protected override back(): void {
+	override dismiss(): void {
 		this.close();
 	}
 

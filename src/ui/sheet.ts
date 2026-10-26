@@ -40,6 +40,9 @@ export abstract class FullSheet {
 	/** The page this sheet is, for the tab's history. */
 	abstract descriptor(): PageDescriptor;
 
+	/** The way out the header's left button offers; Escape takes it too. */
+	abstract dismiss(): void;
+
 	open(): void {
 		this.hosts().show(this);
 	}

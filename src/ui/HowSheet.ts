@@ -65,14 +65,14 @@ export class HowSheet extends FullSheet {
 	}
 
 	/** Back to Who: the step behind in the tab's history when it is Who, a fresh Who when How was opened straight away. */
-	protected back(): void {
+	dismiss(): void {
 		if (this.previousPage()?.kind === "who") this.goBack();
 		else this.ui.newInteraction(this.query);
 	}
 
 	protected fill(content: HTMLElement): void {
 		sheetHeader(content, {
-			left: { icon: this.backIcon, label: "Back", onClick: () => this.back() },
+			left: { icon: this.backIcon, label: "Back", onClick: () => this.dismiss() },
 			title: this.title,
 			subtitle: (parent) => {
 				const line = parent.createDiv("ft-sheet-subtitle");

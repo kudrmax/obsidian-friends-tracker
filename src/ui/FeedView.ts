@@ -1,4 +1,4 @@
-import { ItemView, Notice, ViewStateResult, WorkspaceLeaf } from "obsidian";
+import { ItemView, Notice, Scope, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { FeedDay, FeedRow } from "../application/PeopleService";
 import { describe } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
@@ -39,6 +39,12 @@ export class FeedView extends ItemView implements PageHolder {
 	) {
 		super(leaf);
 		this.history = new TabHistory(leaf, FEED_VIEW);
+		this.scope = new Scope(this.app.scope);
+		this.scope.register([], "Escape", () => {
+			if (!this.sheet) return true;
+			this.sheet.dismiss();
+			return false;
+		});
 	}
 
 	override getViewType(): string {

@@ -23,6 +23,10 @@ class TestSheet extends FullSheet {
 		return { kind: "who", query: "" };
 	}
 
+	dismiss(): void {
+		this.close();
+	}
+
 	type(): void {
 		this.changed();
 	}
