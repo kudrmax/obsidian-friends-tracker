@@ -4,6 +4,7 @@ import { icon, iconButton, row, sectionLabel, sheetHeader } from "./components";
 import { shortDate } from "./format";
 import { FullSheet, PageDescriptor } from "./sheet";
 import { UiContext } from "./UiContext";
+import { writeLayoutDiagnostics } from "./diagnostics";
 
 /** Step one of logging an interaction: who it was with. */
 export class WhoSheet extends FullSheet {
@@ -46,6 +47,8 @@ export class WhoSheet extends FullSheet {
 		this.results = body.createDiv("ft-search-results");
 		this.render();
 		window.setTimeout(() => input.focus());
+		/* temporary: the phone bug of 2026-10-27 */
+		window.setTimeout(() => void writeLayoutDiagnostics(this.app, content), 1500);
 	}
 
 	private render(): void {
