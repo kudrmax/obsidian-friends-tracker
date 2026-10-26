@@ -17,7 +17,7 @@ This document wins over `docs/superpowers/specs/2026-10-26-people-tracker-design
 
 - Title "People" (30 px bold). Two round buttons (56 px) bottom-right over a fade: the white "+" and, 12 px left of it, a quiet grey one with the stats icon. The list scrolls under them.
 - Days are groups: "Today  Sun, 26 Oct" / "Friday  24 Oct" — day name 15 px semibold, date 13 px grey, 8 px apart, on one line. Groups are 12 px apart with a hairline above each but the first. Empty days don't appear.
-- Row: format icon in a circle (Meeting: accent-tinted circle with accent icon; Call and Text: grey circle, grey icon), the person's name, under it the format and its qualifiers as one grey line ("Meeting, one on one", "Call, shared activity", "Text"), a faint chevron. Two interactions with the same person the same day are two rows. Tap → Edit.
+- Row: format icon in a circle (Meeting: accent-tinted circle with accent icon; Call and Text: grey circle, grey icon), the person's name, under it the format and its qualifiers as one grey line ("Meeting, one on one", "Call, shared activity", "Text"), the time of day in grey 13 px tabular figures, then a faint chevron (`MainTime.dc.html`, approved 2026-10-27). Within a day the rows go by time, latest first; a time before the day's start hour counts as the end of that day. Records without a time come last, by name. Two interactions with the same person the same day are two rows. Tap → Edit.
 - The "+" → Who.
 
 ## Who (`Who.dc.html`) — step 1 of a new interaction
@@ -30,7 +30,7 @@ This document wins over `docs/superpowers/specs/2026-10-26-people-tracker-design
 
 ## How (`How.dc.html`, `HowCall.dc.html`, `HowMeeting.dc.html`) — step 2
 
-- Header: back arrow, title "New interaction" with the date under it in grey 13 px ("Today ▾"; tap opens a date picker), a round white ✓ on the right that saves.
+- Header: back arrow, title "New interaction" with the date and the time under it in grey 13 px, 12 px apart, each with its own small chevron ("Today ▾  18:40 ▾"; the date opens the date picker, the time opens the time picker: hours as a grid of round buttons, then minutes in fives; `EditTime.dc.html`, approved 2026-10-27). A new interaction starts with the current time. A record without a time shows "No time ▾". A round white ✓ on the right saves.
 - The person as a row: initial circle and name, nothing else.
 - Fork "How": Text · Call · Meeting, with icons (speech bubble, phone, two people).
 - Text: nothing more.

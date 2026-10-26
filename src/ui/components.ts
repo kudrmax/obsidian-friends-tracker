@@ -59,6 +59,8 @@ export interface RowOptions {
 	readonly title: string | HTMLElement;
 	readonly subtitle?: string;
 	readonly trailing?: "chevron" | { readonly text: string; readonly strong?: boolean };
+	/** A quiet fact on the right, before the chevron: the time of day. */
+	readonly meta?: string;
 	readonly onClick?: () => void;
 	readonly label?: string;
 }
@@ -74,6 +76,7 @@ export function row(parent: HTMLElement, options: RowOptions): HTMLElement {
 	if (typeof options.title === "string") title.setText(options.title);
 	else title.append(options.title);
 	if (options.subtitle !== undefined) text.createSpan({ cls: "ft-row-sub", text: options.subtitle });
+	if (options.meta !== undefined) el.createSpan({ cls: "ft-row-meta", text: options.meta });
 	if (options.trailing === "chevron") icon(el, "chevron-right").addClass("ft-row-chevron");
 	else if (options.trailing) {
 		const value = el.createSpan({ cls: "ft-row-value", text: options.trailing.text });

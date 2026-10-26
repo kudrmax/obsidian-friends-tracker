@@ -1,6 +1,7 @@
 import { DomainError } from "../domain/DomainError";
 import { Company, Interaction, Kind, Length, Purpose } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
+import { LocalTime } from "../domain/LocalTime";
 import { Extras, Person } from "../domain/Person";
 
 export type Frontmatter = Record<string, unknown>;
@@ -11,6 +12,7 @@ export class PersonDecodeError extends Error {}
 export interface PropertyNames {
 	readonly interactions: string;
 	readonly date: string;
+	readonly time: string;
 	readonly kind: string;
 	readonly company: string;
 	readonly length: string;
@@ -24,6 +26,7 @@ export interface PropertyNames {
 export const DEFAULT_PROPERTY_NAMES: PropertyNames = {
 	interactions: "interactions",
 	date: "date",
+	time: "time",
 	kind: "kind",
 	company: "company",
 	length: "length",
@@ -57,7 +60,9 @@ export function encodePerson(person: Person, frontmatter: Frontmatter, keys: Pro
 }
 
 function writeInteraction(interaction: Interaction, keys: PropertyNames): Frontmatter {
-	const out: Frontmatter = { [keys.date]: interaction.date.toString(), [keys.kind]: keys.kinds[interaction.kind] };
+	const out: Frontmatter = { [keys.date]: interaction.date.toString() };
+	if (interaction.time) out[keys.time] = interaction.time.toString();
+	out[keys.kind] = keys.kinds[interaction.kind];
 	if (interaction.kind === "meeting") {
 		out[keys.company] = keys.companies[interaction.company];
 		out[keys.length] = keys.lengths[interaction.length];
@@ -69,9 +74,11 @@ function writeInteraction(interaction: Interaction, keys: PropertyNames): Frontm
 function readInteraction(item: unknown, keys: PropertyNames): { interaction: Interaction; extras: Extras } {
 	if (!isRecord(item)) throw new PersonDecodeError(`${keys.interactions}: expected entries with a date and a kind`);
 	const date = readDate(item[keys.date], keys.date);
+	const time = readTime(item[keys.time], keys.time);
 	const kind = readValue<Kind>(item[keys.kind], keys.kinds, keys.kind);
 	if (kind === undefined) throw new PersonDecodeError(`${keys.kind}: missing`);
-	const own = new Set([keys.date, keys.kind]);
+	const own = new Set([keys.date, keys.time, keys.kind]);
+	const moment = time ? { date, time } : { date };
 	/* A qualifier is spelled out every time: a record that leaves one out says nothing, and is not guessed at. */
 	const qualifier = <T extends string>(key: string, values: Readonly<Record<T, string>>): T => {
 		own.add(key);
@@ -85,16 +92,16 @@ function readInteraction(item: unknown, keys: PropertyNames): { interaction: Int
 	let interaction: Interaction;
 	if (kind === "meeting") {
 		stray(keys.purpose);
-		interaction = { date, kind, company: qualifier<Company>(keys.company, keys.companies), length: qualifier<Length>(keys.length, keys.lengths) };
+		interaction = { ...moment, kind, company: qualifier<Company>(keys.company, keys.companies), length: qualifier<Length>(keys.length, keys.lengths) };
 	} else if (kind === "call") {
 		stray(keys.company);
 		stray(keys.length);
-		interaction = { date, kind, purpose: qualifier<Purpose>(keys.purpose, keys.purposes) };
+		interaction = { ...moment, kind, purpose: qualifier<Purpose>(keys.purpose, keys.purposes) };
 	} else {
 		stray(keys.company);
 		stray(keys.length);
 		stray(keys.purpose);
-		interaction = { date, kind };
+		interaction = { ...moment, kind };
 	}
 	const extras = Object.fromEntries(Object.entries(item).filter(([key]) => !own.has(key)));
 	return { interaction, extras };
@@ -105,6 +112,14 @@ function readValue<T extends string>(value: unknown, values: Readonly<Record<T, 
 	const found = (Object.entries(values) as [T, string][]).find(([, stored]) => stored === value);
 	if (!found) throw new PersonDecodeError(`${key}: unknown value ${JSON.stringify(value)}`);
 	return found[0];
+}
+
+/** "HH:MM" text; nothing when the record has no time; anything else is a problem, never a guess. */
+function readTime(value: unknown, where: string): LocalTime | undefined {
+	if (value === undefined || value === null) return undefined;
+	const time = typeof value === "string" ? LocalTime.parse(value.trim()) : null;
+	if (!time) throw new PersonDecodeError(`${where}: invalid time ${JSON.stringify(value)}`);
+	return time;
 }
 
 function readDate(value: unknown, where: string): LocalDate {

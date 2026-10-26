@@ -61,6 +61,7 @@ function loadProperties(value: unknown): PropertyNames {
 	return {
 		interactions: text(raw.interactions, DEFAULT_PROPERTY_NAMES.interactions),
 		date: text(raw.date, DEFAULT_PROPERTY_NAMES.date),
+		time: text(raw.time, DEFAULT_PROPERTY_NAMES.time),
 		kind: text(raw.kind, DEFAULT_PROPERTY_NAMES.kind),
 		company: text(raw.company, DEFAULT_PROPERTY_NAMES.company),
 		length: text(raw.length, DEFAULT_PROPERTY_NAMES.length),

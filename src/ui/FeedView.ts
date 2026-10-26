@@ -226,6 +226,7 @@ export class FeedView extends ItemView implements PageHolder {
 			circle: { icon: KIND_ICONS[kind], accent: kind === "meeting" },
 			title: entry.name,
 			subtitle: describe(entry.interaction, this.ui.settings().labels),
+			meta: entry.interaction.time?.toString(),
 			trailing: "chevron",
 			onClick: () => this.ui.editInteraction(entry),
 		});

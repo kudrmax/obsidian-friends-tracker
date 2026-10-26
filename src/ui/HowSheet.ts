@@ -2,9 +2,11 @@ import { App, Notice } from "obsidian";
 import { Company, KINDS, Kind, Labels, Length, Purpose, describe } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
 import { DatePicker } from "./DatePicker";
+import { TimePicker } from "./TimePicker";
+import { LocalTime } from "../domain/LocalTime";
 import { KIND_ICONS, QUALIFIER_ICONS, forkRow, iconButton, row, sheetHeader, subtleButton } from "./components";
 import { longDate } from "./format";
-import { HowState, isComplete, toInteraction } from "./howState";
+import { HowState, isComplete, toInteraction, withKind } from "./howState";
 import { FullSheet, PageDescriptor } from "./sheet";
 import { UiContext } from "./UiContext";
 
@@ -15,7 +17,7 @@ export interface HowPerson {
 
 /** The forks the How screen asks, for a state: the kind, then what the kind needs. */
 export function renderForks(parent: HTMLElement, state: HowState, labels: Labels, onChange: (next: HowState) => void): void {
-	forkRow<Kind>(parent, "How", KINDS.map((kind) => ({ value: kind, text: labels[kind], icon: KIND_ICONS[kind] })), state.kind, (kind) => onChange({ date: state.date, kind }));
+	forkRow<Kind>(parent, "How", KINDS.map((kind) => ({ value: kind, text: labels[kind], icon: KIND_ICONS[kind] })), state.kind, (kind) => onChange(withKind(state, kind)));
 	if (state.kind === "call") {
 		const purposes: Purpose[] = ["talk", "activity"];
 		forkRow<Purpose>(parent, "What for", purposes.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.purpose, (purpose) => onChange({ ...state, purpose }));
@@ -34,6 +36,7 @@ export class HowSheet extends FullSheet {
 	private forks: HTMLElement | null = null;
 	private save: HTMLButtonElement | null = null;
 	private dateButton: HTMLButtonElement | null = null;
+	private timeButton: HTMLButtonElement | null = null;
 	/** A write is under way: a second tap must not start another. */
 	private busy = false;
 
@@ -46,7 +49,7 @@ export class HowSheet extends FullSheet {
 		protected readonly query = "",
 	) {
 		super(app, () => ui.sheetHost());
-		this.state = initial ?? { date: ui.service.today() };
+		this.state = initial ?? { date: ui.service.today(), time: ui.service.now() };
 	}
 
 	descriptor(): PageDescriptor {
@@ -70,7 +73,9 @@ export class HowSheet extends FullSheet {
 			left: { icon: this.backIcon, label: "Back", onClick: () => this.back() },
 			title: this.title,
 			subtitle: (parent) => {
-				this.dateButton = subtleButton(parent, this.dateText(), "Change the date", () => this.pickDate());
+				const line = parent.createDiv("ft-sheet-subtitle");
+				this.dateButton = subtleButton(line, this.dateText(), "Change the date", () => this.pickDate());
+				this.timeButton = subtleButton(line, this.timeText(), "Change the time", () => this.pickTime());
 			},
 			right: (parent) => {
 				this.rightActions(parent);
@@ -129,6 +134,19 @@ export class HowSheet extends FullSheet {
 		});
 		if (this.save) this.save.disabled = !isComplete(this.state);
 		this.dateButton?.querySelector("span")?.setText(this.dateText());
+		this.timeButton?.querySelector("span")?.setText(this.timeText());
+	}
+
+	/** "18:40", or "No time" for a record made before times were kept. */
+	private timeText(): string {
+		return this.state.time ? this.state.time.toString() : "No time";
+	}
+
+	private pickTime(): void {
+		new TimePicker(this.app, this.state.time, this.ui.service.now(), (time: LocalTime) => {
+			this.state = { ...this.state, time };
+			this.render();
+		}).open();
 	}
 
 	private dateText(): string {

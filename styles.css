@@ -156,6 +156,7 @@ body {
 .ft-row-title { font-size: var(--ft-font-body); line-height: var(--ft-leading-body); letter-spacing: var(--ft-tracking-body); color: var(--ft-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ft-row-title b { font-weight: var(--ft-weight-semibold); }
 .ft-row-sub { font-size: var(--ft-font-small); line-height: var(--ft-leading-small); color: var(--ft-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ft-row-meta { flex: 0 0 auto; font-size: var(--ft-font-small); color: var(--ft-muted); font-variant-numeric: tabular-nums; }
 .ft-row-chevron { flex: 0 0 auto; color: var(--ft-faint); }
 .ft-row-chevron svg { width: var(--ft-chevron); height: var(--ft-chevron); }
 .ft-row-value { flex: 0 0 auto; font-size: var(--ft-font-body); color: var(--ft-text); font-variant-numeric: tabular-nums; }
@@ -207,6 +208,7 @@ body {
 /* On a page the header reads left to right like the tab around it: the way out, then the title, the actions at the end; the icon's ink starts where the text does. */
 .ft-page .ft-sheet-header { box-sizing: border-box; width: 100%; max-width: var(--ft-column); margin: 0 auto; padding: var(--ft-space-8) calc(var(--ft-gutter) - (var(--ft-button) - var(--ft-icon-button)) / 2) 0; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--ft-space-12); }
 .ft-page .ft-sheet-middle { align-items: flex-start; }
+.ft-sheet-subtitle { display: flex; align-items: center; gap: var(--ft-space-12); }
 .ft-page .ft-sheet-body { box-sizing: border-box; width: 100%; max-width: var(--ft-column); margin: 0 auto; }
 .ft-fade { position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--ft-layer-fade); height: var(--ft-fade); background: linear-gradient(to bottom, var(--ft-fade-from), var(--ft-bg) var(--ft-fade-stop)); pointer-events: none; }
 
@@ -275,18 +277,20 @@ body {
 
 /* Sheets: the whole screen on a phone, a column on a computer. */
 .ft-sheet.modal { display: flex; flex-direction: column; max-width: var(--ft-column); padding: 0; }
-.ft-date-picker .modal-close-button, .ft-date-picker .modal-header, .ft-date-picker .modal-header-button { display: none; }
+.ft-picker .modal-close-button, .ft-picker .modal-header, .ft-picker .modal-header-button { display: none; }
 .ft-sheet .modal-content { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; padding: 0; }
 .ft-sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: var(--ft-space-12) var(--ft-gutter) var(--ft-space-44); }
 
 /* The date picker: a month of round days. */
-.ft-date-picker .ft-picker-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--ft-space-8); }
+.ft-picker .ft-picker-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--ft-space-8); }
 .ft-picker-title { font-size: var(--ft-font-header); font-weight: var(--ft-weight-semibold); }
 .ft-picker-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--ft-space-4); justify-items: center; }
+.ft-picker-hours, .ft-picker-minutes { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.ft-time-picker .ft-picker-head { justify-content: center; }
 .ft-picker-weekday { font-size: var(--ft-font-small); color: var(--ft-faint); }
-.friends-tracker .ft-picker-day { width: var(--ft-circle); height: var(--ft-circle); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: transparent; box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-capsule); cursor: pointer; }
-.friends-tracker .ft-picker-day:disabled { color: var(--ft-faint); cursor: default; }
-.friends-tracker .ft-picker-day.is-today { box-shadow: inset 0 0 0 var(--ft-stroke) var(--ft-accent); }
-.friends-tracker .ft-picker-day.is-picked { background: var(--ft-strong); color: var(--ft-on-strong); }
+.friends-tracker .ft-picker-cell { width: var(--ft-circle); height: var(--ft-circle); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: transparent; box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-capsule); cursor: pointer; }
+.friends-tracker .ft-picker-cell:disabled { color: var(--ft-faint); cursor: default; }
+.friends-tracker .ft-picker-cell.is-today { box-shadow: inset 0 0 0 var(--ft-stroke) var(--ft-accent); }
+.friends-tracker .ft-picker-cell.is-picked { background: var(--ft-strong); color: var(--ft-on-strong); }
 
 .friends-tracker .ft-empty { padding: var(--ft-space-20) 0; color: var(--ft-faint); font-size: var(--ft-font-body); }
