@@ -57,19 +57,25 @@ export interface PageHolder {
 	hidePage(): void;
 }
 
-/** Opens sheets as pages in the Friends tab, which it gets opened for that. */
+/**
+ * Opens sheets as pages in the Friends tab. Showing a page opens that tab when it isn't there; an update or a close
+ * concerns the tab already showing the page and touches nothing else, so typing never re-opens or re-focuses the tab.
+ */
 export class PageHost {
-	constructor(private readonly holder: () => Promise<PageHolder | null>) {}
+	constructor(
+		private readonly open: () => Promise<PageHolder | null>,
+		private readonly current: () => PageHolder | null,
+	) {}
 
 	show(sheet: FullSheet): void {
-		void this.holder().then((holder) => holder?.showPage(sheet));
+		void this.open().then((holder) => holder?.showPage(sheet));
 	}
 
 	update(sheet: FullSheet): void {
-		void this.holder().then((holder) => holder?.updatePage(sheet));
+		this.current()?.updatePage(sheet);
 	}
 
 	hide(_sheet: FullSheet): void {
-		void this.holder().then((holder) => holder?.hidePage());
+		this.current()?.hidePage();
 	}
 }

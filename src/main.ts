@@ -29,17 +29,20 @@ export default class FriendsTrackerPlugin extends Plugin implements SettingsHost
 		const repository = new FrontmatterPersonRepository(this.app, () => this.config, () => this.config.properties);
 		this.repository = repository;
 		const service = new PeopleService(repository, new DayStartClock(() => this.config.dayStartHour));
-		const host = new PageHost(async () => {
-			await this.openView(FEED_VIEW);
-			return this.feedViews()[0] ?? null;
-		});
+		const host = new PageHost(
+			async () => {
+				await this.openView(FEED_VIEW);
+				return this.feedViews()[0] ?? null;
+			},
+			() => this.feedViews()[0] ?? null,
+		);
 		const ui: UiContext = {
 			service,
 			repository,
 			settings: () => this.config,
 			openPerson: (path) => void this.openPerson(path),
 			openFeed: () => void this.openView(FEED_VIEW),
-			openStats: () => void this.openView(STATS_VIEW),
+			openStats: () => void this.openHere(STATS_VIEW),
 			newInteraction: (query) => new WhoSheet(this.app, ui, query).open(),
 			logWith: (person, query) => new HowSheet(this.app, ui, person, undefined, query).open(),
 			editInteraction: (row: FeedRow) => new EditSheet(this.app, ui, row).open(),
@@ -123,6 +126,18 @@ export default class FriendsTrackerPlugin extends Plugin implements SettingsHost
 		this.notes?.refresh();
 	}
 
+	/**
+	 * Opens a view in the tab the plugin already holds (the feed or the stats), so the tab's back arrow leads back;
+	 * a new tab only when the active tab is something else.
+	 */
+	private async openHere(type: string): Promise<void> {
+		const active = this.app.workspace.getMostRecentLeaf();
+		const ours = active && [FEED_VIEW, STATS_VIEW].includes(active.view.getViewType());
+		const leaf = ours ? active : this.app.workspace.getLeaf("tab");
+		await leaf.setViewState({ type, active: true });
+		await this.app.workspace.revealLeaf(leaf);
+	}
+
 	private async openView(type: string): Promise<void> {
 		const [existing] = this.app.workspace.getLeavesOfType(type);
 		const leaf = existing ?? this.app.workspace.getLeaf("tab");
@@ -130,9 +145,10 @@ export default class FriendsTrackerPlugin extends Plugin implements SettingsHost
 		await this.app.workspace.revealLeaf(leaf);
 	}
 
+	/** Opens the note in the tab the tap came from, so back leads to the list it was tapped in. */
 	private async openPerson(path: string): Promise<void> {
 		const file = this.app.vault.getAbstractFileByPath(path);
 		if (!(file instanceof TFile)) return;
-		await this.app.workspace.getLeaf("tab").openFile(file, { active: true });
+		await this.app.workspace.getLeaf(false).openFile(file, { active: true });
 	}
 }

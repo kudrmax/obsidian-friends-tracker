@@ -2,7 +2,7 @@ import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Interaction } from "../domain/Interaction";
 import { Person } from "../domain/Person";
 import { Behind, Often, Period, byMonth, fallingBehind, mostOften, totals } from "../domain/Stats";
-import { forkRow, iconButton, moreButton, row, sectionLabel } from "./components";
+import { forkRow, moreButton, row, sectionLabel } from "./components";
 import { monthChart } from "./MonthChart";
 import { UiContext } from "./UiContext";
 
@@ -58,10 +58,6 @@ export class StatsView extends ItemView {
 		const root = this.contentEl;
 		root.empty();
 		root.addClass("friends-tracker", "ft-view", "ft-stats");
-		const header = root.createDiv("ft-sheet-header");
-		iconButton(header.createDiv("ft-sheet-left"), "chevron-left", "Back", () => this.leaf.detach());
-		header.createDiv("ft-sheet-middle");
-		header.createDiv("ft-sheet-right");
 		const scroller = root.createDiv("ft-scroll");
 		this.body = scroller.createDiv("ft-column");
 		this.refresh();

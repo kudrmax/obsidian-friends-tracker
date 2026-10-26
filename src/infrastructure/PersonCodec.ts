@@ -59,10 +59,10 @@ export function encodePerson(person: Person, frontmatter: Frontmatter, keys: Pro
 function writeInteraction(interaction: Interaction, keys: PropertyNames): Frontmatter {
 	const out: Frontmatter = { [keys.date]: interaction.date.toString(), [keys.kind]: keys.kinds[interaction.kind] };
 	if (interaction.kind === "meeting") {
-		if (interaction.company !== "one_on_one") out[keys.company] = keys.companies[interaction.company];
-		if (interaction.length !== "some_time") out[keys.length] = keys.lengths[interaction.length];
+		out[keys.company] = keys.companies[interaction.company];
+		out[keys.length] = keys.lengths[interaction.length];
 	}
-	if (interaction.kind === "call" && interaction.purpose !== "talk") out[keys.purpose] = keys.purposes[interaction.purpose];
+	if (interaction.kind === "call") out[keys.purpose] = keys.purposes[interaction.purpose];
 	return out;
 }
 
@@ -72,20 +72,31 @@ function readInteraction(item: unknown, keys: PropertyNames): { interaction: Int
 	const kind = readValue<Kind>(item[keys.kind], keys.kinds, keys.kind);
 	if (kind === undefined) throw new PersonDecodeError(`${keys.kind}: missing`);
 	const own = new Set([keys.date, keys.kind]);
-	const qualifier = <T extends string>(key: string, values: Readonly<Record<T, string>>, allowed: boolean, usual: T): T => {
-		if (!allowed) {
-			if (item[key] !== undefined) throw new PersonDecodeError(`${key}: not for a ${keys.kinds[kind]}`);
-			return usual;
-		}
+	/* A qualifier is spelled out every time: a record that leaves one out says nothing, and is not guessed at. */
+	const qualifier = <T extends string>(key: string, values: Readonly<Record<T, string>>): T => {
 		own.add(key);
-		return readValue<T>(item[key], values, key) ?? usual;
+		const value = readValue<T>(item[key], values, key);
+		if (value === undefined) throw new PersonDecodeError(`${key}: missing on a ${keys.kinds[kind]}`);
+		return value;
 	};
-	const company = qualifier<Company>(keys.company, keys.companies, kind === "meeting", "one_on_one");
-	const length = qualifier<Length>(keys.length, keys.lengths, kind === "meeting", "some_time");
-	const purpose = qualifier<Purpose>(keys.purpose, keys.purposes, kind === "call", "talk");
+	const stray = (key: string): void => {
+		if (item[key] !== undefined) throw new PersonDecodeError(`${key}: not for a ${keys.kinds[kind]}`);
+	};
+	let interaction: Interaction;
+	if (kind === "meeting") {
+		stray(keys.purpose);
+		interaction = { date, kind, company: qualifier<Company>(keys.company, keys.companies), length: qualifier<Length>(keys.length, keys.lengths) };
+	} else if (kind === "call") {
+		stray(keys.company);
+		stray(keys.length);
+		interaction = { date, kind, purpose: qualifier<Purpose>(keys.purpose, keys.purposes) };
+	} else {
+		stray(keys.company);
+		stray(keys.length);
+		stray(keys.purpose);
+		interaction = { date, kind };
+	}
 	const extras = Object.fromEntries(Object.entries(item).filter(([key]) => !own.has(key)));
-	const interaction: Interaction =
-		kind === "meeting" ? { date, kind, company, length } : kind === "call" ? { date, kind, purpose } : { date, kind };
 	return { interaction, extras };
 }
 

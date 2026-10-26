@@ -28,7 +28,7 @@ export class WhoSheet extends FullSheet {
 		const body = content.createDiv("ft-sheet-body");
 		const search = body.createDiv("ft-search");
 		icon(search, "search");
-		const input = search.createEl("input", { type: "text", attr: { placeholder: "Name", "aria-label": "Search people", autocapitalize: "words", spellcheck: "false", autocomplete: "off" } });
+		const input = search.createEl("input", { type: "text", attr: { placeholder: "Name", "aria-label": "Search people", autocapitalize: "none", autocorrect: "off", spellcheck: "false", autocomplete: "off" } });
 		input.value = this.query;
 		const clear = iconButton(search, "x", "Clear", () => {
 			input.value = "";
@@ -38,6 +38,7 @@ export class WhoSheet extends FullSheet {
 		});
 		clear.addClass("ft-search-clear");
 		input.addEventListener("input", () => {
+			if (input.value === this.query) return;
 			this.query = input.value;
 			this.changed();
 			this.render();

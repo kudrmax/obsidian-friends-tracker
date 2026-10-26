@@ -39,7 +39,7 @@
   - у встречи две: **состав** `company: one_on_one | group` (One on one / In company) и **длительность** `length: some_time | whole_day` (Some time / Whole day);
   - у созвона одна: `purpose: talk | activity` (Talk / Shared activity);
   - у переписки уточнений нет.
-  Во frontmatter пишется только значение, отличное от обычного (`group`, `whole_day`, `activity`); отсутствие поля читается как `one_on_one`, `some_time`, `talk`.
+  Во frontmatter уточнения пишутся всегда, явно (`company: one_on_one`, `length: some_time`, `purpose: talk` в том числе); запись без уточнения, которое положено её виду, считается нечитаемой — ничего не подразумевается (решение Макса, 2026-10-27).
 
 «Живём вместе» или «приехал на неделю» это просто контакт «встреча, целый день» каждый день.
 
