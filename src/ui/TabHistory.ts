@@ -1,4 +1,4 @@
-import { EventRef, Events, WorkspaceLeaf } from "obsidian";
+import { App, EventRef, Events, WorkspaceLeaf } from "obsidian";
 import { PageDescriptor } from "./sheet";
 
 /** One step of a tab's history, as Obsidian keeps it: the view's type and the state it gave. */
@@ -34,13 +34,20 @@ export function stepsToList(back: readonly HistoryEntry[], type: string): number
  */
 export class TabHistory {
 	constructor(
+		private readonly app: App,
 		private readonly leaf: WorkspaceLeaf,
 		private readonly type: string,
 	) {}
 
-	/** Calls back whenever the tab steps through its history or adds a step to it. */
-	onChange(callback: () => void): EventRef {
-		return (this.leaf as Events).on("history-change", callback);
+	/**
+	 * The phone draws its back and forward buttons from the tab's history only when the active tab changes. The pages
+	 * and the switch between the feed and the stats change it within the same tab, so this says so on every change, or
+	 * the buttons look disabled with steps behind them.
+	 */
+	showOnPhone(): EventRef {
+		return (this.leaf as Events).on("history-change", () => {
+			if (this.app.workspace.getMostRecentLeaf() === this.leaf) this.app.workspace.trigger("active-leaf-change", this.leaf);
+		});
 	}
 
 	/** The page the back arrow leads to: a page, null for the list, undefined for anything else or nothing. */

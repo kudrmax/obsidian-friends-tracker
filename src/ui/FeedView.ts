@@ -38,7 +38,7 @@ export class FeedView extends ItemView implements PageHolder {
 		private readonly ui: UiContext,
 	) {
 		super(leaf);
-		this.history = new TabHistory(leaf, FEED_VIEW);
+		this.history = new TabHistory(this.app, leaf, FEED_VIEW);
 		this.scope = new Scope(this.app.scope);
 		this.scope.register([], "Escape", () => {
 			if (!this.sheet) return true;
@@ -71,7 +71,7 @@ export class FeedView extends ItemView implements PageHolder {
 		root.createDiv("ft-fade");
 		fab(root, "Stats", () => this.ui.openStats(), "bar-chart-3").addClass("is-quiet");
 		fab(root, "Log an interaction", () => this.ui.newInteraction());
-		this.registerEvent(this.history.onChange(() => this.showHistory()));
+		this.registerEvent(this.history.showOnPhone());
 		this.refresh();
 	}
 
@@ -178,14 +178,6 @@ export class FeedView extends ItemView implements PageHolder {
 			await this.leaf.setViewState({ type: FEED_VIEW, active: true, state: { page: null, replace: true } });
 			this.history.dropForward();
 		}
-	}
-
-	/**
-	 * The phone's back and forward buttons are drawn from the tab's history only when the active tab changes; the pages
-	 * change it within the same tab, so say so, or the buttons look disabled with pages behind them.
-	 */
-	private showHistory(): void {
-		if (this.app.workspace.getMostRecentLeaf() === this.leaf) this.app.workspace.trigger("active-leaf-change", this.leaf);
 	}
 
 	previousPage(): PageDescriptor | null | undefined {

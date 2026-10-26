@@ -4,6 +4,7 @@ import { Person } from "../domain/Person";
 import { Behind, Often, Period, byMonth, fallingBehind, mostOften, totals } from "../domain/Stats";
 import { forkRow, moreButton, row, sectionLabel } from "./components";
 import { monthChart } from "./MonthChart";
+import { TabHistory } from "./TabHistory";
 import { UiContext } from "./UiContext";
 
 export const STATS_VIEW = "friends-tracker-stats";
@@ -60,6 +61,7 @@ export class StatsView extends ItemView {
 		root.addClass("friends-tracker", "ft-view", "ft-stats");
 		const scroller = root.createDiv("ft-scroll");
 		this.body = scroller.createDiv("ft-column");
+		this.registerEvent(new TabHistory(this.app, this.leaf, STATS_VIEW).showOnPhone());
 		this.refresh();
 	}
 
