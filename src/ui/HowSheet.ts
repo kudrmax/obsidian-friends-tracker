@@ -5,7 +5,7 @@ import { DatePicker } from "./DatePicker";
 import { KIND_ICONS, QUALIFIER_ICONS, forkRow, iconButton, row, sheetHeader, subtleButton } from "./components";
 import { longDate } from "./format";
 import { HowState, isComplete, toInteraction } from "./howState";
-import { FullSheet } from "./sheet";
+import { FullSheet, PageDescriptor } from "./sheet";
 import { UiContext } from "./UiContext";
 
 export interface HowPerson {
@@ -43,10 +43,14 @@ export class HowSheet extends FullSheet {
 		protected readonly person: HowPerson,
 		initial?: HowState,
 		/** What was typed on Who, so going back shows the same list. */
-		private readonly query = "",
+		protected readonly query = "",
 	) {
 		super(app, () => ui.sheetHost());
 		this.state = initial ?? { date: ui.service.today() };
+	}
+
+	descriptor(): PageDescriptor {
+		return { kind: "how", path: this.person.path, name: this.person.name, query: this.query };
 	}
 
 	protected get title(): string {
@@ -58,7 +62,6 @@ export class HowSheet extends FullSheet {
 	}
 
 	protected back(): void {
-		this.close();
 		this.ui.newInteraction(this.query);
 	}
 

@@ -4,6 +4,7 @@ import { describe } from "../domain/Interaction";
 import { iconButton } from "./components";
 import { fromInteraction, isComplete, toInteraction } from "./howState";
 import { HowSheet } from "./HowSheet";
+import { PageDescriptor } from "./sheet";
 import { UiContext } from "./UiContext";
 
 /** The How screen over an interaction already logged: its answers filled in, a trash can beside ✓. */
@@ -14,6 +15,10 @@ export class EditSheet extends HowSheet {
 		private readonly row: FeedRow,
 	) {
 		super(app, ui, { path: row.path, name: row.name }, fromInteraction(row.interaction));
+	}
+
+	override descriptor(): PageDescriptor {
+		return { kind: "edit", path: this.row.path, index: this.row.index };
 	}
 
 	protected override get title(): string {

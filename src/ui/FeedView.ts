@@ -1,10 +1,10 @@
-import { ItemView, Notice, WorkspaceLeaf } from "obsidian";
+import { ItemView, Notice, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { FeedDay, FeedRow } from "../application/PeopleService";
 import { describe } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
 import { KIND_ICONS, dayHeader, fab, row } from "./components";
 import { nextPage, pagesAvailable, pagesShown } from "./feed";
-import { PageHolder } from "./sheet";
+import { FullSheet, PageDescriptor, PageHolder, samePage } from "./sheet";
 import { dayDate, dayName } from "./format";
 import { UiContext, UndoOffer } from "./UiContext";
 
@@ -16,12 +16,18 @@ export const UNDO_MS = 5000;
 
 /** The main screen: every interaction logged, grouped by day, newest first, with the "+" to log another. */
 export class FeedView extends ItemView implements PageHolder {
+	/** A view Obsidian keeps history for, so its back and forward arrows walk the pages. */
+	override navigation = true;
 	private shown: FeedDay[] = [];
 	private list: HTMLElement | null = null;
 	private scroller: HTMLElement | null = null;
 	private undoEl: HTMLElement | null = null;
 	private undoTimer: number | null = null;
 	private page: HTMLElement | null = null;
+	/** What the tab's history knows the shown page as; null while the list shows. */
+	private pageState: PageDescriptor | null = null;
+	/** The sheet whose page was just asked for, so setState shows that very instance. */
+	private pending: FullSheet | null = null;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -113,17 +119,53 @@ export class FeedView extends ItemView implements PageHolder {
 		return true;
 	}
 
-	/** On a computer a sheet takes the tab over: the list steps aside until the sheet closes. */
-	showPage(render: (content: HTMLElement) => void): void {
-		this.hidePage();
-		this.page = this.contentEl.createDiv("ft-page");
-		this.contentEl.addClass("has-page");
-		render(this.page);
+	override getState(): Record<string, unknown> {
+		return { page: this.pageState };
+	}
+
+	/**
+	 * The tab's state says which page shows; every change of it is a step in the tab's history, so Obsidian's back and
+	 * forward walk the pages. A sheet just opened is taken as it is; one coming back from history is rebuilt.
+	 */
+	override async setState(state: unknown, result: ViewStateResult): Promise<void> {
+		const page = ((state as { page?: unknown } | null)?.page ?? null) as PageDescriptor | null;
+		await super.setState(state, result);
+		if (samePage(page, this.pageState)) return;
+		result.history = true;
+		const pending = this.pending;
+		this.pending = null;
+		const sheet = page ? (pending && samePage(pending.descriptor(), page) ? pending : this.ui.sheetFor(page)) : null;
+		if (sheet) this.put(sheet);
+		else this.takeDown();
+	}
+
+	/* A sheet takes the tab over: the list steps aside until the sheet closes. */
+	showPage(sheet: FullSheet): void {
+		this.pending = sheet;
+		void this.leaf.setViewState({ type: FEED_VIEW, active: true, state: { page: sheet.descriptor() } });
+	}
+
+	updatePage(sheet: FullSheet): void {
+		if (this.pageState) this.pageState = sheet.descriptor();
 	}
 
 	hidePage(): void {
+		if (!this.pageState) return;
+		void this.leaf.setViewState({ type: FEED_VIEW, active: true, state: { page: null } });
+	}
+
+	private put(sheet: FullSheet): void {
+		this.page?.remove();
+		this.page = this.contentEl.createDiv("ft-page");
+		this.contentEl.addClass("has-page");
+		this.pageState = sheet.descriptor();
+		sheet.mount(this.page);
+	}
+
+	private takeDown(): void {
 		this.page?.remove();
 		this.page = null;
+		this.pageState = null;
 		this.contentEl.removeClass("has-page");
 	}
 

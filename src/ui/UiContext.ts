@@ -1,7 +1,7 @@
 import { FeedRow, PeopleService } from "../application/PeopleService";
 import { PersonRepository } from "../application/ports";
 import { PeopleSettings } from "../settings";
-import { SheetHost } from "./sheet";
+import { FullSheet, PageDescriptor, PageHost } from "./sheet";
 
 export interface UiContext {
 	readonly service: PeopleService;
@@ -17,8 +17,10 @@ export interface UiContext {
 	editInteraction(row: FeedRow): void;
 	/** Shows the undo line over the feed for what was just logged. */
 	offerUndo(offer: UndoOffer): void;
-	/** Where a sheet opens: a modal on a phone, a page in the Friends tab on a computer. */
-	sheetHost(): SheetHost;
+	/** Where a sheet opens: as a page in the Friends tab. */
+	sheetHost(): PageHost;
+	/** Rebuilds a sheet from what the tab's history kept of it; null when it no longer exists (a record deleted). */
+	sheetFor(page: PageDescriptor): FullSheet | null;
 }
 
 export interface UndoOffer {

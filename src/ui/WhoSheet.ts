@@ -2,7 +2,7 @@ import { App, Notice } from "obsidian";
 import { PersonHit } from "../application/PeopleService";
 import { icon, iconButton, row, sectionLabel, sheetHeader } from "./components";
 import { shortDate } from "./format";
-import { FullSheet } from "./sheet";
+import { FullSheet, PageDescriptor } from "./sheet";
 import { UiContext } from "./UiContext";
 
 /** Step one of logging an interaction: who it was with. */
@@ -17,6 +17,10 @@ export class WhoSheet extends FullSheet {
 	) {
 		super(app, () => ui.sheetHost());
 		this.query = initialQuery;
+	}
+
+	descriptor(): PageDescriptor {
+		return { kind: "who", query: this.query };
 	}
 
 	protected fill(content: HTMLElement): void {
@@ -35,6 +39,7 @@ export class WhoSheet extends FullSheet {
 		clear.addClass("ft-search-clear");
 		input.addEventListener("input", () => {
 			this.query = input.value;
+			this.changed();
 			this.render();
 		});
 		this.results = body.createDiv("ft-search-results");
@@ -101,8 +106,8 @@ export class WhoSheet extends FullSheet {
 		return el;
 	}
 
+	/** How takes this page's place; the tab's history keeps Who behind it. */
 	private pick(person: { path: string; name: string }): void {
-		this.close();
 		this.ui.logWith(person, this.query);
 	}
 

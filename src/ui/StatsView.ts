@@ -17,6 +17,7 @@ const LIST_SHOWN = 5;
 
 /** How much you talk to people, who you are falling behind with, and who you see most. */
 export class StatsView extends ItemView {
+	override navigation = true;
 	private period: Period = "month";
 	private behindOpen = false;
 	private body: HTMLElement | null = null;

@@ -20,3 +20,11 @@ Scratch Obsidian 1.14.4 with its own profile and a scratch vault of 151 people (
 | Day starts at 4:00: at 00:xx on 27 Oct, "Today" is Mon 26 Oct | ✓ | — | Happened to be true on the laptop's clock during the tryout. |
 
 Left for Max to click through in the scratch Obsidian (it stays open): the same list by hand, especially the feel of the forks on a phone and the person block next to a note's real properties.
+
+## After Max's look (2026-10-27)
+
+- Rows and buttons were squircles: Obsidian 1.14 sets `corner-shape`; every circle and capsule now says `round`.
+- The phone's input chrome and the modal's own header were showing: stripped.
+- The stats button moved next to the "+" as a quiet round button; no drop shadows anywhere.
+- Who, How and Edit are pages inside the Friends tab on both platforms, and the tab's own back and forward arrows walk through them (the views are `navigation` views; the page is the tab's state). The typed search comes back with the page.
+- Renamed to Friends Tracker: id `friends-tracker`, tag `#friend`, folder `Friends`, classes `ft-`.

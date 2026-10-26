@@ -267,12 +267,74 @@ body {
 .ft-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--ft-font-capsule); }
 .friends-tracker .ft-undo-button { margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; }
 
+/* A sheet's body under its header. */
+.ft-sheet-body { box-sizing: border-box; width: 100%; max-width: var(--ft-column); margin: 0 auto; }
+.ft-fade { position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--ft-layer-fade); height: var(--ft-fade); background: linear-gradient(to bottom, var(--ft-fade-from), var(--ft-bg) var(--ft-fade-stop)); pointer-events: none; }
+
+/* On a phone the "+", the undo line and the list's end sit above Obsidian's bar. */
+.is-mobile .friends-tracker .ft-fab, .is-mobile .friends-tracker .ft-undo { bottom: calc(var(--ft-fab-bottom) + var(--ft-navbar)); }
+.is-mobile .friends-tracker .ft-scroll { padding-bottom: calc(var(--ft-space-104) + var(--ft-navbar)); }
+.is-mobile .friends-tracker .ft-fade { height: calc(var(--ft-fade) + var(--ft-navbar)); }
+
+/* The search field on Who. */
+.ft-search { display: flex; align-items: center; gap: var(--ft-space-8); box-sizing: border-box; height: var(--ft-search); padding: 0 0 0 var(--ft-space-12); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-fill); }
+.ft-search-results { margin-top: var(--ft-space-12); }
+.ft-search .ft-icon { color: var(--ft-muted); }
+.ft-search .ft-icon svg { width: var(--ft-icon-search); height: var(--ft-icon-search); }
+.friends-tracker .ft-search input, .friends-tracker .ft-search input:focus, .friends-tracker .ft-search input:active { flex: 1 1 auto; min-width: 0; height: 100%; margin: 0; padding: 0; border: none; border-radius: 0; background: transparent; box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-body); font-family: var(--ft-font-inherit); -webkit-appearance: none; appearance: none; outline: none; }
+.friends-tracker .ft-search .ft-icon-button { width: var(--ft-button); height: var(--ft-search); color: var(--ft-muted); }
+
+/* The period on Stats, and its big numbers. */
+.ft-periods { margin-top: var(--ft-space-20); }
+.ft-stats .ft-month-chart { margin-top: var(--ft-space-4); }
+
+.ft-numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: var(--ft-space-28); }
+.ft-number-line { display: flex; align-items: baseline; gap: var(--ft-space-8); }
+.ft-number { font-size: var(--ft-font-number); line-height: var(--ft-leading-one); font-weight: var(--ft-weight-bold); letter-spacing: var(--ft-tracking-number); }
+.ft-delta { font-size: var(--ft-font-small); font-weight: var(--ft-weight-semibold); }
+.ft-delta.is-up { color: var(--ft-up); }
+.ft-delta.is-down { color: var(--ft-danger); }
+.ft-number-label { margin-top: var(--ft-space-6); font-size: var(--ft-font-small); color: var(--ft-muted); }
+
+/* The chart of months. */
+.ft-chart { display: flex; gap: var(--ft-space-4); align-items: flex-end; height: var(--ft-chart); }
+.ft-bar { flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: var(--ft-bar-gap); }
+.ft-bar span { display: block; border-radius: var(--ft-radius-bar); }
+.ft-bar-text { background: var(--ft-chart-text); }
+.ft-bar-call { background: var(--ft-chart-call); }
+.ft-bar-meeting { background: var(--ft-chart-meeting); }
+.ft-bar-whole { background: var(--ft-chart-whole); }
+.ft-months { display: flex; gap: var(--ft-space-4); margin-top: var(--ft-space-4); font-size: var(--ft-font-micro); line-height: var(--ft-leading-micro); color: var(--ft-faint); }
+.ft-months span { flex: 1 1 0; text-align: center; }
+.ft-legend { display: flex; gap: var(--ft-space-16); margin-top: var(--ft-space-12); font-size: var(--ft-font-legend); color: var(--ft-muted); white-space: nowrap; }
+.ft-legend span { display: inline-flex; align-items: center; gap: var(--ft-space-4); }
+.ft-swatch { display: inline-block; width: var(--ft-swatch); height: var(--ft-swatch); border-radius: var(--ft-radius-bar); }
+
+/* The person's panel inside the note: Obsidian's Properties classes draw the rows; this is only what they don't have. */
+/* Obsidian's own rule for the panel in editing mode weighs five classes; these weigh six, so they win. */
+.workspace-leaf-content.ft-person-note .view-content .metadata-property.ft-own-property.ft-own-property, .workspace-leaf-content.ft-person-note .view-content .metadata-container.ft-only-own.ft-only-own { display: none; }
+.ft-person-panel .metadata-property.is-wide { flex-direction: column; align-items: stretch; }
+.ft-person-panel .metadata-property.is-wide .metadata-property-value { padding: var(--ft-space-4) var(--ft-space-12) var(--ft-space-12) 0; color: var(--ft-property-text); font-size: var(--ft-property-font); }
+.ft-person-panel .metadata-property.is-wide .metadata-property-key { width: auto; min-width: 0; }
+.ft-person-panel .ft-legend { margin-top: var(--ft-space-8); }
+.ft-recent { display: flex; flex-direction: column; gap: var(--ft-space-4); }
+.ft-person-panel .ft-recent-row { display: grid; grid-template-columns: var(--ft-recent-date) var(--ft-recent-dot) minmax(0, 1fr); align-items: center; min-height: var(--ft-space-28); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); width: 100%; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.ft-recent-date { color: var(--ft-muted); }
+.ft-dot { width: var(--ft-dot); height: var(--ft-dot); border-radius: var(--ft-radius-circle); }
+.ft-panel-quiet { padding-inline-start: var(--ft-space-6); color: var(--ft-faint); }
+.friends-tracker .ft-more, .ft-person-panel .ft-more { display: inline-flex; align-items: center; gap: var(--ft-space-4); height: var(--ft-section); margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: var(--ft-muted); font-size: var(--ft-font-capsule); cursor: pointer; }
+.ft-more .ft-icon svg { width: var(--ft-chevron); height: var(--ft-chevron); }
+
+/* The undo line over the feed after something is logged. */
+.friends-tracker .ft-undo { position: absolute; left: var(--ft-gutter); right: calc(var(--ft-gutter) + 2 * var(--ft-fab) + 2 * var(--ft-space-12)); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; gap: var(--ft-space-12); height: var(--ft-button); padding: 0 var(--ft-space-8) 0 var(--ft-space-16); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-surface); }
+.ft-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--ft-font-capsule); }
+.friends-tracker .ft-undo-button { margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; }
+
 /* Sheets: the whole screen on a phone, a column on a computer. */
 .ft-sheet.modal { display: flex; flex-direction: column; max-width: var(--ft-column); padding: 0; }
-.ft-sheet .modal-close-button, .ft-sheet .modal-header, .ft-sheet .modal-header-button, .ft-date-picker .modal-close-button, .ft-date-picker .modal-header, .ft-date-picker .modal-header-button { display: none; }
+.ft-date-picker .modal-close-button, .ft-date-picker .modal-header, .ft-date-picker .modal-header-button { display: none; }
 .ft-sheet .modal-content { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; padding: 0; }
 .ft-sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: var(--ft-space-12) var(--ft-gutter) var(--ft-space-44); }
-.is-mobile .ft-sheet.modal { max-width: none; width: 100%; height: 100%; border-radius: 0; }
 
 /* The date picker: a month of round days. */
 .ft-date-picker .ft-picker-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--ft-space-8); }
