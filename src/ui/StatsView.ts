@@ -114,7 +114,7 @@ export class StatsView extends ItemView {
 				title: item.person.name,
 				subtitle: `Usually every ${item.usual} ${item.usual === 1 ? "day" : "days"}`,
 				trailing: { text: `${item.days} days`, strong: true },
-				onClick: () => this.open(item.person.name),
+				onClick: () => this.openPerson(item.person.name),
 			});
 		}
 		if (behind.length <= LIST_SHOWN) return;
@@ -135,13 +135,13 @@ export class StatsView extends ItemView {
 				circle: { initial: item.person.name.slice(0, 1).toUpperCase() },
 				title: item.person.name,
 				trailing: { text: String(item.count), strong: true },
-				onClick: () => this.open(item.person.name),
+				onClick: () => this.openPerson(item.person.name),
 			});
 		}
 	}
 
 	/** Opens the person's note by name; the repository knows the path. */
-	private open(name: string): void {
+	private openPerson(name: string): void {
 		const entry = this.ui.repository.list().find((candidate) => candidate.kind === "ok" && candidate.person.name === name);
 		if (entry) this.ui.openPerson(entry.path);
 	}

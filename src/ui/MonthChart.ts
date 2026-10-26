@@ -1,5 +1,6 @@
 import { Labels } from "../domain/Interaction";
 import { MonthBar } from "../domain/Stats";
+import { DESIGN } from "./design";
 import { monthLetter } from "./format";
 
 const LAYERS = ["text", "call", "meeting", "wholeDay"] as const;
@@ -19,17 +20,11 @@ export function barHeights(bars: readonly MonthBar[], max: number): number[][] {
 	});
 }
 
-/** The height a chart draws at, taken from its token so TypeScript and CSS agree. */
-function chartHeight(parent: HTMLElement): number {
-	const value = getComputedStyle(parent).getPropertyValue("--pt-chart");
-	return parseFloat(value) || 0;
-}
-
 /** Twelve months as stacked bars, their letters under them and a legend of the layers. */
 export function monthChart(parent: HTMLElement, bars: readonly MonthBar[], labels: Labels): HTMLElement {
 	const el = parent.createDiv("pt-month-chart");
 	const chart = el.createDiv("pt-chart");
-	const heights = barHeights(bars, chartHeight(parent));
+	const heights = barHeights(bars, DESIGN.chart);
 	bars.forEach((bar, index) => {
 		const column = chart.createDiv("pt-bar");
 		LAYERS.forEach((layer, at) => {
