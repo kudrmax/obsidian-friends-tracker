@@ -58,9 +58,13 @@ export class HowSheet extends FullSheet {
 		return { kind: "how", path: this.person.path, name: this.person.name, query: this.query };
 	}
 
+	override isGone(): boolean {
+		return !this.ui.repository.get(this.person.path);
+	}
+
 	/** The person's note is gone: there is nothing left to log to, so the sheet steps back to the list. */
 	override refresh(): void {
-		if (!this.ui.repository.get(this.person.path)) this.close();
+		if (this.isGone()) this.close();
 	}
 
 	/** The person's note was renamed or moved: the sheet follows it, so ✓ writes to it where it is now. */

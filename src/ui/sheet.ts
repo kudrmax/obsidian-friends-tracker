@@ -10,6 +10,16 @@ export function samePage(a: PageDescriptor | null, b: PageDescriptor | null): bo
 	return JSON.stringify(a) === JSON.stringify(b);
 }
 
+/**
+ * The sheet a step of the tab's history shows: the one just opened when it is that page, else one rebuilt from the
+ * page's description; none for the list, and none when what the page is about is gone, so the list shows instead.
+ */
+export function sheetForPage(page: PageDescriptor | null, opened: FullSheet | null, rebuild: (page: PageDescriptor) => FullSheet | null): FullSheet | null {
+	if (!page) return null;
+	const sheet = opened && samePage(opened.descriptor(), page) ? opened : rebuild(page);
+	return sheet && !sheet.isGone() ? sheet : null;
+}
+
 /** Something that holds a sheet as a page in place of its own content: the Friends view. */
 export interface PageHolder {
 	showPage(sheet: FullSheet): void;
@@ -65,6 +75,11 @@ export abstract class FullSheet {
 
 	protected goBack(): void {
 		this.holder?.goBack();
+	}
+
+	/** What the page is about no longer exists, like a person whose note was deleted. Never, unless a sheet says otherwise. */
+	isGone(): boolean {
+		return false;
 	}
 
 	/** The people changed while the sheet shows: redraw what depends on them. Nothing, unless a sheet says otherwise. */

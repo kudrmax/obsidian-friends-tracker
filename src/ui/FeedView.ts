@@ -5,7 +5,7 @@ import { LocalDate } from "../domain/LocalDate";
 import { KIND_ICONS, dayHeader, fab, row } from "./components";
 import { nextPage, pagesAvailable, pagesShown, rowKeys } from "./feed";
 import { ANIMATION, Arrivals, arrive, leave, play } from "./motion";
-import { FullSheet, PageDescriptor, PageHolder, samePage } from "./sheet";
+import { FullSheet, PageDescriptor, PageHolder, samePage, sheetForPage } from "./sheet";
 import { dayDate, dayName } from "./format";
 import { TabHistory } from "./TabHistory";
 import { UiContext, UndoOffer } from "./UiContext";
@@ -155,7 +155,7 @@ export class FeedView extends ItemView implements PageHolder {
 		result.history = (state as { replace?: unknown } | null)?.replace !== true;
 		const pending = this.pending;
 		this.pending = null;
-		const sheet = page ? (pending && samePage(pending.descriptor(), page) ? pending : this.ui.sheetFor(page)) : null;
+		const sheet = sheetForPage(page, pending, (described) => this.ui.sheetFor(described));
 		if (sheet) this.put(sheet);
 		else this.takeDown();
 	}

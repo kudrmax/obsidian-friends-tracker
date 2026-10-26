@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FullSheet, PageDescriptor, PageHolder, PageHost } from "../src/ui/sheet";
+import { FullSheet, PageDescriptor, PageHolder, PageHost, sheetForPage } from "../src/ui/sheet";
 import type { App } from "obsidian";
 
 function holder(log: string[]): PageHolder {
@@ -13,14 +13,22 @@ function holder(log: string[]): PageHolder {
 }
 
 class TestSheet extends FullSheet {
-	constructor(host: PageHost) {
+	constructor(
+		host: PageHost,
+		private readonly page: PageDescriptor = { kind: "who", query: "" },
+		private readonly gone = false,
+	) {
 		super({} as App, () => host);
 	}
 
 	protected fill(): void {}
 
 	descriptor(): PageDescriptor {
-		return { kind: "who", query: "" };
+		return this.page;
+	}
+
+	override isGone(): boolean {
+		return this.gone;
 	}
 
 	dismiss(): void {
@@ -65,5 +73,24 @@ describe("FullSheet", () => {
 		sheet.type();
 		sheet.close();
 		expect(log).toEqual([]);
+	});
+});
+
+describe("sheetForPage", () => {
+	const nowhere = new PageHost(async () => null);
+	const how: PageDescriptor = { kind: "how", path: "Friends/Anya.md", name: "Anya", query: "" };
+
+	it("shows the sheet just opened when it is that page, else rebuilds it", () => {
+		const opened = new TestSheet(nowhere, how);
+		const rebuilt = new TestSheet(nowhere, how);
+		expect(sheetForPage(how, opened, () => rebuilt)).toBe(opened);
+		expect(sheetForPage(how, new TestSheet(nowhere), () => rebuilt)).toBe(rebuilt);
+		expect(sheetForPage(how, null, () => rebuilt)).toBe(rebuilt);
+	});
+
+	it("shows the list for no page, a page that can't be rebuilt, and a page whose person is gone", () => {
+		expect(sheetForPage(null, new TestSheet(nowhere), () => new TestSheet(nowhere))).toBeNull();
+		expect(sheetForPage(how, null, () => null)).toBeNull();
+		expect(sheetForPage(how, null, () => new TestSheet(nowhere, how, true))).toBeNull();
 	});
 });
