@@ -1,0 +1,28 @@
+/*
+ * People Tracker's design system. Every value lives here, as a token: colours (from the Obsidian theme where it has
+ * one), shapes, sizes, type, spacing and motion. Component rules below only refer to these tokens; tests/styles.test.ts
+ * fails on a number, a colour or a radius written straight into a rule, and on a token no rule uses. To change how
+ * something looks, change its token, or add one here with a name that says what it is for.
+ *
+ * Shapes: everything is round. A circle is --pt-radius-circle; anything longer than it is tall is a capsule,
+ * --pt-radius-capsule.
+ */
+body {
+	/* Colour */
+	--pt-bg: var(--background-primary);
+	--pt-text: var(--text-normal);
+
+	/* Sizes */
+	--pt-column: 640px;
+	--pt-gutter: 20px;
+	--pt-row: 60px;
+
+	/* Type */
+	/* A phone draws the screens in Apple's own font. */
+	--pt-font-phone: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-interface);
+}
+
+.people-tracker { background: var(--pt-bg); color: var(--pt-text); }
+.is-mobile .people-tracker { font-family: var(--pt-font-phone); }
+.pt-column { box-sizing: border-box; width: 100%; max-width: var(--pt-column); margin: 0 auto; padding: 0 var(--pt-gutter); }
+.pt-row { display: flex; align-items: center; height: var(--pt-row); }
