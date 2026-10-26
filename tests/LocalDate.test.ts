@@ -22,6 +22,12 @@ describe("LocalDate", () => {
 		expect(d("2026-03-01").addDays(-1).toString()).toBe("2026-02-28");
 	});
 
+	it("finds the Monday of its week", () => {
+		expect(d("2026-10-19").startOfWeek().toString()).toBe("2026-10-19");
+		expect(d("2026-10-25").startOfWeek().toString()).toBe("2026-10-19");
+		expect(d("2026-01-01").startOfWeek().toString()).toBe("2025-12-29");
+	});
+
 	it("knows the weekday", () => {
 		expect(d("2026-10-05").weekday()).toBe("mon");
 		expect(d("2026-10-09").weekday()).toBe("fri");

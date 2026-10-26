@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dayDate, dayName, daysAgo, longDate, monthLetter, shortDate } from "../src/ui/format";
+import { barLabel, dayDate, dayName, daysAgo, fullDate, longDate, monthLetter, shortDate } from "../src/ui/format";
 import { d } from "./support/dates";
 
 const today = d("2026-10-26");
@@ -43,5 +43,18 @@ describe("counts", () => {
 	it("gives a month its letter", () => {
 		expect(monthLetter(1)).toBe("J");
 		expect(monthLetter(10)).toBe("O");
+	});
+});
+
+describe("a chart's labels", () => {
+	it("give a week its Monday's day, a month its letter, a year its number", () => {
+		expect(barLabel(d("2026-10-19"), "weeks", 12)).toBe("19");
+		expect(barLabel(d("2026-03-01"), "months", 12)).toBe("M");
+		expect(barLabel(d("2024-01-01"), "years", 6)).toBe("2024");
+		expect(barLabel(d("2024-01-01"), "years", 7)).toBe("’24");
+	});
+
+	it("write a date years back in full", () => {
+		expect(fullDate(d("2023-03-12"))).toBe("12 Mar 2023");
 	});
 });

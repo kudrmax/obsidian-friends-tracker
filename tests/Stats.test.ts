@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Interaction, Kind } from "../src/domain/Interaction";
 import { LocalDate } from "../src/domain/LocalDate";
 import { Person } from "../src/domain/Person";
-import { byMonth, daysSince, fallingBehind, mostOften, totals, usualGap } from "../src/domain/Stats";
+import { buckets, countKinds, daysSince, fallingBehind, mostOften, sum, totals, usualGap } from "../src/domain/Stats";
 import { d } from "./support/dates";
 
 const today = d("2026-10-26");
@@ -42,12 +42,59 @@ describe("usualGap", () => {
 	});
 });
 
-describe("byMonth", () => {
+describe("countKinds", () => {
+	it("counts whole days apart from meetings, and calls whatever they were for", () => {
+		const activity: Interaction = { date: today, kind: "call", purpose: "activity" };
+		expect(countKinds([one(today, "meeting", true), one(today, "meeting"), one(today), activity, one(today, "text")])).toEqual({ text: 1, call: 2, meeting: 1, wholeDay: 1 });
+		expect(countKinds([])).toEqual({ text: 0, call: 0, meeting: 0, wholeDay: 0 });
+	});
+
+	it("adds counts up layer by layer", () => {
+		expect(sum([{ text: 1, call: 2, meeting: 3, wholeDay: 4 }, { text: 1, call: 0, meeting: 1, wholeDay: 0 }])).toEqual({ text: 2, call: 2, meeting: 4, wholeDay: 4 });
+	});
+});
+
+const span = (bucket: { from: LocalDate; to: LocalDate }) => [bucket.from.toString(), bucket.to.toString()];
+
+describe("buckets", () => {
 	it("gives twelve months ending with the current one, whole days apart from meetings", () => {
-		const bars = byMonth([one(d("2026-10-20"), "meeting", true), one(d("2026-10-02"), "meeting"), one(d("2025-11-15"), "text"), one(d("2025-10-31"), "call")], today);
+		const bars = buckets([one(d("2026-10-20"), "meeting", true), one(d("2026-10-02"), "meeting"), one(d("2025-11-15"), "text"), one(d("2025-10-31"), "call")], "months", today);
 		expect(bars).toHaveLength(12);
-		expect(bars[0]).toEqual({ year: 2025, month: 11, text: 1, call: 0, meeting: 0, wholeDay: 0 });
-		expect(bars[11]).toEqual({ year: 2026, month: 10, text: 0, call: 0, meeting: 1, wholeDay: 1 });
+		expect(bars[0]).toEqual({ from: d("2025-11-01"), to: d("2025-11-30"), text: 1, call: 0, meeting: 0, wholeDay: 0 });
+		expect(bars[11]).toEqual({ from: d("2026-10-01"), to: d("2026-10-31"), text: 0, call: 0, meeting: 1, wholeDay: 1 });
+	});
+
+	it("ends a leap February on the 29th", () => {
+		expect(span(buckets([], "months", d("2028-03-10"))[10])).toEqual(["2028-02-01", "2028-02-29"]);
+	});
+
+	it("gives twelve weeks from Monday, the current one last", () => {
+		const bars = buckets([one(d("2026-10-25")), one(d("2026-08-09")), one(d("2026-08-10"))], "weeks", today);
+		expect(bars).toHaveLength(12);
+		expect(span(bars[11])).toEqual(["2026-10-26", "2026-11-01"]);
+		expect(span(bars[0])).toEqual(["2026-08-10", "2026-08-16"]);
+		expect(bars[10].call).toBe(1);
+		expect(bars[0].call).toBe(1);
+		expect(sum(bars).call).toBe(2);
+	});
+
+	it("gives the years from the first interaction on, an empty year included", () => {
+		const bars = buckets([one(d("2023-05-01")), one(d("2026-01-01"))], "years", today);
+		expect(bars.map(span)).toEqual([
+			["2023-01-01", "2023-12-31"],
+			["2024-01-01", "2024-12-31"],
+			["2025-01-01", "2025-12-31"],
+			["2026-01-01", "2026-12-31"],
+		]);
+		expect(bars.map((bar) => bar.call)).toEqual([1, 0, 0, 1]);
+	});
+
+	it("gives the current year alone when nothing was logged, and twelve years at most", () => {
+		expect(buckets([], "years", today).map(span)).toEqual([["2026-01-01", "2026-12-31"]]);
+		const bars = buckets([one(d("2010-06-01")), one(d("2015-06-01"))], "years", today);
+		expect(bars).toHaveLength(12);
+		expect(bars[0].from.toString()).toBe("2015-01-01");
+		expect(sum(bars).call).toBe(1);
 	});
 });
 

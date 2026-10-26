@@ -43,6 +43,11 @@ export class LocalDate {
 		return WEEKDAYS[(this.utc.getUTCDay() + 6) % 7];
 	}
 
+	/** The Monday of this date's week. */
+	startOfWeek(): LocalDate {
+		return this.addDays(-WEEKDAYS.indexOf(this.weekday()));
+	}
+
 	addDays(days: number): LocalDate {
 		return new LocalDate(this.epochDay + days);
 	}

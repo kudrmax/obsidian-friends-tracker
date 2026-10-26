@@ -1,24 +1,35 @@
 import { App, setIcon } from "obsidian";
-import { moreButton } from "./components";
+import { ForkOption, forkRow, moreButton } from "./components";
 import { Interaction, describe } from "../domain/Interaction";
 import { Person } from "../domain/Person";
-import { byMonth, daysSince, usualGap } from "../domain/Stats";
+import { Contact, PersonStats } from "../domain/PersonStats";
+import { ChartRange, buckets } from "../domain/Stats";
 import { EditSheet } from "./EditSheet";
-import { daysAgo, shortDate } from "./format";
-import { monthChart } from "./MonthChart";
+import { daysAgo, fullDate, shortDate } from "./format";
+import { barChart } from "./MonthChart";
 import { Debut } from "./motion";
 import { UiContext } from "./UiContext";
 
 const RECENT_SHOWN = 3;
 const KIND_DOT: Record<Interaction["kind"], string> = { text: "ft-bar-text", call: "ft-bar-call", meeting: "ft-bar-meeting" };
 
+const RANGES: readonly ForkOption<ChartRange>[] = [
+	{ value: "weeks", text: "Weeks" },
+	{ value: "months", text: "Months" },
+	{ value: "years", text: "Years" },
+];
+const RANGE_NAME: Record<ChartRange, string> = { weeks: "by week", months: "by month", years: "by year" };
+
 /** Panels the reader folded, and panels whose whole list is open, remembered while Obsidian is open. */
 const folded = new Set<string>();
 const opened = new Set<string>();
+/** What a bar of the chart covers, the same for every person, remembered while Obsidian is open. */
+let range: ChartRange = "months";
 
 /**
- * The person's own panel in their note, next to Properties and drawn with its classes: when you last met, the usual
- * gap, a year of months and the latest interactions, above the note's text.
+ * The person's own panel in their note, next to Properties and drawn with its classes: when you last met and spoke,
+ * the usual gap, the past year against the one before, a chart by weeks, months or years and the latest interactions,
+ * above the note's text.
  */
 export class PersonBlock {
 	readonly el: HTMLElement;
@@ -59,7 +70,8 @@ export class PersonBlock {
 			return;
 		}
 		const rows = content.createDiv("metadata-properties");
-		this.renderNumbers(rows, entry.person);
+		this.renderFacts(rows, new PersonStats(entry.person, this.ui.service.today()));
+		if (!entry.person.interactions().length) return;
 		this.renderChart(rows, entry.person);
 		this.renderRecent(rows, entry.person);
 	}
@@ -90,23 +102,46 @@ export class PersonBlock {
 		return item.createDiv("metadata-property-value");
 	}
 
-	private text(rows: HTMLElement, icon: string, name: string, value: string): void {
-		this.property(rows, icon, name).createDiv({ cls: "metadata-input-longtext", text: value });
+	private text(rows: HTMLElement, icon: string, name: string, value: string): HTMLElement {
+		return this.property(rows, icon, name).createDiv({ cls: "metadata-input-longtext", text: value });
 	}
 
-	private renderNumbers(rows: HTMLElement, person: Person): void {
-		const today = this.ui.service.today();
-		const since = daysSince(person, today);
-		const gap = usualGap(person, today);
-		const pastYear = person.interactions().filter((i) => !i.date.isBefore(today.addDays(-364))).length;
-		this.text(rows, "clock", "last seen", since === undefined ? "never" : daysAgo(since));
-		this.text(rows, "align-justify", "usual gap", gap === undefined ? "—" : `${gap} ${gap === 1 ? "day" : "days"}`);
-		this.text(rows, "bar-chart-3", "past year", `${pastYear} ${pastYear === 1 ? "interaction" : "interactions"}`);
+	/** The small numbers, one to a row; a row with nothing to say is left out, but for when you last met. */
+	private renderFacts(rows: HTMLElement, stats: PersonStats): void {
+		const met = stats.lastMeeting();
+		const contact = stats.lastContact();
+		const usual = stats.usualGap();
+		const seen = this.text(rows, "clock", "last seen", met ? daysAgo(met.days) : "never");
+		const spoke = contact && (!met || contact.days < met.days) ? this.text(rows, "message-circle", "last contact", daysAgo(contact.days)) : seen;
+		if (contact && usual !== undefined && stats.isOverdue()) this.markOverdue(spoke, contact, usual);
+		if (usual !== undefined) this.text(rows, "align-justify", "usual gap", days(usual));
+		const first = stats.firstDate();
+		if (!first) return;
+		const year = stats.pastYear();
+		const count = this.text(rows, "bar-chart-3", "past year", `${year.count} ${year.count === 1 ? "interaction" : "interactions"}`);
+		if (year.delta !== 0) count.createSpan({ cls: `ft-delta ${year.delta > 0 ? "is-up" : "is-down"}`, text: `${year.delta > 0 ? "+" : "−"}${Math.abs(year.delta)}` });
+		this.text(rows, "calendar-plus", "since", fullDate(first));
+	}
+
+	private markOverdue(value: HTMLElement, contact: Contact, usual: number): void {
+		value.addClass("ft-overdue");
+		const said = `${daysAgo(contact.days)}, usually every ${days(usual)}`;
+		value.setAttribute("aria-label", said);
+		value.setAttribute("title", said);
 	}
 
 	private renderChart(rows: HTMLElement, person: Person): void {
-		const cell = this.property(rows, "calendar", "by month", true);
-		monthChart(cell, byMonth(person.interactions(), this.ui.service.today()), this.ui.settings().labels, this.debut.offset());
+		const cell = this.property(rows, "calendar", RANGE_NAME[range], true);
+		const box = cell.createDiv("ft-activity");
+		const switcher = forkRow<ChartRange>(box, undefined, RANGES, range, (picked) => {
+			if (picked === range) return;
+			range = picked;
+			this.debut.restart();
+			this.render();
+		});
+		switcher.addClass("ft-range");
+		const bars = buckets(person.interactions(), range, this.ui.service.today());
+		barChart(box, bars, range, this.ui.settings().labels, { grow: this.debut.offset(), counts: true });
 	}
 
 	private renderRecent(rows: HTMLElement, person: Person): void {
@@ -131,4 +166,8 @@ export class PersonBlock {
 			this.render();
 		});
 	}
+}
+
+function days(count: number): string {
+	return `${count} ${count === 1 ? "day" : "days"}`;
 }

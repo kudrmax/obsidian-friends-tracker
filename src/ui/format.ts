@@ -1,4 +1,5 @@
 import { LocalDate, Weekday } from "../domain/LocalDate";
+import { ChartRange } from "../domain/Stats";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const WEEKDAY_NAMES: Record<Weekday, string> = {
@@ -45,4 +46,19 @@ export function daysAgo(days: number): string {
 
 export function monthLetter(month: number): string {
 	return MONTHS[month - 1][0];
+}
+
+/** "12 Mar 2023", always with the year: a date that may lie years back. */
+export function fullDate(date: LocalDate): string {
+	return `${date.day} ${MONTHS[date.month - 1]} ${date.year}`;
+}
+
+/** The years a chart can name in full; more of them are shortened to "’24" to fit. */
+const FULL_YEARS_SHOWN = 6;
+
+/** What stands under a chart's bar: the Monday's day for a week, the month's letter, the year. */
+export function barLabel(from: LocalDate, range: ChartRange, bars: number): string {
+	if (range === "weeks") return String(from.day);
+	if (range === "months") return monthLetter(from.month);
+	return bars <= FULL_YEARS_SHOWN ? String(from.year) : `’${String(from.year).slice(-2)}`;
 }

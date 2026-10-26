@@ -79,6 +79,8 @@ body {
 	--ft-icon-search: 16px;
 	--ft-icon-fab: 24px;
 	--ft-chart: 64px;
+	/* The capsules that switch the person's chart between weeks, months and years: a line of the panel, not a page's fork. */
+	--ft-range: 28px;
 	--ft-bar-gap: 1px;
 	--ft-radius-bar: 2px;
 	--ft-swatch: 8px;
@@ -207,9 +209,9 @@ body {
 .ft-fork .ft-section { margin-top: var(--ft-space-16); padding-bottom: var(--ft-space-8); }
 .ft-forks > .ft-fork:first-child .ft-section { margin-top: var(--ft-space-8); }
 .ft-fork-row { display: flex; gap: var(--ft-space-8); }
-.friends-tracker .ft-capsule { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--ft-space-6); height: var(--ft-button); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-fill); box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-medium); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.friends-tracker .ft-capsule, .ft-person-panel .ft-capsule { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--ft-space-6); height: var(--ft-button); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-fill); box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-medium); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .ft-capsule .ft-icon svg { width: var(--ft-icon-capsule); height: var(--ft-icon-capsule); stroke-width: var(--ft-stroke-capsule); }
-.friends-tracker .ft-capsule.is-on { background: var(--ft-strong); color: var(--ft-on-strong); font-weight: var(--ft-weight-semibold); }
+.friends-tracker .ft-capsule.is-on, .ft-person-panel .ft-capsule.is-on { background: var(--ft-strong); color: var(--ft-on-strong); font-weight: var(--ft-weight-semibold); }
 
 /* Round icon buttons, the one that saves filled. */
 .friends-tracker .ft-icon-button { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: var(--ft-button); height: var(--ft-button); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: transparent; box-shadow: none; color: var(--ft-text); cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -301,7 +303,14 @@ body {
 .ft-person-panel .metadata-property.is-wide .metadata-property-key { width: auto; min-width: 0; }
 /* Obsidian lays a property's value out in a row; the chart and the list take its whole width, as on the board. */
 .ft-person-panel .metadata-property.is-wide .metadata-property-value > * { flex: 1 1 auto; min-width: 0; }
-.ft-person-panel .ft-legend { margin-top: var(--ft-space-8); }
+.ft-person-panel .ft-legend { margin-top: var(--ft-space-8); flex-wrap: wrap; column-gap: var(--ft-space-12); row-gap: var(--ft-space-4); }
+.ft-legend-count { color: var(--ft-text); font-weight: var(--ft-weight-medium); font-variant-numeric: tabular-nums; }
+.ft-activity { display: flex; flex-direction: column; }
+.ft-person-panel .ft-range { margin-bottom: var(--ft-space-12); }
+.ft-person-panel .ft-range .ft-fork-row { gap: var(--ft-space-4); }
+.ft-person-panel .ft-range .ft-capsule { height: var(--ft-range); font-size: var(--ft-font-legend); }
+.ft-person-panel .ft-delta { margin-inline-start: var(--ft-space-6); }
+.ft-overdue { color: var(--ft-danger); }
 .ft-recent { display: flex; flex-direction: column; gap: var(--ft-space-4); }
 .ft-person-panel .ft-recent-row { display: grid; grid-template-columns: var(--ft-recent-date) var(--ft-recent-dot) minmax(0, 1fr); align-items: center; min-height: var(--ft-space-28); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); width: 100%; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .is-mobile .ft-person-panel .ft-recent-row { min-height: var(--ft-button); }
@@ -346,11 +355,11 @@ body {
  * filled. Text: grey or accent words. Rows are rows. Each family hovers, presses and shows focus the same way.
  */
 .friends-tracker :is(.ft-row, .ft-capsule, .ft-icon-button, .ft-fab, .ft-subtle, .ft-more, .ft-undo-button, .ft-picker-cell):focus-visible,
-.ft-person-panel :is(.ft-recent-row, .ft-more):focus-visible { outline: var(--ft-ring) solid var(--ft-focus); outline-offset: var(--ft-focus-offset); }
+.ft-person-panel :is(.ft-recent-row, .ft-more, .ft-capsule):focus-visible { outline: var(--ft-ring) solid var(--ft-focus); outline-offset: var(--ft-focus-offset); }
 @media (hover: hover) {
 	.friends-tracker :is(button.ft-row, .ft-icon-button, .ft-picker-cell):hover, .ft-person-panel .ft-recent-row:hover { background: var(--ft-hover); }
-	.friends-tracker .ft-capsule:hover, .friends-tracker .ft-fab.is-quiet:hover { background: var(--ft-fill-hover); }
-	.friends-tracker :is(.ft-capsule.is-on, .ft-icon-button.is-filled, .ft-picker-cell.is-on, .ft-fab:not(.is-quiet)):hover { background: var(--ft-strong); opacity: var(--ft-hover-strong); }
+	.friends-tracker .ft-capsule:hover, .ft-person-panel .ft-capsule:hover, .friends-tracker .ft-fab.is-quiet:hover { background: var(--ft-fill-hover); }
+	.friends-tracker :is(.ft-capsule.is-on, .ft-icon-button.is-filled, .ft-picker-cell.is-on, .ft-fab:not(.is-quiet)):hover, .ft-person-panel .ft-capsule.is-on:hover { background: var(--ft-strong); opacity: var(--ft-hover-strong); }
 	.friends-tracker .ft-icon-button:disabled:hover { background: transparent; opacity: var(--ft-disabled); }
 	.friends-tracker .ft-icon-button.is-filled:disabled:hover { background: var(--ft-strong); }
 	.friends-tracker .ft-picker-cell:disabled:hover { background: transparent; }
@@ -369,8 +378,8 @@ body {
 
 /* What moves, only for a reader who hasn't asked for less motion. The code puts the classes on for one run. */
 @media (prefers-reduced-motion: no-preference) {
-	.friends-tracker :is(.ft-capsule, .ft-icon-button, .ft-fab, .ft-picker-cell) { transition: transform var(--ft-duration-press) var(--ft-ease-out), background var(--ft-duration-fade) var(--ft-ease-out), opacity var(--ft-duration-fade) var(--ft-ease-out); }
-	.friends-tracker :is(.ft-capsule, .ft-picker-cell):not(:disabled):active { transform: scale(var(--ft-press-scale)); }
+	.friends-tracker :is(.ft-capsule, .ft-icon-button, .ft-fab, .ft-picker-cell), .ft-person-panel .ft-capsule { transition: transform var(--ft-duration-press) var(--ft-ease-out), background var(--ft-duration-fade) var(--ft-ease-out), opacity var(--ft-duration-fade) var(--ft-ease-out); }
+	.friends-tracker :is(.ft-capsule, .ft-picker-cell):not(:disabled):active, .ft-person-panel .ft-capsule:active { transform: scale(var(--ft-press-scale)); }
 	.friends-tracker :is(.ft-icon-button, .ft-fab):not(:disabled):active { transform: scale(var(--ft-press-scale-round)); }
 	.friends-tracker .ft-search .ft-search-clear { transition: opacity var(--ft-duration-fade) var(--ft-ease-out); }
 

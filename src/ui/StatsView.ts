@@ -1,9 +1,9 @@
 import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Interaction } from "../domain/Interaction";
 import { Person } from "../domain/Person";
-import { Behind, Often, Period, byMonth, fallingBehind, mostOften, totals } from "../domain/Stats";
+import { Behind, Often, Period, buckets, fallingBehind, mostOften, totals } from "../domain/Stats";
 import { forkRow, moreButton, row, sectionLabel } from "./components";
-import { monthChart } from "./MonthChart";
+import { barChart } from "./MonthChart";
 import { ANIMATION, Arrivals, Debut, arrive, play } from "./motion";
 import { TabHistory } from "./TabHistory";
 import { UiContext } from "./UiContext";
@@ -101,7 +101,7 @@ export class StatsView extends ItemView {
 		this.renderNumbers(body, totals(people, this.period, today));
 		sectionLabel(body, "By month");
 		const all: Interaction[] = people.flatMap((person) => [...person.interactions()]);
-		monthChart(body, byMonth(all, today), this.ui.settings().labels, this.debut.offset());
+		barChart(body, buckets(all, "months", today), "months", this.ui.settings().labels, { grow: this.debut.offset() });
 		this.renderBehind(body, fallingBehind(people, today));
 		this.renderOften(body, mostOften(people, this.period, today));
 	}

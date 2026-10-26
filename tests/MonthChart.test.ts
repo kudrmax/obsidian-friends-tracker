@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { MonthBar } from "../src/domain/Stats";
-import { barHeights } from "../src/ui/MonthChart";
+import { KindCounts } from "../src/domain/Stats";
+import { barHeights, padSlots } from "../src/ui/MonthChart";
 
-const bar = (text: number, call: number, meeting: number, wholeDay: number): MonthBar => ({ year: 2026, month: 1, text, call, meeting, wholeDay });
+const bar = (text: number, call: number, meeting: number, wholeDay: number): KindCounts => ({ text, call, meeting, wholeDay });
 
 describe("barHeights", () => {
 	it("gives an empty month no height and the fullest month the whole chart", () => {
@@ -24,5 +24,16 @@ describe("barHeights", () => {
 			expect(month.every(Number.isInteger)).toBe(true);
 			expect(month.reduce((a, b) => a + b)).toBeLessThanOrEqual(50);
 		}
+	});
+});
+
+describe("padSlots", () => {
+	it("fills the places after a few bars with empty ones", () => {
+		expect(padSlots([1, 2, 3, 4], 12)).toEqual([1, 2, 3, 4, null, null, null, null, null, null, null, null]);
+	});
+
+	it("never cuts a full chart", () => {
+		const twelve = Array.from({ length: 12 }, (_, index) => index);
+		expect(padSlots(twelve, 12)).toEqual(twelve);
 	});
 });
