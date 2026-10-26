@@ -9,6 +9,8 @@ import { UiContext } from "./UiContext";
 export class WhoSheet extends FullSheet {
 	private query = "";
 	private results: HTMLElement | null = null;
+	/** A note is being created: a second tap must not try to create it again. */
+	private creating = false;
 
 	constructor(
 		app: App,
@@ -122,11 +124,15 @@ export class WhoSheet extends FullSheet {
 	}
 
 	private async create(name: string): Promise<void> {
+		if (this.creating) return;
+		this.creating = true;
 		try {
 			const path = await this.ui.service.createPerson(name);
 			this.pick({ path, name });
 		} catch (error) {
 			new Notice(error instanceof Error ? error.message : String(error));
+		} finally {
+			this.creating = false;
 		}
 	}
 }
