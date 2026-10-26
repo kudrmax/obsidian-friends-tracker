@@ -28,3 +28,11 @@ Left for Max to click through in the scratch Obsidian (it stays open): the same 
 - The stats button moved next to the "+" as a quiet round button; no drop shadows anywhere.
 - Who, How and Edit are pages inside the Friends tab on both platforms, and the tab's own back and forward arrows walk through them (the views are `navigation` views; the page is the tab's state). The typed search comes back with the page.
 - Renamed to Friends Tracker: id `friends-tracker`, tag `#friend`, folder `Friends`, classes `ft-`.
+
+## 0.1.1 (2026-10-27)
+
+- Stats opens in the Friends tab itself, so the tab's back arrow leads to the feed; its own drawn back arrow is gone. A person tapped in Stats, in the feed's Edit page or on How opens in that same tab, and back leads to where it was tapped.
+- Typing in the search no longer re-opens and re-reveals the Friends tab on every character (the page host updates the tab already showing the page); the search field asks the phone for no capitals and no autocorrect; the person line on How and Edit leads to the note.
+- Every qualifier is written out (`company: one_on_one`, `length: some_time`, `purpose: talk` too); a record missing one is unreadable, nothing is guessed. Max's notes from 0.1.0 were migrated by a one-off script outside the plugin.
+- Checked in the scratch Obsidian, phone layout and desktop: feed ↔ Stats ↔ person note, feed → Who (typed query) → How → person note, back and forward through all of it, Edit from a feed row. Not checked: the phone's own keyboard (the reported "+" and caps bugs could not be reproduced in the emulated phone; the likely causes were removed).
+

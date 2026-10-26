@@ -29,12 +29,10 @@ describe("decodePerson", () => {
 		]);
 	});
 
-	it("reads a missing qualifier as the usual one", () => {
-		const person = decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "meeting" }, { date: "2026-10-23", kind: "call" }] });
-		expect(person.interactions()).toEqual<Interaction[]>([
-			{ date: d("2026-10-24"), kind: "meeting", company: "one_on_one", length: "some_time" },
-			{ date: d("2026-10-23"), kind: "call", purpose: "talk" },
-		]);
+	it("refuses a record that leaves a qualifier out instead of guessing it", () => {
+		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "meeting", company: "one_on_one" }] })).toThrow(/length: missing/);
+		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "meeting", length: "some_time" }] })).toThrow(/company: missing/);
+		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-23", kind: "call" }] })).toThrow(/purpose: missing/);
 	});
 
 	it("reads a date the metadata cache turned into a Date", () => {
@@ -47,7 +45,7 @@ describe("decodePerson", () => {
 			interactions: [
 				{ date: "2026-10-21", kind: "text" },
 				{ date: "2026-10-24", kind: "text" },
-				{ date: "2026-10-24", kind: "call" },
+				{ date: "2026-10-24", kind: "call", purpose: "talk" },
 			],
 		});
 		expect(person.interactions().map((i) => `${i.date} ${i.kind}`)).toEqual(["2026-10-24 text", "2026-10-24 call", "2026-10-21 text"]);
@@ -70,10 +68,13 @@ describe("encodePerson", () => {
 		expect(roundTrip(sample)).toEqual(sample);
 	});
 
-	it("leaves out the usual qualifiers", () => {
+	it("spells out every qualifier, the usual ones too", () => {
 		const out: Frontmatter = {};
 		encodePerson(Person.restore({ name: "Misha", interactions: [{ date: d("2026-10-24"), kind: "meeting", company: "one_on_one", length: "some_time" }, { date: d("2026-10-23"), kind: "call", purpose: "talk" }] }), out);
-		expect(out.interactions).toEqual([{ date: "2026-10-24", kind: "meeting" }, { date: "2026-10-23", kind: "call" }]);
+		expect(out.interactions).toEqual([
+			{ date: "2026-10-24", kind: "meeting", company: "one_on_one", length: "some_time" },
+			{ date: "2026-10-23", kind: "call", purpose: "talk" },
+		]);
 	});
 
 	it("keeps unknown fields of an interaction and unknown keys of the note", () => {
@@ -92,7 +93,7 @@ describe("encodePerson", () => {
 		const keys = { ...DEFAULT_PROPERTY_NAMES, interactions: "met", kinds: { ...DEFAULT_PROPERTY_NAMES.kinds, meeting: "irl" } };
 		const out: Frontmatter = {};
 		encodePerson(Person.restore({ name: "Misha", interactions: [{ date: d("2026-10-24"), kind: "meeting", company: "group", length: "some_time" }] }), out, keys);
-		expect(out.met).toEqual([{ date: "2026-10-24", kind: "irl", company: "group" }]);
+		expect(out.met).toEqual([{ date: "2026-10-24", kind: "irl", company: "group", length: "some_time" }]);
 		expect(decodePerson("Misha", out, keys).interactions()[0].kind).toBe("meeting");
 	});
 });

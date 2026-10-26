@@ -50,7 +50,7 @@ A panel inside the note's Properties area, above the text, collapsible under the
 
 ## Stats (`Stats.dc.html`)
 
-- Back arrow, title "Stats", fork "Week · Month · Year" (Month by default).
+- Title "Stats", fork "Week · Month · Year" (Month by default). No back arrow of its own: Stats opens in the Friends tab, and the tab's own back arrow leads to the feed (decided 2026-10-27).
 - Two numbers 32 px bold: interactions and people in the period, each with the difference to the previous period in small green (+) or red (−).
 - "By month": the same chart as in the person note, over everyone.
 - "Falling behind": person rows with "Usually every N days" under the name and "N days" (since the last interaction) bold on the right; "N more" expands.

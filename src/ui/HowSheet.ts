@@ -78,7 +78,12 @@ export class HowSheet extends FullSheet {
 			},
 		});
 		const body = content.createDiv("ft-sheet-body");
-		row(body, { circle: { initial: this.person.name.slice(0, 1).toUpperCase() }, title: this.person.name });
+		row(body, {
+			circle: { initial: this.person.name.slice(0, 1).toUpperCase() },
+			title: this.person.name,
+			trailing: "chevron",
+			onClick: () => this.ui.openPerson(this.person.path),
+		});
 		this.forks = body.createDiv("ft-forks");
 		this.render();
 	}
