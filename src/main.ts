@@ -39,7 +39,7 @@ export default class FriendsTrackerPlugin extends Plugin implements SettingsHost
 			settings: () => this.config,
 			openPerson: (path) => void this.openPerson(path),
 			openFeed: () => void this.openView(FEED_VIEW),
-			openStats: () => void this.openHere(STATS_VIEW),
+			openStats: () => void this.openView(STATS_VIEW),
 			newInteraction: (query) => new WhoSheet(this.app, ui, query).open(),
 			logWith: (person, query) => new HowSheet(this.app, ui, person, undefined, query).open(),
 			editInteraction: (row: FeedRow) => new EditSheet(this.app, ui, row).open(),
@@ -124,22 +124,15 @@ export default class FriendsTrackerPlugin extends Plugin implements SettingsHost
 	}
 
 	/**
-	 * Opens a view in the tab the plugin already holds (the feed or the stats), so the tab's back arrow leads back;
-	 * a new tab only when the active tab is something else.
+	 * Opens the feed or the stats in the tab the plugin already holds, switching it over when it shows the other one, so
+	 * there is one Friends tab and its back arrow leads back; a new tab only when there is none.
 	 */
-	private async openHere(type: string): Promise<void> {
-		const active = this.app.workspace.getMostRecentLeaf();
-		const ours = active && [FEED_VIEW, STATS_VIEW].includes(active.view.getViewType());
-		const leaf = ours ? active : this.app.workspace.getLeaf("tab");
-		await leaf.setViewState({ type, active: true });
-		await this.app.workspace.revealLeaf(leaf);
-	}
-
 	private async openView(type: string): Promise<void> {
-		const [existing] = this.app.workspace.getLeavesOfType(type);
-		const leaf = existing ?? this.app.workspace.getLeaf("tab");
-		if (!existing) await leaf.setViewState({ type, active: true });
-		await this.app.workspace.revealLeaf(leaf);
+		const workspace = this.app.workspace;
+		const [leaf] = [type, ...[FEED_VIEW, STATS_VIEW].filter((other) => other !== type)].flatMap((kind) => workspace.getLeavesOfType(kind));
+		const target = leaf ?? workspace.getLeaf("tab");
+		if (target.view.getViewType() !== type) await target.setViewState({ type, active: true });
+		await workspace.revealLeaf(target);
 	}
 
 	/** Opens the note in the tab the tap came from, so back leads to the list it was tapped in. */
