@@ -1,7 +1,7 @@
 import { Kind } from "./Interaction";
 import { LocalDate } from "./LocalDate";
 import { Person } from "./Person";
-import { totals, usualGap } from "./Stats";
+import { PERIOD_DAYS, totals, usualGap } from "./Stats";
 
 /** A day of contact and how many days ago it was; a day after today counts as today. */
 export interface Contact {
@@ -35,14 +35,21 @@ export class PersonStats {
 		return last !== undefined && usual !== undefined && last.days > usual;
 	}
 
-	/** Interactions in the last 365 days, and how many more than in the 365 before them. */
-	pastYear(): { readonly count: number; readonly delta: number } {
+	/**
+	 * Interactions in the last 365 days, and how many more than in the 365 before them; no difference when the person
+	 * only turned up within the last 365 days, as there was no year before to compare with.
+	 */
+	pastYear(): { readonly count: number; readonly delta?: number } {
 		const year = totals([this.person], "year", this.today);
-		return { count: year.interactions, delta: year.interactionsDelta };
+		return this.knownBefore(this.today.addDays(-(PERIOD_DAYS.year - 1))) ? { count: year.interactions, delta: year.interactionsDelta } : { count: year.interactions };
 	}
 
 	firstDate(): LocalDate | undefined {
 		return this.person.interactions().reduce<LocalDate | undefined>((first, i) => (first && !i.date.isBefore(first) ? first : i.date), undefined);
+	}
+
+	private knownBefore(date: LocalDate): boolean {
+		return this.firstDate()?.isBefore(date) ?? false;
 	}
 
 	private newest(match: (kind: Kind) => boolean): LocalDate | undefined {

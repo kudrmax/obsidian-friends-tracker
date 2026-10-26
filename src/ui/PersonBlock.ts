@@ -119,7 +119,7 @@ export class PersonBlock {
 		if (!first) return;
 		const year = stats.pastYear();
 		const count = this.text(rows, "bar-chart-3", "past year", `${year.count} ${year.count === 1 ? "interaction" : "interactions"}`);
-		if (year.delta !== 0) count.createSpan({ cls: `ft-delta ${year.delta > 0 ? "is-up" : "is-down"}`, text: `${year.delta > 0 ? "+" : "−"}${Math.abs(year.delta)}` });
+		if (year.delta) count.createSpan({ cls: `ft-delta ${year.delta > 0 ? "is-up" : "is-down"}`, text: `${year.delta > 0 ? "+" : "−"}${Math.abs(year.delta)}` });
 		this.text(rows, "calendar-plus", "since", fullDate(first));
 	}
 

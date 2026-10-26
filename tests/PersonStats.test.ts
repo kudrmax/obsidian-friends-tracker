@@ -26,7 +26,7 @@ describe("PersonStats", () => {
 		expect(empty.usualGap()).toBeUndefined();
 		expect(empty.firstDate()).toBeUndefined();
 		expect(empty.isOverdue()).toBe(false);
-		expect(empty.pastYear()).toEqual({ count: 0, delta: 0 });
+		expect(empty.pastYear()).toEqual({ count: 0 });
 	});
 
 	it("tells the last meeting from the last contact of any kind", () => {
@@ -45,6 +45,11 @@ describe("PersonStats", () => {
 	it("compares the past year with the year before", () => {
 		expect(stats(one(0), one(100), one(364), one(365)).pastYear()).toEqual({ count: 3, delta: 2 });
 		expect(stats(one(400), one(500)).pastYear()).toEqual({ count: 0, delta: -2 });
+	});
+
+	it("has no year before to compare with for a person met within the past year", () => {
+		expect(stats(one(0), one(100), one(364)).pastYear()).toEqual({ count: 3 });
+		expect(stats(one(0), one(365)).pastYear()).toEqual({ count: 1, delta: 0 });
 	});
 
 	it("finds the first interaction", () => {
