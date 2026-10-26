@@ -77,6 +77,11 @@ export default class PeopleTrackerPlugin extends Plugin implements SettingsHost 
 			if (paths.some((path) => this.peoplePaths.has(path) || repository.contains(path))) this.refreshViews();
 		};
 		this.registerEvent(this.app.metadataCache.on("changed", (file) => refreshIfPerson(file.path)));
+		/* Right after a start the cache is still filling, and a listing taken then would be empty for good. */
+		this.registerEvent(this.app.metadataCache.on("resolved", () => {
+			repository.invalidate();
+			this.refreshViews();
+		}));
 		this.registerEvent(this.app.vault.on("delete", (file) => refreshIfPerson(file.path)));
 		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => refreshIfPerson(file.path, oldPath)));
 		const watcher = new DayWatcher(service, () => this.refreshViews());

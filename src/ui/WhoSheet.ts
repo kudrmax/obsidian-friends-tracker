@@ -24,7 +24,7 @@ export class WhoSheet extends FullSheet {
 		const body = content.createDiv("pt-sheet-body");
 		const search = body.createDiv("pt-search");
 		icon(search, "search");
-		const input = search.createEl("input", { type: "text", attr: { placeholder: "Name", "aria-label": "Search people", autocapitalize: "words" } });
+		const input = search.createEl("input", { type: "text", attr: { placeholder: "Name", "aria-label": "Search people", autocapitalize: "words", spellcheck: "false", autocomplete: "off" } });
 		input.value = this.query;
 		const clear = iconButton(search, "x", "Clear", () => {
 			input.value = "";

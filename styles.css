@@ -39,6 +39,10 @@ body {
 	/* Shape */
 	--pt-radius-circle: 50%;
 	--pt-radius-capsule: 999px;
+	/* Obsidian 1.14 draws its buttons as squircles; ours stay true circles and capsules. */
+	--pt-corner: round;
+	/* A row's press highlight reaches this far past its text on each side. */
+	--pt-row-reach: 8px;
 
 	/* Sizes */
 	--pt-column: 640px;
@@ -98,7 +102,6 @@ body {
 	--pt-font-ui: var(--font-interface);
 	--pt-font-inherit: inherit;
 	/* Obsidian's Properties look, for the person's panel. */
-	--pt-property-padding: var(--input-padding);
 	--pt-property-text: var(--metadata-input-text-color);
 	--pt-property-font: var(--metadata-input-font-size);
 
@@ -142,7 +145,7 @@ body {
 .pt-view { position: relative; display: flex; flex-direction: column; height: 100%; padding: 0; }
 
 /* A row: the circle, the name with its line, and what stands on the right. */
-.people-tracker .pt-row { display: flex; align-items: center; gap: var(--pt-space-12); width: 100%; height: var(--pt-row); margin: 0; padding: 0; border: none; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: default; }
+.people-tracker .pt-row { display: flex; align-items: center; gap: var(--pt-space-12); box-sizing: border-box; width: calc(100% + 2 * var(--pt-row-reach)); height: var(--pt-row); margin: 0 calc(-1 * var(--pt-row-reach)); padding: 0 var(--pt-row-reach); border: none; border-radius: var(--pt-radius-capsule); corner-shape: var(--pt-corner); background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: default; }
 .people-tracker button.pt-row { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .people-tracker button.pt-row:active { background: var(--pt-hover); }
 .people-tracker .pt-row.is-broken { opacity: var(--pt-dim); }
@@ -170,13 +173,13 @@ body {
 .pt-fork { display: flex; flex-direction: column; }
 .pt-fork .pt-section { margin-top: var(--pt-space-16); padding-bottom: var(--pt-space-8); }
 .pt-fork-row { display: flex; gap: var(--pt-space-8); }
-.people-tracker .pt-capsule { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--pt-space-6); height: var(--pt-button); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-capsule); background: var(--pt-fill); box-shadow: none; color: var(--pt-text); font-size: var(--pt-font-capsule); font-weight: var(--pt-weight-medium); cursor: pointer; transition: background var(--pt-fast); -webkit-tap-highlight-color: transparent; }
+.people-tracker .pt-capsule { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--pt-space-6); height: var(--pt-button); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-capsule); corner-shape: var(--pt-corner); background: var(--pt-fill); box-shadow: none; color: var(--pt-text); font-size: var(--pt-font-capsule); font-weight: var(--pt-weight-medium); cursor: pointer; transition: background var(--pt-fast); -webkit-tap-highlight-color: transparent; }
 .pt-capsule .pt-icon svg { width: var(--pt-icon-capsule); height: var(--pt-icon-capsule); }
 .people-tracker .pt-capsule.is-on { background: var(--pt-strong); color: var(--pt-on-strong); font-weight: var(--pt-weight-semibold); }
 .pt-capsule.is-danger { color: var(--pt-danger); }
 
 /* Round icon buttons, the one that saves filled. */
-.people-tracker .pt-icon-button { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: var(--pt-button); height: var(--pt-button); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); background: transparent; box-shadow: none; color: var(--pt-text); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.people-tracker .pt-icon-button { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: var(--pt-button); height: var(--pt-button); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); corner-shape: var(--pt-corner); background: transparent; box-shadow: none; color: var(--pt-text); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .pt-icon-button .pt-icon svg { width: var(--pt-icon-button); height: var(--pt-icon-button); }
 .people-tracker .pt-icon-button.is-filled { background: var(--pt-strong); color: var(--pt-on-strong); }
 .people-tracker .pt-icon-button.is-filled:disabled { opacity: var(--pt-disabled); cursor: default; }
@@ -192,7 +195,7 @@ body {
 .pt-subtle .pt-icon svg { width: var(--pt-icon-subtle); height: var(--pt-icon-subtle); }
 
 /* The "+" over the feed, and the fade the list scrolls under. */
-.people-tracker .pt-fab { position: absolute; right: var(--pt-gutter); bottom: var(--pt-fab-bottom); z-index: var(--pt-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--pt-fab); height: var(--pt-fab); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); background: var(--pt-strong); box-shadow: var(--pt-fab-shadow); color: var(--pt-on-strong); cursor: pointer; }
+.people-tracker .pt-fab { position: absolute; right: var(--pt-gutter); bottom: var(--pt-fab-bottom); z-index: var(--pt-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--pt-fab); height: var(--pt-fab); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); corner-shape: var(--pt-corner); background: var(--pt-strong); box-shadow: var(--pt-fab-shadow); color: var(--pt-on-strong); cursor: pointer; }
 .pt-fab .pt-icon svg { width: var(--pt-space-24); height: var(--pt-space-24); }
 .pt-fade { position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--pt-layer-fade); height: var(--pt-fade); background: linear-gradient(to bottom, var(--pt-fade-from), var(--pt-bg) var(--pt-fade-stop)); pointer-events: none; }
 
@@ -202,11 +205,10 @@ body {
 .is-mobile .people-tracker .pt-fade { height: calc(var(--pt-fade) + var(--pt-navbar)); }
 
 /* The search field on Who. */
-.pt-search { display: flex; align-items: center; gap: var(--pt-space-8); box-sizing: border-box; height: var(--pt-search); margin-top: var(--pt-space-12); padding: 0 0 0 var(--pt-space-12); border-radius: var(--pt-radius-capsule); background: var(--pt-fill); }
+.pt-search { display: flex; align-items: center; gap: var(--pt-space-8); box-sizing: border-box; height: var(--pt-search); padding: 0 0 0 var(--pt-space-12); border-radius: var(--pt-radius-capsule); corner-shape: var(--pt-corner); background: var(--pt-fill); }
 .pt-search .pt-icon { color: var(--pt-muted); }
 .pt-search .pt-icon svg { width: var(--pt-icon-search); height: var(--pt-icon-search); }
-.pt-search input { flex: 1 1 auto; min-width: 0; height: 100%; padding: 0; border: none; background: transparent; box-shadow: none; color: var(--pt-text); font-size: var(--pt-font-body); font-family: var(--pt-font-inherit); }
-.pt-search input:focus { box-shadow: none; }
+.people-tracker .pt-search input, .people-tracker .pt-search input:focus, .people-tracker .pt-search input:active { flex: 1 1 auto; min-width: 0; height: 100%; margin: 0; padding: 0; border: none; border-radius: 0; background: transparent; box-shadow: none; color: var(--pt-text); font-size: var(--pt-font-body); font-family: var(--pt-font-inherit); -webkit-appearance: none; appearance: none; outline: none; }
 .people-tracker .pt-search .pt-icon-button { width: var(--pt-button); height: var(--pt-search); color: var(--pt-muted); }
 
 /* The period on Stats, and its big numbers. */
@@ -231,7 +233,7 @@ body {
 .pt-bar-whole { background: var(--pt-chart-whole); }
 .pt-months { display: flex; gap: var(--pt-space-4); margin-top: var(--pt-space-4); font-size: var(--pt-font-micro); line-height: var(--pt-leading-micro); color: var(--pt-faint); }
 .pt-months span { flex: 1 1 0; text-align: center; }
-.pt-legend { display: flex; gap: var(--pt-space-12); margin-top: var(--pt-space-8); font-size: var(--pt-font-legend); color: var(--pt-muted); white-space: nowrap; }
+.pt-legend { display: flex; gap: var(--pt-space-16); margin-top: var(--pt-space-12); font-size: var(--pt-font-legend); color: var(--pt-muted); white-space: nowrap; }
 .pt-legend span { display: inline-flex; align-items: center; gap: var(--pt-space-4); }
 .pt-swatch { display: inline-block; width: var(--pt-swatch); height: var(--pt-swatch); border-radius: var(--pt-radius-bar); }
 
@@ -239,10 +241,11 @@ body {
 /* Obsidian's own rule for the panel in editing mode weighs five classes; these weigh six, so they win. */
 .workspace-leaf-content.pt-person-note .view-content .metadata-property.pt-own-property.pt-own-property, .workspace-leaf-content.pt-person-note .view-content .metadata-container.pt-only-own.pt-only-own { display: none; }
 .pt-person-panel .metadata-property.is-wide { flex-direction: column; align-items: stretch; }
-.pt-person-panel .metadata-property.is-wide .metadata-property-value { padding: var(--pt-property-padding); padding-left: var(--pt-space-24); color: var(--pt-property-text); font-size: var(--pt-property-font); }
+.pt-person-panel .metadata-property.is-wide .metadata-property-value { padding: var(--pt-space-4) var(--pt-space-12) var(--pt-space-12) 0; color: var(--pt-property-text); font-size: var(--pt-property-font); }
+.pt-person-panel .metadata-property.is-wide .metadata-property-key { width: auto; min-width: 0; }
 .pt-person-panel .pt-legend { margin-top: var(--pt-space-8); }
-.pt-recent { display: flex; flex-direction: column; gap: var(--pt-space-8); }
-.pt-person-panel .pt-recent-row { display: grid; grid-template-columns: var(--pt-recent-date) var(--pt-recent-dot) minmax(0, 1fr); align-items: center; width: 100%; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.pt-recent { display: flex; flex-direction: column; gap: var(--pt-space-4); }
+.pt-person-panel .pt-recent-row { display: grid; grid-template-columns: var(--pt-recent-date) var(--pt-recent-dot) minmax(0, 1fr); align-items: center; min-height: var(--pt-space-28); border-radius: var(--pt-radius-capsule); corner-shape: var(--pt-corner); width: 100%; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .pt-recent-date { color: var(--pt-muted); }
 .pt-dot { width: var(--pt-dot); height: var(--pt-dot); border-radius: var(--pt-radius-circle); }
 .pt-panel-quiet { padding-inline-start: var(--pt-space-6); color: var(--pt-faint); }
@@ -250,14 +253,14 @@ body {
 .pt-more .pt-icon svg { width: var(--pt-chevron); height: var(--pt-chevron); }
 
 /* The undo line over the feed after something is logged. */
-.people-tracker .pt-undo { position: absolute; left: var(--pt-gutter); right: var(--pt-space-104); bottom: var(--pt-fab-bottom); z-index: var(--pt-layer-fab); display: flex; align-items: center; gap: var(--pt-space-12); height: var(--pt-button); padding: 0 var(--pt-space-8) 0 var(--pt-space-16); border-radius: var(--pt-radius-capsule); background: var(--pt-surface); box-shadow: var(--pt-fab-shadow); }
+.people-tracker .pt-undo { position: absolute; left: var(--pt-gutter); right: var(--pt-space-104); bottom: var(--pt-fab-bottom); z-index: var(--pt-layer-fab); display: flex; align-items: center; gap: var(--pt-space-12); height: var(--pt-button); padding: 0 var(--pt-space-8) 0 var(--pt-space-16); border-radius: var(--pt-radius-capsule); corner-shape: var(--pt-corner); background: var(--pt-surface); box-shadow: var(--pt-fab-shadow); }
 .pt-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--pt-font-capsule); }
 .people-tracker .pt-undo-button { margin: 0; padding: 0 var(--pt-space-8); border: none; background: transparent; box-shadow: none; color: var(--pt-accent-text); font-size: var(--pt-font-capsule); font-weight: var(--pt-weight-semibold); cursor: pointer; }
 
 /* Sheets: the whole screen on a phone, a column on a computer. */
 .pt-sheet.modal { display: flex; flex-direction: column; max-width: var(--pt-column); padding: 0; }
 .pt-sheet .modal-close-button, .pt-sheet .modal-header, .pt-sheet .modal-header-button, .pt-date-picker .modal-close-button, .pt-date-picker .modal-header, .pt-date-picker .modal-header-button { display: none; }
-.pt-sheet .modal-content { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.pt-sheet .modal-content { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; padding: 0; }
 .pt-sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: var(--pt-space-12) var(--pt-gutter) var(--pt-space-44); }
 .is-mobile .pt-sheet.modal { max-width: none; width: 100%; height: 100%; border-radius: 0; }
 
@@ -266,7 +269,7 @@ body {
 .pt-picker-title { font-size: var(--pt-font-header); font-weight: var(--pt-weight-semibold); }
 .pt-picker-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--pt-space-4); justify-items: center; }
 .pt-picker-weekday { font-size: var(--pt-font-small); color: var(--pt-faint); }
-.people-tracker .pt-picker-day { width: var(--pt-circle); height: var(--pt-circle); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); background: transparent; box-shadow: none; color: var(--pt-text); font-size: var(--pt-font-capsule); cursor: pointer; }
+.people-tracker .pt-picker-day { width: var(--pt-circle); height: var(--pt-circle); margin: 0; padding: 0; border: none; border-radius: var(--pt-radius-circle); corner-shape: var(--pt-corner); background: transparent; box-shadow: none; color: var(--pt-text); font-size: var(--pt-font-capsule); cursor: pointer; }
 .people-tracker .pt-picker-day:disabled { color: var(--pt-faint); cursor: default; }
 .people-tracker .pt-picker-day.is-today { box-shadow: inset 0 0 0 var(--pt-stroke) var(--pt-accent); }
 .people-tracker .pt-picker-day.is-picked { background: var(--pt-strong); color: var(--pt-on-strong); }
