@@ -1,4 +1,4 @@
-import { Plugin, TFile } from "obsidian";
+import { Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { FeedRow, PeopleService } from "./application/PeopleService";
 import { DayStartClock } from "./domain/Clock";
 import { FrontmatterPersonRepository } from "./infrastructure/FrontmatterPersonRepository";
@@ -42,7 +42,11 @@ export default class FriendsTrackerPlugin extends Plugin implements SettingsHost
 			openStats: () => void this.openView(STATS_VIEW),
 			newInteraction: (query) => new WhoSheet(this.app, ui, query).open(),
 			logWith: (person, query) => new HowSheet(this.app, ui, person, undefined, query).open(),
-			editInteraction: (row: FeedRow) => new EditSheet(this.app, ui, row).open(),
+			editInteraction: (row: FeedRow, over?: WorkspaceLeaf) => {
+				const sheet = new EditSheet(this.app, ui, row);
+				if (over) void this.openPageOver(over, sheet.descriptor());
+				else sheet.open();
+			},
 			offerUndo: (offer: UndoOffer) => this.feedViews().forEach((view) => view.offerUndo(offer)),
 			sheetHost: () => host,
 			sheetFor: (page: PageDescriptor): FullSheet | null => {
@@ -136,6 +140,12 @@ export default class FriendsTrackerPlugin extends Plugin implements SettingsHost
 		const target = leaf ?? workspace.getLeaf("tab");
 		if (target.view.getViewType() !== type) await target.setViewState({ type, active: true });
 		await workspace.revealLeaf(target);
+	}
+
+	/** Opens a page in a note's own tab, over the note, a step in that tab's history like any other. */
+	private async openPageOver(leaf: WorkspaceLeaf, page: PageDescriptor): Promise<void> {
+		await leaf.setViewState({ type: FEED_VIEW, active: true, state: { page } });
+		await this.app.workspace.revealLeaf(leaf);
 	}
 
 	/** Opens the note in the tab the tap came from, so back leads to the list it was tapped in. */

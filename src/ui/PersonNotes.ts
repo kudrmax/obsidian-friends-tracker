@@ -77,8 +77,8 @@ export class PersonNotes extends Component {
 			placed = undefined;
 		}
 		if (!placed) {
-			const source = new PersonBlock(this.app, this.ui, path);
-			const reading = new PersonBlock(this.app, this.ui, path);
+			const source = new PersonBlock(this.ui, leaf, path);
+			const reading = new PersonBlock(this.ui, leaf, path);
 			const observer = new MutationObserver(() => this.attach(view, source, reading));
 			observer.observe(view.contentEl, { childList: true, subtree: true });
 			placed = { view, source, reading, observer };

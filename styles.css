@@ -27,9 +27,16 @@ body {
 	/* A quiet capsule under the pointer: the fill, a step stronger. */
 	--ft-fill-hover: rgba(118, 118, 128, 0.24);
 	--ft-focus: var(--background-modifier-border-focus);
-	/* The round buttons and the undo line float over the list. */
-	--ft-shadow-float: 0 2px 8px var(--ft-shadow-ink);
-	--ft-shadow-ink: rgba(0, 0, 0, 0.25);
+	/*
+	 * The quiet round button and the undo line float over the list, without a shadow: a ground of their own that stands
+	 * out from the page, solid so the list doesn't show through, and a step stronger under the pointer. In a dark theme
+	 * that is the surface; in a light one, whose surface is near white, the fill made solid.
+	 */
+	--ft-float: var(--ft-surface);
+	--ft-float-hover: color-mix(in srgb, var(--ft-fill-ink) 24%, var(--ft-surface));
+	--ft-float-light: color-mix(in srgb, var(--ft-fill-ink) 16%, var(--ft-bg));
+	--ft-float-light-hover: color-mix(in srgb, var(--ft-fill-ink) 24%, var(--ft-bg));
+	--ft-fill-ink: rgb(118, 118, 128);
 	--ft-danger: var(--color-red);
 	--ft-up: var(--color-green);
 	--ft-fade-from: rgba(var(--ft-bg-rgb), 0);
@@ -164,6 +171,7 @@ body {
 	--ft-press-scale-round: 0.92;
 	--ft-pop-scale: 0.94;
 }
+.theme-light { --ft-float: var(--ft-float-light); --ft-float-hover: var(--ft-float-light-hover); }
 
 /* The views and the sheets share one ground and, on a phone, one font. */
 .friends-tracker { background: var(--ft-bg); color: var(--ft-text); font-family: var(--ft-font-ui); }
@@ -201,7 +209,7 @@ body {
 /* A day's header and the group under it. */
 .ft-group { display: flex; flex-direction: column; margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-hairline) solid var(--ft-line); }
 .ft-group:first-of-type { margin-top: var(--ft-space-20); padding-top: 0; border-top: none; }
-.ft-day { display: flex; align-items: center; gap: var(--ft-space-8); height: var(--ft-day); }
+.ft-day { display: flex; align-items: baseline; gap: var(--ft-space-8); height: var(--ft-day); line-height: var(--ft-day); }
 .ft-day-name { font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); color: var(--ft-text); }
 .ft-day-date { font-size: var(--ft-font-small); color: var(--ft-muted); }
 .ft-section { display: flex; align-items: flex-end; box-sizing: border-box; height: var(--ft-section); margin-top: var(--ft-space-12); padding-bottom: var(--ft-space-6); font-size: var(--ft-font-small); font-weight: var(--ft-weight-semibold); color: var(--ft-muted); }
@@ -235,10 +243,10 @@ body {
 .friends-tracker .ft-subtle::after { content: ""; position: absolute; inset: calc((var(--ft-subtle) - var(--ft-button)) / 2) calc(-1 * var(--ft-space-6)); }
 
 /* The "+" over the feed, and the fade the list scrolls under. */
-.friends-tracker .ft-fab { position: absolute; right: var(--ft-edge); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--ft-fab); height: var(--ft-fab); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: var(--ft-strong); box-shadow: var(--ft-shadow-float); color: var(--ft-on-strong); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.friends-tracker .ft-fab { position: absolute; right: var(--ft-edge); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--ft-fab); height: var(--ft-fab); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: var(--ft-strong); box-shadow: none; color: var(--ft-on-strong); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .ft-fab .ft-icon svg { width: var(--ft-icon-fab); height: var(--ft-icon-fab); stroke-width: var(--ft-stroke-bold); }
 /* The quiet one stands left of the "+": the surface's grey, the text's colour. */
-.friends-tracker .ft-fab.is-quiet { right: calc(var(--ft-edge) + var(--ft-fab) + var(--ft-space-12)); background: var(--ft-surface); color: var(--ft-text); }
+.friends-tracker .ft-fab.is-quiet { right: calc(var(--ft-edge) + var(--ft-fab) + var(--ft-space-12)); background: var(--ft-float); color: var(--ft-text); }
 .ft-fab.is-quiet .ft-icon svg { width: var(--ft-icon-button); height: var(--ft-icon-button); stroke-width: var(--ft-stroke-capsule); }
 /* With no header row the title keeps its distance from the top. */
 .ft-view .ft-column > .ft-title { padding-top: var(--ft-space-20); }
@@ -327,9 +335,13 @@ body {
 .ft-person-panel .ft-more::after { inset: calc((var(--ft-space-28) - var(--ft-button)) / 2) 0; }
 
 /* The undo line over the feed after something is logged. */
-.friends-tracker .ft-undo { position: absolute; left: var(--ft-edge); right: calc(var(--ft-edge) + 2 * var(--ft-fab) + 2 * var(--ft-space-12)); bottom: calc(var(--ft-fab-bottom) + (var(--ft-fab) - var(--ft-button)) / 2); z-index: var(--ft-layer-fab); display: flex; align-items: center; gap: var(--ft-space-12); height: var(--ft-button); padding: 0 var(--ft-space-8) 0 var(--ft-space-16); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-surface); box-shadow: var(--ft-shadow-float); }
+.friends-tracker .ft-undo { position: absolute; left: var(--ft-edge); right: calc(var(--ft-edge) + 2 * var(--ft-fab) + 2 * var(--ft-space-12)); bottom: calc(var(--ft-fab-bottom) + (var(--ft-fab) - var(--ft-button)) / 2); z-index: var(--ft-layer-fab); display: flex; align-items: center; gap: var(--ft-space-12); height: var(--ft-button); padding: 0 var(--ft-space-8) 0 var(--ft-space-16); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-float); }
 .ft-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--ft-font-capsule); }
-.friends-tracker .ft-undo-button { align-self: stretch; margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+/* The same line as a notice, after something is deleted from a person's note. */
+.ft-undo-notice { display: flex; align-items: baseline; gap: var(--ft-space-12); }
+.ft-undo-notice .ft-undo-text { white-space: normal; }
+:is(.friends-tracker, .ft-undo-notice) .ft-undo-button { align-self: stretch; height: auto; margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ft-undo-notice .ft-undo-button { align-self: auto; }
 
 /* A sheet's body under its header. */
 
@@ -356,19 +368,20 @@ body {
  * "+"). Ghost round: an icon alone, ✕, back, the trash can in red. Choice: a capsule or a picker's circle, the chosen one
  * filled. Text: grey or accent words. Rows are rows. Each family hovers, presses and shows focus the same way.
  */
-.friends-tracker :is(.ft-row, .ft-capsule, .ft-icon-button, .ft-fab, .ft-subtle, .ft-more, .ft-undo-button, .ft-picker-cell):focus-visible,
+.friends-tracker :is(.ft-row, .ft-capsule, .ft-icon-button, .ft-fab, .ft-subtle, .ft-more, .ft-undo-button, .ft-picker-cell):focus-visible, .ft-undo-notice .ft-undo-button:focus-visible,
 .ft-person-panel :is(.ft-recent-row, .ft-more, .ft-capsule):focus-visible { outline: var(--ft-ring) solid var(--ft-focus); outline-offset: var(--ft-focus-offset); }
 @media (hover: hover) {
 	.friends-tracker :is(button.ft-row, .ft-icon-button, .ft-picker-cell):hover, .ft-person-panel .ft-recent-row:hover { background: var(--ft-hover); }
-	.friends-tracker .ft-capsule:hover, .ft-person-panel .ft-capsule:hover, .friends-tracker .ft-fab.is-quiet:hover { background: var(--ft-fill-hover); }
+	.friends-tracker .ft-capsule:hover, .ft-person-panel .ft-capsule:hover { background: var(--ft-fill-hover); }
+	.friends-tracker .ft-fab.is-quiet:hover { background: var(--ft-float-hover); }
 	.friends-tracker :is(.ft-capsule.is-on, .ft-icon-button.is-filled, .ft-picker-cell.is-on, .ft-fab:not(.is-quiet)):hover, .ft-person-panel .ft-capsule.is-on:hover { background: var(--ft-strong); opacity: var(--ft-hover-strong); }
 	.friends-tracker .ft-icon-button:disabled:hover { background: transparent; opacity: var(--ft-disabled); }
 	.friends-tracker .ft-icon-button.is-filled:disabled:hover { background: var(--ft-strong); }
 	.friends-tracker .ft-picker-cell:disabled:hover { background: transparent; }
 	.friends-tracker :is(.ft-subtle, .ft-more, .ft-search .ft-icon-button):hover, .ft-person-panel .ft-more:hover { background: transparent; color: var(--ft-text); }
-	.friends-tracker .ft-undo-button:hover { background: transparent; opacity: var(--ft-hover-strong); }
+	:is(.friends-tracker, .ft-undo-notice) .ft-undo-button:hover { background: transparent; opacity: var(--ft-hover-strong); }
 }
-.friends-tracker :is(.ft-subtle, .ft-more, .ft-undo-button):active, .ft-person-panel .ft-more:active { opacity: var(--ft-pressed); }
+.friends-tracker :is(.ft-subtle, .ft-more, .ft-undo-button):active, .ft-undo-notice .ft-undo-button:active, .ft-person-panel .ft-more:active { opacity: var(--ft-pressed); }
 
 @keyframes ft-arrive { from { opacity: 0; transform: translateY(var(--ft-rise)); } }
 @keyframes ft-leave { to { opacity: 0; transform: translateY(var(--ft-rise)); } }

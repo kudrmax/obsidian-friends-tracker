@@ -1,10 +1,9 @@
-import { App, setIcon } from "obsidian";
+import { WorkspaceLeaf, setIcon } from "obsidian";
 import { ForkOption, forkRow, moreButton } from "./components";
 import { Interaction, describe } from "../domain/Interaction";
 import { Person } from "../domain/Person";
 import { Contact, PersonStats } from "../domain/PersonStats";
 import { ChartRange, buckets } from "../domain/Stats";
-import { EditSheet } from "./EditSheet";
 import { daysAgo, fullDate, shortDate } from "./format";
 import { barChart } from "./MonthChart";
 import { Debut } from "./motion";
@@ -37,8 +36,9 @@ export class PersonBlock {
 	private readonly debut = new Debut();
 
 	constructor(
-		private readonly app: App,
 		private readonly ui: UiContext,
+		/** The note's tab, where Edit opens over the note. */
+		private readonly leaf: WorkspaceLeaf,
 		private path: string,
 	) {
 		this.el = createDiv();
@@ -157,7 +157,7 @@ export class PersonBlock {
 			line.createSpan({ cls: "ft-recent-date", text: shortDate(interaction.date, today) });
 			line.createSpan(`ft-dot ${interaction.kind === "meeting" && interaction.length === "whole_day" ? "ft-bar-whole" : KIND_DOT[interaction.kind]}`);
 			line.createSpan({ text: describe(interaction, labels) });
-			line.addEventListener("click", () => new EditSheet(this.app, this.ui, { path: this.path, name: person.name, index, interaction }).open());
+			line.addEventListener("click", () => this.ui.editInteraction({ path: this.path, name: person.name, index, interaction }, this.leaf));
 		});
 		if (interactions.length <= RECENT_SHOWN) return;
 		moreButton(list, open, open ? "Fewer" : `All ${interactions.length}`, () => {

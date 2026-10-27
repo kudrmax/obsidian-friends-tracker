@@ -171,8 +171,8 @@ export class FeedView extends ItemView implements PageHolder {
 	}
 
 	/**
-	 * Back to the list the pages were opened over, forgetting them, so the back arrow never leads into a sheet already
-	 * done with. A page with no list behind it (restored on start) is replaced by the list.
+	 * Back to what the pages were opened over, the list or a person's note, forgetting them, so the back arrow never
+	 * leads into a sheet already done with. A page with nothing behind it (restored on start) is replaced by the list.
 	 */
 	hidePage(): void {
 		if (!this.pageState) return;
@@ -180,7 +180,7 @@ export class FeedView extends ItemView implements PageHolder {
 	}
 
 	private async leavePages(): Promise<void> {
-		if (!(await this.history.backToList()) && this.pageState) {
+		if (!(await this.history.backOutOfPages()) && this.pageState) {
 			await this.leaf.setViewState({ type: FEED_VIEW, active: true, state: { page: null, replace: true } });
 			this.history.dropForward();
 		}
@@ -227,14 +227,21 @@ export class FeedView extends ItemView implements PageHolder {
 		this.sheet?.moved(from, to);
 	}
 
-	/** Offers to undo what was just logged, for a few seconds, over the "+". */
+	/**
+	 * Offers to undo what was just logged, for a few seconds, over the "+". A page opened over a note goes back to the
+	 * note, where there is no "+": there the offer is a notice.
+	 */
 	offerUndo(offer: UndoOffer): void {
+		if (this.sheet && this.history.pagesOverAnotherView()) {
+			undoNotice(offer);
+			return;
+		}
 		this.clearUndo();
 		const line = this.contentEl.createDiv({ cls: "ft-undo", attr: { role: "status" } });
 		line.createSpan({ cls: "ft-undo-text", text: offer.text });
 		line.createEl("button", { cls: "ft-undo-button", text: "Undo", attr: { type: "button" } }).addEventListener("click", () => {
 			this.clearUndo();
-			offer.undo().catch((error: unknown) => new Notice(error instanceof Error ? error.message : String(error)));
+			undo(offer);
 		});
 		line.addEventListener("click", (event) => {
 			if (event.target === line) this.clearUndo();
@@ -302,4 +309,21 @@ export class FeedView extends ItemView implements PageHolder {
 		if (left > rowHeight * ROWS_BEFORE_END) return;
 		this.loadMore();
 	}
+}
+
+function undo(offer: UndoOffer): void {
+	offer.undo().catch((error: unknown) => new Notice(error instanceof Error ? error.message : String(error)));
+}
+
+/** The undo line as an Obsidian notice, for a screen the line can't stand on. */
+function undoNotice(offer: UndoOffer): void {
+	const message = createFragment();
+	const line = message.createDiv("ft-undo-notice");
+	line.createSpan({ cls: "ft-undo-text", text: offer.text });
+	const button = line.createEl("button", { cls: "ft-undo-button", text: "Undo", attr: { type: "button" } });
+	const notice = new Notice(message, UNDO_MS);
+	button.addEventListener("click", () => {
+		notice.hide();
+		undo(offer);
+	});
 }

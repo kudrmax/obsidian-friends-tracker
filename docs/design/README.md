@@ -53,7 +53,7 @@ A panel inside the note's Properties area, above the text, collapsible under the
 - `past year` — interactions in the last 365 days, then the difference with the 365 before in small green (+) or red (−), as on Stats; no difference for a person first met within those 365 days.
 - `since` — the first logged interaction, always with its year ("12 Mar 2023").
 - `by week` / `by month` / `by year` — a fork of three small capsules (Weeks · Months · Years, 28 px, Months by default) over the stacked bar chart by format: twelve weeks from Monday labelled by the Monday's day, twelve months by letter, or the years from the first interaction on (the last twelve) labelled by year, left-aligned in twelve places so a bar is as wide in every range. The legend gives each format's count over the bars shown. The choice is the same for every person and lasts while Obsidian is open; the bars grow again when it changes.
-- `recent` — three latest as date · dot · format with qualifiers, then "All N" that expands the list in place.
+- `recent` — three latest as date · dot · format with qualifiers, then "All N" that expands the list in place. Tap a line → Edit, opened over the note in the note's own tab (never a second tab); ✓, ✕, delete and Escape step back to the note and the finished Edit leaves the tab's history. After a delete the undo offer is an Obsidian notice with the accent "Undo", since the note has no undo line.
 
 A person with no interactions shows `last seen: never` alone.
 
@@ -77,7 +77,7 @@ A person with no interactions shows `last seen: never` alone.
 
 Every button belongs to one of four families, and a family looks, hovers, presses and shows focus the same way everywhere:
 
-1. **Filled round**: the one action of a screen, white on dark (dark on white in a light theme). The "+" (56 px) and ✓ (44 px). The grey stats button beside the "+" is its quiet sibling. The "+", the stats button and the undo line float over the list with a soft shadow.
+1. **Filled round**: the one action of a screen, white on dark (dark on white in a light theme). The "+" (56 px) and ✓ (44 px). The grey stats button beside the "+" is its quiet sibling. The "+", the stats button and the undo line float over the list without a shadow: the stats button and the undo line stand out by a solid grey ground of their own (the surface in a dark theme, the capsules' grey made solid in a light one), the stats button a step greyer under the pointer.
 2. **Ghost round**: an icon alone in a 44 px circle: ✕, back, the picker's month arrows, the search's clear. The trash can is this family in red; there is no other destructive style.
 3. **Choice**: a capsule in a fork, or a round day or hour in a picker. The chosen one is filled like family 1.
 4. **Text**: grey words with a small chevron (the date and the time under a title, "N more", "All N"), and the accent "Undo". A finger gets 44 px of height even where the line is shorter.
