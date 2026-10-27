@@ -329,7 +329,10 @@ body {
 /* The undo line over the feed after something is logged. */
 .friends-tracker .ft-undo { position: absolute; left: var(--ft-edge); right: calc(var(--ft-edge) + 2 * var(--ft-fab) + 2 * var(--ft-space-12)); bottom: calc(var(--ft-fab-bottom) + (var(--ft-fab) - var(--ft-button)) / 2); z-index: var(--ft-layer-fab); display: flex; align-items: center; gap: var(--ft-space-12); height: var(--ft-button); padding: 0 var(--ft-space-8) 0 var(--ft-space-16); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-surface); box-shadow: var(--ft-shadow-float); }
 .ft-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--ft-font-capsule); }
-.friends-tracker .ft-undo-button { align-self: stretch; margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+/* The same line as a notice, after something is deleted from a person's note. */
+.ft-undo-notice { display: flex; align-items: center; gap: var(--ft-space-12); }
+.ft-undo-notice .ft-undo-text { white-space: normal; }
+:is(.friends-tracker, .ft-undo-notice) .ft-undo-button { align-self: stretch; margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
 /* A sheet's body under its header. */
 
@@ -356,7 +359,7 @@ body {
  * "+"). Ghost round: an icon alone, ✕, back, the trash can in red. Choice: a capsule or a picker's circle, the chosen one
  * filled. Text: grey or accent words. Rows are rows. Each family hovers, presses and shows focus the same way.
  */
-.friends-tracker :is(.ft-row, .ft-capsule, .ft-icon-button, .ft-fab, .ft-subtle, .ft-more, .ft-undo-button, .ft-picker-cell):focus-visible,
+.friends-tracker :is(.ft-row, .ft-capsule, .ft-icon-button, .ft-fab, .ft-subtle, .ft-more, .ft-undo-button, .ft-picker-cell):focus-visible, .ft-undo-notice .ft-undo-button:focus-visible,
 .ft-person-panel :is(.ft-recent-row, .ft-more, .ft-capsule):focus-visible { outline: var(--ft-ring) solid var(--ft-focus); outline-offset: var(--ft-focus-offset); }
 @media (hover: hover) {
 	.friends-tracker :is(button.ft-row, .ft-icon-button, .ft-picker-cell):hover, .ft-person-panel .ft-recent-row:hover { background: var(--ft-hover); }
@@ -366,9 +369,9 @@ body {
 	.friends-tracker .ft-icon-button.is-filled:disabled:hover { background: var(--ft-strong); }
 	.friends-tracker .ft-picker-cell:disabled:hover { background: transparent; }
 	.friends-tracker :is(.ft-subtle, .ft-more, .ft-search .ft-icon-button):hover, .ft-person-panel .ft-more:hover { background: transparent; color: var(--ft-text); }
-	.friends-tracker .ft-undo-button:hover { background: transparent; opacity: var(--ft-hover-strong); }
+	:is(.friends-tracker, .ft-undo-notice) .ft-undo-button:hover { background: transparent; opacity: var(--ft-hover-strong); }
 }
-.friends-tracker :is(.ft-subtle, .ft-more, .ft-undo-button):active, .ft-person-panel .ft-more:active { opacity: var(--ft-pressed); }
+.friends-tracker :is(.ft-subtle, .ft-more, .ft-undo-button):active, .ft-undo-notice .ft-undo-button:active, .ft-person-panel .ft-more:active { opacity: var(--ft-pressed); }
 
 @keyframes ft-arrive { from { opacity: 0; transform: translateY(var(--ft-rise)); } }
 @keyframes ft-leave { to { opacity: 0; transform: translateY(var(--ft-rise)); } }
