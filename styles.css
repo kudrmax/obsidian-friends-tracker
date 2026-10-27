@@ -209,7 +209,7 @@ body {
 /* A day's header and the group under it. */
 .ft-group { display: flex; flex-direction: column; margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-hairline) solid var(--ft-line); }
 .ft-group:first-of-type { margin-top: var(--ft-space-20); padding-top: 0; border-top: none; }
-.ft-day { display: flex; align-items: center; gap: var(--ft-space-8); height: var(--ft-day); }
+.ft-day { display: flex; align-items: baseline; gap: var(--ft-space-8); height: var(--ft-day); line-height: var(--ft-day); }
 .ft-day-name { font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); color: var(--ft-text); }
 .ft-day-date { font-size: var(--ft-font-small); color: var(--ft-muted); }
 .ft-section { display: flex; align-items: flex-end; box-sizing: border-box; height: var(--ft-section); margin-top: var(--ft-space-12); padding-bottom: var(--ft-space-6); font-size: var(--ft-font-small); font-weight: var(--ft-weight-semibold); color: var(--ft-muted); }
@@ -338,9 +338,10 @@ body {
 .friends-tracker .ft-undo { position: absolute; left: var(--ft-edge); right: calc(var(--ft-edge) + 2 * var(--ft-fab) + 2 * var(--ft-space-12)); bottom: calc(var(--ft-fab-bottom) + (var(--ft-fab) - var(--ft-button)) / 2); z-index: var(--ft-layer-fab); display: flex; align-items: center; gap: var(--ft-space-12); height: var(--ft-button); padding: 0 var(--ft-space-8) 0 var(--ft-space-16); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-float); }
 .ft-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--ft-font-capsule); }
 /* The same line as a notice, after something is deleted from a person's note. */
-.ft-undo-notice { display: flex; align-items: center; gap: var(--ft-space-12); }
+.ft-undo-notice { display: flex; align-items: baseline; gap: var(--ft-space-12); }
 .ft-undo-notice .ft-undo-text { white-space: normal; }
-:is(.friends-tracker, .ft-undo-notice) .ft-undo-button { align-self: stretch; margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+:is(.friends-tracker, .ft-undo-notice) .ft-undo-button { align-self: stretch; height: auto; margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ft-undo-notice .ft-undo-button { align-self: auto; }
 
 /* A sheet's body under its header. */
 
