@@ -77,7 +77,7 @@ A person with no interactions shows `last seen: never` alone.
 
 Every button belongs to one of four families, and a family looks, hovers, presses and shows focus the same way everywhere:
 
-1. **Filled round**: the one action of a screen, white on dark (dark on white in a light theme). The "+" (56 px) and ✓ (44 px). The grey stats button beside the "+" is its quiet sibling. The "+", the stats button and the undo line float over the list with a soft shadow.
+1. **Filled round**: the one action of a screen, white on dark (dark on white in a light theme). The "+" (56 px) and ✓ (44 px). The grey stats button beside the "+" is its quiet sibling. The "+", the stats button and the undo line float over the list without a shadow: the stats button and the undo line stand out by a solid grey ground of their own (the surface in a dark theme, the capsules' grey made solid in a light one), the stats button a step greyer under the pointer.
 2. **Ghost round**: an icon alone in a 44 px circle: ✕, back, the picker's month arrows, the search's clear. The trash can is this family in red; there is no other destructive style.
 3. **Choice**: a capsule in a fork, or a round day or hour in a picker. The chosen one is filled like family 1.
 4. **Text**: grey words with a small chevron (the date and the time under a title, "N more", "All N"), and the accent "Undo". A finger gets 44 px of height even where the line is shorter.
