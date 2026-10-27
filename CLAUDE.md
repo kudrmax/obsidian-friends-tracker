@@ -29,14 +29,12 @@ A branch build is tried on this laptop in a separate Obsidian, the phone view an
 - The separate Obsidian runs with its own profile and a scratch vault: `open -n -a Obsidian --args --user-data-dir=<scratch>/obsidian-user --remote-debugging-port=9333`, the vault registered in that profile's `obsidian.json`, holding sample people notes and the plugin's `data.json`, with the branch build in its `.obsidian/plugins/friends-tracker/`. Reuse one that is already running (`ps aux | grep remote-debugging-port`); never open a scratch vault with `obsidian://open`.
 - Check the build there first yourself, over the debugging port: the phone view (window 390×844, then `app.emulateMobile(true)`) and the desktop view. Then leave it open for Max to click through, with a checklist of what to try.
 - `~/Obsidian/.obsidian/plugins/friends-tracker/` only ever gets released versions, pulled in as "Releasing" says. Never copy a branch build there, never touch its `data.json`.
-- The separate Obsidian shares `~/.obsidian-cli.sock` with Max's: quitting it removes the socket and the CLI loses Max's Obsidian until that restarts. Quit it only when done, then restart Max's Obsidian (`osascript -e 'quit app "Obsidian"'`, `open -a Obsidian`).
 - A page in a browser is not a check: it runs the code outside Obsidian and misses what Obsidian adds.
 
 ## Releasing
 
-Max installs nothing himself. Once a branch is merged into main, the agent takes it all the way to his Obsidian, and he just uses it on the laptop and the phone:
+Release and installation follow Max's global `~/.claude/CLAUDE.md`, section «Свои плагины Obsidian»: the agent releases a merged version and pulls it into his Obsidian himself. For this plugin:
 
-1. Bump the version in `manifest.json`, `package.json` and `versions.json` on the branch, merge into main, push.
-2. `npm run build`, then `gh release create <version> main.js manifest.json styles.css --title <version>` with short notes: a published release, not a draft, so BRAT sees it.
-3. Pull it into Max's Obsidian through the Obsidian CLI with BRAT (the plugin is in BRAT's list as `kudrmax/obsidian-friends-tracker`), then reload the plugin. Check `app.plugins.plugins["friends-tracker"].manifest.version` over `obsidian eval`, and that Sync's log shows the plugin's files uploaded, so the phone gets them too.
-
+- The version lives in `manifest.json`, `package.json` and `versions.json`.
+- There is no CI: `npm run build`, then `gh release create <version> main.js manifest.json styles.css --title <version>` with short notes.
+- BRAT lists it as `kudrmax/obsidian-friends-tracker`; the plugin id is `friends-tracker`.
