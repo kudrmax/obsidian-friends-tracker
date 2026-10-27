@@ -7,6 +7,7 @@ import { LocalTime } from "../domain/LocalTime";
 import { KIND_ICONS, QUALIFIER_ICONS, forkRow, iconButton, row, sheetHeader, subtleButton } from "./components";
 import { longDate } from "./format";
 import { HowState, isComplete, toInteraction, withKind } from "./howState";
+import { Arrivals } from "./motion";
 import { FullSheet, PageDescriptor } from "./sheet";
 import { UiContext } from "./UiContext";
 
@@ -16,17 +17,17 @@ export interface HowPerson {
 }
 
 /** The forks the How screen asks, for a state: the kind, then what the kind needs. */
-export function renderForks(parent: HTMLElement, state: HowState, labels: Labels, onChange: (next: HowState) => void): void {
-	forkRow<Kind>(parent, "How", KINDS.map((kind) => ({ value: kind, text: labels[kind], icon: KIND_ICONS[kind] })), state.kind, (kind) => onChange(withKind(state, kind)));
+export function renderForks(parent: HTMLElement, state: HowState, labels: Labels, onChange: (next: HowState) => void, arrivals?: Arrivals): void {
+	forkRow<Kind>(parent, "How", KINDS.map((kind) => ({ value: kind, text: labels[kind], icon: KIND_ICONS[kind] })), state.kind, (kind) => onChange(withKind(state, kind)), arrivals);
 	if (state.kind === "call") {
 		const purposes: Purpose[] = ["talk", "activity"];
-		forkRow<Purpose>(parent, "What for", purposes.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.purpose, (purpose) => onChange({ ...state, purpose }));
+		forkRow<Purpose>(parent, "What for", purposes.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.purpose, (purpose) => onChange({ ...state, purpose }), arrivals);
 	}
 	if (state.kind === "meeting") {
 		const companies: Company[] = ["one_on_one", "group"];
-		forkRow<Company>(parent, "Company", companies.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.company, (company) => onChange({ ...state, company }));
+		forkRow<Company>(parent, "Company", companies.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.company, (company) => onChange({ ...state, company }), arrivals);
 		const lengths: Length[] = ["some_time", "whole_day"];
-		forkRow<Length>(parent, "Length", lengths.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.length, (length) => onChange({ ...state, length }));
+		forkRow<Length>(parent, "Length", lengths.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.length, (length) => onChange({ ...state, length }), arrivals);
 	}
 }
 
@@ -39,11 +40,12 @@ export class HowSheet extends FullSheet {
 	private timeButton: HTMLButtonElement | null = null;
 	/** A write is under way: a second tap must not start another. */
 	private busy = false;
+	private readonly arrivals = new Arrivals();
 
 	constructor(
 		app: App,
 		protected readonly ui: UiContext,
-		protected readonly person: HowPerson,
+		protected person: HowPerson,
 		initial?: HowState,
 		/** What was typed on Who, so going back shows the same list. */
 		protected readonly query = "",
@@ -56,6 +58,24 @@ export class HowSheet extends FullSheet {
 		return { kind: "how", path: this.person.path, name: this.person.name, query: this.query };
 	}
 
+	override isGone(): boolean {
+		return !this.ui.repository.get(this.person.path);
+	}
+
+	/** The person's note is gone: there is nothing left to log to, so the sheet steps back to the list. */
+	override refresh(): void {
+		if (this.isGone()) this.close();
+	}
+
+	/** The person's note was renamed or moved: the sheet follows it, so ✓ writes to it where it is now. */
+	override moved(from: string, to: string): void {
+		if (this.person.path !== from) return;
+		const entry = this.ui.repository.get(to);
+		this.person = { path: to, name: entry?.kind === "ok" ? entry.person.name : this.person.name };
+		this.changed();
+		this.redraw();
+	}
+
 	protected get title(): string {
 		return "New interaction";
 	}
@@ -64,13 +84,15 @@ export class HowSheet extends FullSheet {
 		return "chevron-left";
 	}
 
-	protected back(): void {
-		this.ui.newInteraction(this.query);
+	/** Back to Who: the step behind in the tab's history when it is Who, a fresh Who when How was opened straight away. */
+	dismiss(): void {
+		if (this.previousPage()?.kind === "who") this.goBack();
+		else this.ui.newInteraction(this.query);
 	}
 
 	protected fill(content: HTMLElement): void {
 		sheetHeader(content, {
-			left: { icon: this.backIcon, label: "Back", onClick: () => this.back() },
+			left: { icon: this.backIcon, label: "Back", onClick: () => this.dismiss() },
 			title: this.title,
 			subtitle: (parent) => {
 				const line = parent.createDiv("ft-sheet-subtitle");
@@ -128,10 +150,17 @@ export class HowSheet extends FullSheet {
 		const forks = this.forks;
 		if (!forks) return;
 		forks.empty();
-		renderForks(forks, this.state, this.ui.settings().labels, (next) => {
-			this.state = next;
-			this.render();
-		});
+		this.arrivals.begin();
+		renderForks(
+			forks,
+			this.state,
+			this.ui.settings().labels,
+			(next) => {
+				this.state = next;
+				this.render();
+			},
+			this.arrivals,
+		);
 		if (this.save) this.save.disabled = !isComplete(this.state);
 		this.dateButton?.querySelector("span")?.setText(this.dateText());
 		this.timeButton?.querySelector("span")?.setText(this.timeText());

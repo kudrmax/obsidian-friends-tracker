@@ -24,6 +24,12 @@ body {
 	/* iOS's fill: a quiet ground for a capsule that isn't chosen and for the circles. */
 	--ft-fill: rgba(118, 118, 128, 0.16);
 	--ft-hover: var(--background-modifier-hover);
+	/* A quiet capsule under the pointer: the fill, a step stronger. */
+	--ft-fill-hover: rgba(118, 118, 128, 0.24);
+	--ft-focus: var(--background-modifier-border-focus);
+	/* The round buttons and the undo line float over the list. */
+	--ft-shadow-float: 0 2px 8px var(--ft-shadow-ink);
+	--ft-shadow-ink: rgba(0, 0, 0, 0.25);
 	--ft-danger: var(--color-red);
 	--ft-up: var(--color-green);
 	--ft-fade-from: rgba(var(--ft-bg-rgb), 0);
@@ -41,10 +47,16 @@ body {
 	--ft-corner: round;
 	/* A row's press highlight reaches this far past its text on each side. */
 	--ft-row-reach: 8px;
+	--ft-hairline: 1px;
+	/* The focus ring, and the ring round today in the date picker. */
+	--ft-ring: 2px;
+	--ft-focus-offset: 2px;
 
 	/* Sizes */
 	--ft-column: 640px;
 	--ft-gutter: 20px;
+	/* What floats over the list keeps to the column's edge, not the window's, on a wide screen. */
+	--ft-edge: max(var(--ft-gutter), calc((100% - var(--ft-column)) / 2 + var(--ft-gutter)));
 	--ft-row: 60px;
 	--ft-circle: 40px;
 	--ft-button: 44px;
@@ -65,7 +77,10 @@ body {
 	--ft-icon-capsule: 16px;
 	--ft-icon-subtle: 12px;
 	--ft-icon-search: 16px;
+	--ft-icon-fab: 24px;
 	--ft-chart: 64px;
+	/* The capsules that switch the person's chart between weeks, months and years: a line of the panel, not a page's fork. */
+	--ft-range: 28px;
 	--ft-bar-gap: 1px;
 	--ft-radius-bar: 2px;
 	--ft-swatch: 8px;
@@ -73,6 +88,9 @@ body {
 	--ft-recent-date: 52px;
 	--ft-recent-dot: 16px;
 	--ft-stroke: 1.75px;
+	/* The "+", ✓ and the chevrons draw bolder; a capsule's icon a little. */
+	--ft-stroke-bold: 2.4px;
+	--ft-stroke-capsule: 2px;
 
 	/* Type */
 	--ft-font-title: 30px;
@@ -102,6 +120,8 @@ body {
 	/* Obsidian's Properties look, for the person's panel. */
 	--ft-property-text: var(--metadata-input-text-color);
 	--ft-property-font: var(--metadata-input-font-size);
+	/* How far into a Properties row its icon starts: what spans the person panel's whole width starts there too. */
+	--ft-property-inset: var(--size-4-1);
 
 	/* Spacing */
 	--ft-space-1: 1px;
@@ -112,7 +132,6 @@ body {
 	--ft-space-12: 12px;
 	--ft-space-16: 16px;
 	--ft-space-20: 20px;
-	--ft-space-24: 24px;
 	--ft-space-28: 28px;
 	--ft-space-44: 44px;
 	--ft-space-104: 104px;
@@ -120,13 +139,30 @@ body {
 	/* Opacity */
 	--ft-dim: 0.5;
 	--ft-disabled: 0.4;
+	/* A filled button under the pointer, and a text button while pressed. */
+	--ft-hover-strong: 0.88;
+	--ft-pressed: 0.6;
 
 	/* Layers */
 	--ft-layer-fade: 2;
 	--ft-layer-fab: 3;
 
-	/* Motion */
-	--ft-fast: 150ms ease;
+	/*
+	 * Motion. What arrives rises a little and fades in, what leaves sinks and fades out, faster; a press shrinks what is
+	 * pressed. Only transform and opacity move, and nothing moves for a reader who asks for reduced motion.
+	 */
+	--ft-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+	--ft-ease-in: cubic-bezier(0.4, 0, 1, 1);
+	--ft-duration-press: 120ms;
+	--ft-duration-fade: 160ms;
+	--ft-duration-enter: 240ms;
+	--ft-duration-grow: 420ms;
+	--ft-duration-glow: 1200ms;
+	--ft-stagger: 20ms;
+	--ft-rise: 8px;
+	--ft-press-scale: 0.97;
+	--ft-press-scale-round: 0.92;
+	--ft-pop-scale: 0.94;
 }
 
 /* The views and the sheets share one ground and, on a phone, one font. */
@@ -141,8 +177,8 @@ body {
 
 /* A view fills its leaf; the "+" and the fade sit over its list. */
 .ft-view { position: relative; display: flex; flex-direction: column; height: 100%; padding: 0; }
-/* Obsidian pads a view's bottom by the safe area, which is the keyboard's height while it is up: our pages pad themselves. */
-.workspace-leaf-content .view-content.ft-view { padding-bottom: 0; }
+/* Obsidian pads a view on a phone, and its bottom by the safe area, which is the keyboard's height while it is up: our pages keep their own gutters. */
+.workspace-leaf-content .view-content.ft-view { padding: 0; }
 
 /* A row: the circle, the name with its line, and what stands on the right. */
 .friends-tracker .ft-row { display: flex; align-items: center; gap: var(--ft-space-12); box-sizing: border-box; width: calc(100% + 2 * var(--ft-row-reach)); height: var(--ft-row); margin: 0 calc(-1 * var(--ft-row-reach)); padding: 0 var(--ft-row-reach); border: none; border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: default; }
@@ -156,14 +192,14 @@ body {
 .ft-row-title { font-size: var(--ft-font-body); line-height: var(--ft-leading-body); letter-spacing: var(--ft-tracking-body); color: var(--ft-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ft-row-title b { font-weight: var(--ft-weight-semibold); }
 .ft-row-sub { font-size: var(--ft-font-small); line-height: var(--ft-leading-small); color: var(--ft-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ft-row-meta { flex: 0 0 auto; font-size: var(--ft-font-small); color: var(--ft-muted); font-variant-numeric: tabular-nums; }
+.ft-row-meta { flex: 0 0 auto; font-size: var(--ft-font-small); line-height: var(--ft-leading-small); color: var(--ft-muted); font-variant-numeric: tabular-nums; }
 .ft-row-chevron { flex: 0 0 auto; color: var(--ft-faint); }
-.ft-row-chevron svg { width: var(--ft-chevron); height: var(--ft-chevron); }
+.ft-row-chevron svg { width: var(--ft-chevron); height: var(--ft-chevron); stroke-width: var(--ft-stroke-bold); }
 .ft-row-value { flex: 0 0 auto; font-size: var(--ft-font-body); color: var(--ft-text); font-variant-numeric: tabular-nums; }
 .ft-row-value.is-strong { font-weight: var(--ft-weight-semibold); }
 
 /* A day's header and the group under it. */
-.ft-group { display: flex; flex-direction: column; margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-space-1) solid var(--ft-line); }
+.ft-group { display: flex; flex-direction: column; margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-hairline) solid var(--ft-line); }
 .ft-group:first-of-type { margin-top: var(--ft-space-20); padding-top: 0; border-top: none; }
 .ft-day { display: flex; align-items: center; gap: var(--ft-space-8); height: var(--ft-day); }
 .ft-day-name { font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); color: var(--ft-text); }
@@ -173,17 +209,18 @@ body {
 /* A fork: one row of equal capsules. */
 .ft-fork { display: flex; flex-direction: column; }
 .ft-fork .ft-section { margin-top: var(--ft-space-16); padding-bottom: var(--ft-space-8); }
+.ft-forks > .ft-fork:first-child .ft-section { margin-top: var(--ft-space-8); }
 .ft-fork-row { display: flex; gap: var(--ft-space-8); }
-.friends-tracker .ft-capsule { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--ft-space-6); height: var(--ft-button); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-fill); box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-medium); cursor: pointer; transition: background var(--ft-fast); -webkit-tap-highlight-color: transparent; }
-.ft-capsule .ft-icon svg { width: var(--ft-icon-capsule); height: var(--ft-icon-capsule); }
-.friends-tracker .ft-capsule.is-on { background: var(--ft-strong); color: var(--ft-on-strong); font-weight: var(--ft-weight-semibold); }
-.ft-capsule.is-danger { color: var(--ft-danger); }
+.friends-tracker .ft-capsule, .ft-person-panel .ft-capsule { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--ft-space-6); height: var(--ft-button); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-fill); box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-medium); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ft-capsule .ft-icon svg { width: var(--ft-icon-capsule); height: var(--ft-icon-capsule); stroke-width: var(--ft-stroke-capsule); }
+.friends-tracker .ft-capsule.is-on, .ft-person-panel .ft-capsule.is-on { background: var(--ft-strong); color: var(--ft-on-strong); font-weight: var(--ft-weight-semibold); }
 
 /* Round icon buttons, the one that saves filled. */
 .friends-tracker .ft-icon-button { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: var(--ft-button); height: var(--ft-button); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: transparent; box-shadow: none; color: var(--ft-text); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .ft-icon-button .ft-icon svg { width: var(--ft-icon-button); height: var(--ft-icon-button); }
 .friends-tracker .ft-icon-button.is-filled { background: var(--ft-strong); color: var(--ft-on-strong); }
-.friends-tracker .ft-icon-button.is-filled:disabled { opacity: var(--ft-disabled); cursor: default; }
+.friends-tracker .ft-icon-button.is-filled .ft-icon svg { stroke-width: var(--ft-stroke-bold); }
+.friends-tracker .ft-icon-button:disabled { opacity: var(--ft-disabled); cursor: default; }
 .friends-tracker .ft-icon-button.is-danger { color: var(--ft-danger); }
 
 /* A sheet's header: a way out, the title with what stands under it, the actions. */
@@ -192,14 +229,17 @@ body {
 .ft-sheet-middle { display: flex; flex-direction: column; align-items: center; gap: var(--ft-space-1); }
 .ft-sheet-title { font-size: var(--ft-font-header); line-height: var(--ft-leading-header); font-weight: var(--ft-weight-semibold); color: var(--ft-text); }
 .ft-sheet-right { justify-self: end; display: flex; align-items: center; gap: var(--ft-space-4); }
-.friends-tracker .ft-subtle { display: inline-flex; align-items: center; gap: var(--ft-space-2); height: var(--ft-subtle); margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: var(--ft-muted); font-size: var(--ft-font-small); line-height: var(--ft-leading-small); cursor: pointer; }
-.ft-subtle .ft-icon svg { width: var(--ft-icon-subtle); height: var(--ft-icon-subtle); }
+.friends-tracker .ft-subtle { display: inline-flex; align-items: center; gap: var(--ft-space-2); height: var(--ft-subtle); margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: var(--ft-muted); font-size: var(--ft-font-small); line-height: var(--ft-leading-small); cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; }
+.ft-subtle .ft-icon svg { width: var(--ft-icon-subtle); height: var(--ft-icon-subtle); stroke-width: var(--ft-stroke-bold); }
+/* The date and the time are short lines; a finger gets the whole height of a button. */
+.friends-tracker .ft-subtle::after { content: ""; position: absolute; inset: calc((var(--ft-subtle) - var(--ft-button)) / 2) calc(-1 * var(--ft-space-6)); }
 
 /* The "+" over the feed, and the fade the list scrolls under. */
-.friends-tracker .ft-fab { position: absolute; right: var(--ft-gutter); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--ft-fab); height: var(--ft-fab); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: var(--ft-strong); color: var(--ft-on-strong); cursor: pointer; }
-.ft-fab .ft-icon svg { width: var(--ft-space-24); height: var(--ft-space-24); }
+.friends-tracker .ft-fab { position: absolute; right: var(--ft-edge); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; justify-content: center; width: var(--ft-fab); height: var(--ft-fab); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: var(--ft-strong); box-shadow: var(--ft-shadow-float); color: var(--ft-on-strong); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ft-fab .ft-icon svg { width: var(--ft-icon-fab); height: var(--ft-icon-fab); stroke-width: var(--ft-stroke-bold); }
 /* The quiet one stands left of the "+": the surface's grey, the text's colour. */
-.friends-tracker .ft-fab.is-quiet { right: calc(var(--ft-gutter) + var(--ft-fab) + var(--ft-space-12)); background: var(--ft-surface); color: var(--ft-text); }
+.friends-tracker .ft-fab.is-quiet { right: calc(var(--ft-edge) + var(--ft-fab) + var(--ft-space-12)); background: var(--ft-surface); color: var(--ft-text); }
+.ft-fab.is-quiet .ft-icon svg { width: var(--ft-icon-button); height: var(--ft-icon-button); stroke-width: var(--ft-stroke-capsule); }
 /* With no header row the title keeps its distance from the top. */
 .ft-view .ft-column > .ft-title { padding-top: var(--ft-space-20); }
 /* On a computer a sheet is a page inside the People tab: the list, its fade and its buttons step aside. */
@@ -208,12 +248,15 @@ body {
 /* On a page the header reads left to right like the tab around it: the way out, then the title, the actions at the end; the icon's ink starts where the text does. */
 .ft-page .ft-sheet-header { box-sizing: border-box; width: 100%; max-width: var(--ft-column); margin: 0 auto; padding: var(--ft-space-8) calc(var(--ft-gutter) - (var(--ft-button) - var(--ft-icon-button)) / 2) 0; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--ft-space-12); }
 .ft-page .ft-sheet-middle { align-items: flex-start; }
+/* On a phone the title stands in the middle, as on the boards. */
+.is-mobile .ft-page .ft-sheet-header { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+.is-mobile .ft-page .ft-sheet-middle { align-items: center; }
 .ft-sheet-subtitle { display: flex; align-items: center; gap: var(--ft-space-12); }
-.ft-page .ft-sheet-body { box-sizing: border-box; width: 100%; max-width: var(--ft-column); margin: 0 auto; }
 .ft-fade { position: absolute; left: 0; right: 0; bottom: 0; z-index: var(--ft-layer-fade); height: var(--ft-fade); background: linear-gradient(to bottom, var(--ft-fade-from), var(--ft-bg) var(--ft-fade-stop)); pointer-events: none; }
 
 /* On a phone the "+", the undo line and the list's end sit above Obsidian's bar. */
-.is-mobile .friends-tracker .ft-fab, .is-mobile .friends-tracker .ft-undo { bottom: calc(var(--ft-fab-bottom) + var(--ft-navbar)); }
+.is-mobile .friends-tracker .ft-fab { bottom: calc(var(--ft-fab-bottom) + var(--ft-navbar)); }
+.is-mobile .friends-tracker .ft-undo { bottom: calc(var(--ft-fab-bottom) + var(--ft-navbar) + (var(--ft-fab) - var(--ft-button)) / 2); }
 .is-mobile .friends-tracker .ft-scroll { padding-bottom: calc(var(--ft-space-104) + var(--ft-navbar)); }
 .is-mobile .friends-tracker .ft-sheet-body { padding-bottom: calc(var(--ft-space-44) + var(--ft-navbar)); }
 .is-mobile .friends-tracker .ft-fade { height: calc(var(--ft-fade) + var(--ft-navbar)); }
@@ -225,6 +268,8 @@ body {
 .ft-search .ft-icon svg { width: var(--ft-icon-search); height: var(--ft-icon-search); }
 .friends-tracker .ft-search input, .friends-tracker .ft-search input:focus, .friends-tracker .ft-search input:active { flex: 1 1 auto; min-width: 0; height: 100%; margin: 0; padding: 0; border: none; border-radius: 0; background: transparent; box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-body); font-family: var(--ft-font-inherit); -webkit-appearance: none; appearance: none; outline: none; }
 .friends-tracker .ft-search .ft-icon-button { width: var(--ft-button); height: var(--ft-search); color: var(--ft-muted); }
+/* Nothing typed, nothing to clear. */
+.friends-tracker .ft-search:has(input:placeholder-shown) .ft-search-clear { opacity: 0; pointer-events: none; }
 
 /* The period on Stats, and its big numbers. */
 .ft-periods { margin-top: var(--ft-space-20); }
@@ -256,30 +301,41 @@ body {
 /* Obsidian's own rule for the panel in editing mode weighs five classes; these weigh six, so they win. */
 .workspace-leaf-content.ft-person-note .view-content .metadata-property.ft-own-property.ft-own-property, .workspace-leaf-content.ft-person-note .view-content .metadata-container.ft-only-own.ft-only-own { display: none; }
 .ft-person-panel .metadata-property.is-wide { flex-direction: column; align-items: stretch; }
-.ft-person-panel .metadata-property.is-wide .metadata-property-value { padding: var(--ft-space-4) var(--ft-space-12) var(--ft-space-12) 0; color: var(--ft-property-text); font-size: var(--ft-property-font); }
+.ft-person-panel .metadata-property.is-wide .metadata-property-value { padding: var(--ft-space-4) var(--ft-space-12) var(--ft-space-12) var(--ft-property-inset); color: var(--ft-property-text); font-size: var(--ft-property-font); }
 .ft-person-panel .metadata-property.is-wide .metadata-property-key { width: auto; min-width: 0; }
-.ft-person-panel .ft-legend { margin-top: var(--ft-space-8); }
+/* Obsidian lays a property's value out in a row; the chart and the list take its whole width, as on the board. */
+.ft-person-panel .metadata-property.is-wide .metadata-property-value > * { flex: 1 1 auto; min-width: 0; }
+.ft-person-panel .ft-legend { margin-top: var(--ft-space-8); flex-wrap: wrap; column-gap: var(--ft-space-12); row-gap: var(--ft-space-4); }
+.ft-legend-count { color: var(--ft-text); font-weight: var(--ft-weight-medium); font-variant-numeric: tabular-nums; }
+.ft-activity { display: flex; flex-direction: column; }
+.ft-person-panel .ft-range { margin-bottom: var(--ft-space-12); }
+.ft-person-panel .ft-range .ft-fork-row { gap: var(--ft-space-4); }
+.ft-person-panel .ft-range .ft-capsule { height: var(--ft-range); font-size: var(--ft-font-legend); }
+.ft-person-panel .ft-delta { margin-inline-start: var(--ft-space-6); }
+.ft-overdue { color: var(--ft-danger); }
 .ft-recent { display: flex; flex-direction: column; gap: var(--ft-space-4); }
-.ft-person-panel .ft-recent-row { display: grid; grid-template-columns: var(--ft-recent-date) var(--ft-recent-dot) minmax(0, 1fr); align-items: center; min-height: var(--ft-space-28); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); width: 100%; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.ft-person-panel .ft-recent-row { display: grid; grid-template-columns: var(--ft-recent-date) var(--ft-recent-dot) minmax(0, 1fr); align-items: center; min-height: var(--ft-space-28); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); width: 100%; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.is-mobile .ft-person-panel .ft-recent-row { min-height: var(--ft-button); }
 .ft-recent-date { color: var(--ft-muted); }
 .ft-dot { width: var(--ft-dot); height: var(--ft-dot); border-radius: var(--ft-radius-circle); }
 .ft-panel-quiet { padding-inline-start: var(--ft-space-6); color: var(--ft-faint); }
-.friends-tracker .ft-more, .ft-person-panel .ft-more { display: inline-flex; align-items: center; gap: var(--ft-space-4); height: var(--ft-section); margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: var(--ft-muted); font-size: var(--ft-font-capsule); cursor: pointer; }
-.ft-more .ft-icon svg { width: var(--ft-chevron); height: var(--ft-chevron); }
+.friends-tracker .ft-more, .ft-person-panel .ft-more { display: inline-flex; align-items: center; gap: var(--ft-space-4); height: var(--ft-section); margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: var(--ft-muted); font-size: var(--ft-font-capsule); cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent; }
+.ft-more .ft-icon svg { width: var(--ft-chevron); height: var(--ft-chevron); stroke-width: var(--ft-stroke-bold); }
+.ft-more::after { content: ""; position: absolute; inset: calc((var(--ft-section) - var(--ft-button)) / 2) 0; }
+/* In the person's panel it is a line of the panel, in the Properties' type. */
+.ft-person-panel .ft-more { align-self: flex-start; height: auto; min-height: var(--ft-space-28); font-size: var(--ft-property-font); }
+.ft-person-panel .ft-more::after { inset: calc((var(--ft-space-28) - var(--ft-button)) / 2) 0; }
 
 /* The undo line over the feed after something is logged. */
-.friends-tracker .ft-undo { position: absolute; left: var(--ft-gutter); right: calc(var(--ft-gutter) + 2 * var(--ft-fab) + 2 * var(--ft-space-12)); bottom: var(--ft-fab-bottom); z-index: var(--ft-layer-fab); display: flex; align-items: center; gap: var(--ft-space-12); height: var(--ft-button); padding: 0 var(--ft-space-8) 0 var(--ft-space-16); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-surface); }
+.friends-tracker .ft-undo { position: absolute; left: var(--ft-edge); right: calc(var(--ft-edge) + 2 * var(--ft-fab) + 2 * var(--ft-space-12)); bottom: calc(var(--ft-fab-bottom) + (var(--ft-fab) - var(--ft-button)) / 2); z-index: var(--ft-layer-fab); display: flex; align-items: center; gap: var(--ft-space-12); height: var(--ft-button); padding: 0 var(--ft-space-8) 0 var(--ft-space-16); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-surface); box-shadow: var(--ft-shadow-float); }
 .ft-undo-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--ft-font-capsule); }
-.friends-tracker .ft-undo-button { margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; }
+.friends-tracker .ft-undo-button { align-self: stretch; margin: 0; padding: 0 var(--ft-space-8); border: none; background: transparent; box-shadow: none; color: var(--ft-accent-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
 /* A sheet's body under its header. */
-.ft-sheet-body { box-sizing: border-box; width: 100%; max-width: var(--ft-column); margin: 0 auto; }
 
-/* Sheets: the whole screen on a phone, a column on a computer. */
-.ft-sheet.modal { display: flex; flex-direction: column; max-width: var(--ft-column); padding: 0; }
+/* The pickers are Obsidian's modals without their header. */
 .ft-picker .modal-close-button, .ft-picker .modal-header, .ft-picker .modal-header-button { display: none; }
-.ft-sheet .modal-content { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; padding: 0; }
-.ft-sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: var(--ft-space-12) var(--ft-gutter) var(--ft-space-44); }
+.ft-sheet-body { box-sizing: border-box; flex: 1 1 auto; width: 100%; max-width: var(--ft-column); min-height: 0; margin: 0 auto; overflow-y: auto; padding: var(--ft-space-12) var(--ft-gutter) var(--ft-space-44); }
 
 /* The date picker: a month of round days. */
 .ft-picker .ft-picker-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--ft-space-8); }
@@ -288,9 +344,56 @@ body {
 .ft-picker-hours, .ft-picker-minutes { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .ft-time-picker .ft-picker-head { justify-content: center; }
 .ft-picker-weekday { font-size: var(--ft-font-small); color: var(--ft-faint); }
-.friends-tracker .ft-picker-cell { width: var(--ft-circle); height: var(--ft-circle); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: transparent; box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-capsule); cursor: pointer; }
+.friends-tracker .ft-picker-cell { width: var(--ft-button); height: var(--ft-button); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-circle); corner-shape: var(--ft-corner); background: transparent; box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-capsule); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .friends-tracker .ft-picker-cell:disabled { color: var(--ft-faint); cursor: default; }
-.friends-tracker .ft-picker-cell.is-today { box-shadow: inset 0 0 0 var(--ft-stroke) var(--ft-accent); }
-.friends-tracker .ft-picker-cell.is-picked { background: var(--ft-strong); color: var(--ft-on-strong); }
+.friends-tracker .ft-picker-cell.is-today { box-shadow: inset 0 0 0 var(--ft-ring) var(--ft-accent); }
+.friends-tracker .ft-picker-cell.is-on { background: var(--ft-strong); color: var(--ft-on-strong); }
 
 .friends-tracker .ft-empty { padding: var(--ft-space-20) 0; color: var(--ft-faint); font-size: var(--ft-font-body); }
+
+/*
+ * The buttons come in four families. Filled round: the one action, the "+" and ✓ (and the quiet round one beside the
+ * "+"). Ghost round: an icon alone, ✕, back, the trash can in red. Choice: a capsule or a picker's circle, the chosen one
+ * filled. Text: grey or accent words. Rows are rows. Each family hovers, presses and shows focus the same way.
+ */
+.friends-tracker :is(.ft-row, .ft-capsule, .ft-icon-button, .ft-fab, .ft-subtle, .ft-more, .ft-undo-button, .ft-picker-cell):focus-visible,
+.ft-person-panel :is(.ft-recent-row, .ft-more, .ft-capsule):focus-visible { outline: var(--ft-ring) solid var(--ft-focus); outline-offset: var(--ft-focus-offset); }
+@media (hover: hover) {
+	.friends-tracker :is(button.ft-row, .ft-icon-button, .ft-picker-cell):hover, .ft-person-panel .ft-recent-row:hover { background: var(--ft-hover); }
+	.friends-tracker .ft-capsule:hover, .ft-person-panel .ft-capsule:hover, .friends-tracker .ft-fab.is-quiet:hover { background: var(--ft-fill-hover); }
+	.friends-tracker :is(.ft-capsule.is-on, .ft-icon-button.is-filled, .ft-picker-cell.is-on, .ft-fab:not(.is-quiet)):hover, .ft-person-panel .ft-capsule.is-on:hover { background: var(--ft-strong); opacity: var(--ft-hover-strong); }
+	.friends-tracker .ft-icon-button:disabled:hover { background: transparent; opacity: var(--ft-disabled); }
+	.friends-tracker .ft-icon-button.is-filled:disabled:hover { background: var(--ft-strong); }
+	.friends-tracker .ft-picker-cell:disabled:hover { background: transparent; }
+	.friends-tracker :is(.ft-subtle, .ft-more, .ft-search .ft-icon-button):hover, .ft-person-panel .ft-more:hover { background: transparent; color: var(--ft-text); }
+	.friends-tracker .ft-undo-button:hover { background: transparent; opacity: var(--ft-hover-strong); }
+}
+.friends-tracker :is(.ft-subtle, .ft-more, .ft-undo-button):active, .ft-person-panel .ft-more:active { opacity: var(--ft-pressed); }
+
+@keyframes ft-arrive { from { opacity: 0; transform: translateY(var(--ft-rise)); } }
+@keyframes ft-leave { to { opacity: 0; transform: translateY(var(--ft-rise)); } }
+@keyframes ft-fade-in { from { opacity: 0; } }
+@keyframes ft-pop { from { transform: scale(var(--ft-pop-scale)); } }
+@keyframes ft-come-back { from { opacity: 0; transform: scale(var(--ft-pop-scale)); } }
+@keyframes ft-grow { from { transform: scaleY(0); } }
+@keyframes ft-glow { from { opacity: 1; } to { opacity: 0; } }
+
+/* What moves, only for a reader who hasn't asked for less motion. The code puts the classes on for one run. */
+@media (prefers-reduced-motion: no-preference) {
+	.friends-tracker :is(.ft-capsule, .ft-icon-button, .ft-fab, .ft-picker-cell), .ft-person-panel .ft-capsule { transition: transform var(--ft-duration-press) var(--ft-ease-out), background var(--ft-duration-fade) var(--ft-ease-out), opacity var(--ft-duration-fade) var(--ft-ease-out); }
+	.friends-tracker :is(.ft-capsule, .ft-picker-cell):not(:disabled):active, .ft-person-panel .ft-capsule:active { transform: scale(var(--ft-press-scale)); }
+	.friends-tracker :is(.ft-icon-button, .ft-fab):not(:disabled):active { transform: scale(var(--ft-press-scale-round)); }
+	.friends-tracker .ft-search .ft-search-clear { transition: opacity var(--ft-duration-fade) var(--ft-ease-out); }
+
+	.friends-tracker :is(.ft-page.is-entering, .ft-undo.is-arriving, .ft-day.is-arriving, .ft-fork.is-arriving, .ft-numbers.is-arriving, .ft-row.is-arriving) { animation: ft-arrive var(--ft-duration-enter) var(--ft-ease-out) both; animation-delay: calc(-1 * var(--ft-motion-offset, 0ms)); }
+	/* A row just logged or changed in the feed glows for a moment. */
+	.ft-feed .ft-row.is-arriving { position: relative; }
+	.ft-feed .ft-row.is-arriving::before { content: ""; position: absolute; inset: 0; border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-hover); pointer-events: none; animation: ft-glow var(--ft-duration-glow) var(--ft-ease-in) both; animation-delay: calc(-1 * var(--ft-motion-offset, 0ms)); }
+	.friends-tracker .ft-capsule.is-arriving { animation: ft-pop var(--ft-duration-enter) var(--ft-ease-out); animation-delay: calc(-1 * var(--ft-motion-offset, 0ms)); }
+	.friends-tracker .ft-scroll.is-returning { animation: ft-fade-in var(--ft-duration-enter) var(--ft-ease-out) both; }
+	.friends-tracker .ft-fab.is-returning { animation: ft-come-back var(--ft-duration-enter) var(--ft-ease-out) both; }
+	.ft-bar { transform-origin: bottom; }
+	.ft-bar.is-growing { animation: ft-grow var(--ft-duration-grow) var(--ft-ease-out) both; animation-delay: calc(var(--ft-bar-index) * var(--ft-stagger) - var(--ft-motion-offset, 0ms)); }
+	.friends-tracker .ft-undo.is-leaving { animation: ft-leave var(--ft-duration-fade) var(--ft-ease-in) both; }
+}
+.friends-tracker .ft-undo.is-leaving { pointer-events: none; }

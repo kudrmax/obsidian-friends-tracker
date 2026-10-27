@@ -1,11 +1,13 @@
-import { ItemView, Notice, ViewStateResult, WorkspaceLeaf } from "obsidian";
+import { ItemView, Notice, Scope, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { FeedDay, FeedRow } from "../application/PeopleService";
 import { describe } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
 import { KIND_ICONS, dayHeader, fab, row } from "./components";
-import { nextPage, pagesAvailable, pagesShown } from "./feed";
-import { FullSheet, PageDescriptor, PageHolder, samePage } from "./sheet";
+import { nextPage, pagesAvailable, pagesShown, rowKeys } from "./feed";
+import { ANIMATION, Arrivals, arrive, leave, play } from "./motion";
+import { FullSheet, PageDescriptor, PageHolder, samePage, sheetForPage } from "./sheet";
 import { dayDate, dayName } from "./format";
+import { TabHistory } from "./TabHistory";
 import { UiContext, UndoOffer } from "./UiContext";
 
 export const FEED_VIEW = "friends-tracker-feed";
@@ -30,12 +32,23 @@ export class FeedView extends ItemView implements PageHolder {
 	private pageState: PageDescriptor | null = null;
 	/** The sheet whose page was just asked for, so setState shows that very instance. */
 	private pending: FullSheet | null = null;
+	private readonly history: TabHistory;
+	private fabs: HTMLButtonElement[] = [];
+	/** What a redraw of the list brings that the one before didn't: a record just logged, changed or brought back. */
+	private readonly arrivals = new Arrivals();
 
 	constructor(
 		leaf: WorkspaceLeaf,
 		private readonly ui: UiContext,
 	) {
 		super(leaf);
+		this.history = new TabHistory(this.app, leaf, FEED_VIEW);
+		this.scope = new Scope(this.app.scope);
+		this.scope.register([], "Escape", () => {
+			if (!this.sheet) return true;
+			this.sheet.dismiss();
+			return false;
+		});
 	}
 
 	override getViewType(): string {
@@ -60,13 +73,17 @@ export class FeedView extends ItemView implements PageHolder {
 		this.list = column.createDiv("ft-feed-list");
 		this.scroller.addEventListener("scroll", () => this.maybeLoadMore());
 		root.createDiv("ft-fade");
-		fab(root, "Stats", () => this.ui.openStats(), "bar-chart-3").addClass("is-quiet");
-		fab(root, "Log an interaction", () => this.ui.newInteraction());
+		const stats = fab(root, "Stats", () => this.ui.openStats(), "bar-chart-3");
+		stats.addClass("is-quiet");
+		this.fabs = [stats, fab(root, "Log an interaction", () => this.ui.newInteraction())];
+		this.registerEvent(this.history.showOnPhone());
 		this.refresh();
+		play(this.scroller, "is-returning", ANIMATION.fadeIn);
 	}
 
 	override async onClose(): Promise<void> {
-		this.clearUndo();
+		this.clearUndo(true);
+		this.takeDown();
 		this.contentEl.empty();
 	}
 
@@ -118,7 +135,7 @@ export class FeedView extends ItemView implements PageHolder {
 		if (pages >= this.pagesInAll()) return false;
 		this.shown = nextPage(this.shown, this.ui.service, this.ui.service.today(), pages);
 		this.pagesLoaded = pages + 1;
-		this.render();
+		this.render(true);
 		return true;
 	}
 
@@ -134,10 +151,11 @@ export class FeedView extends ItemView implements PageHolder {
 		const page = ((state as { page?: unknown } | null)?.page ?? null) as PageDescriptor | null;
 		await super.setState(state, result);
 		if (samePage(page, this.pageState)) return;
-		result.history = true;
+		/* A change of page is a step in the tab's history, unless it asks to replace the step it is on. */
+		result.history = (state as { replace?: unknown } | null)?.replace !== true;
 		const pending = this.pending;
 		this.pending = null;
-		const sheet = page ? (pending && samePage(pending.descriptor(), page) ? pending : this.ui.sheetFor(page)) : null;
+		const sheet = sheetForPage(page, pending, (described) => this.ui.sheetFor(described));
 		if (sheet) this.put(sheet);
 		else this.takeDown();
 	}
@@ -152,26 +170,61 @@ export class FeedView extends ItemView implements PageHolder {
 		if (this.pageState) this.pageState = sheet.descriptor();
 	}
 
+	/**
+	 * Back to the list the pages were opened over, forgetting them, so the back arrow never leads into a sheet already
+	 * done with. A page with no list behind it (restored on start) is replaced by the list.
+	 */
 	hidePage(): void {
 		if (!this.pageState) return;
-		void this.leaf.setViewState({ type: FEED_VIEW, active: true, state: { page: null } });
+		void this.leavePages();
+	}
+
+	private async leavePages(): Promise<void> {
+		if (!(await this.history.backToList()) && this.pageState) {
+			await this.leaf.setViewState({ type: FEED_VIEW, active: true, state: { page: null, replace: true } });
+			this.history.dropForward();
+		}
+	}
+
+	previousPage(): PageDescriptor | null | undefined {
+		return this.history.previous();
+	}
+
+	goBack(): void {
+		void this.history.back();
 	}
 
 	private put(sheet: FullSheet): void {
+		this.sheet?.unmount();
 		this.page?.remove();
 		this.page = this.contentEl.createDiv("ft-page");
 		this.contentEl.addClass("has-page");
 		this.pageState = sheet.descriptor();
 		this.sheet = sheet;
-		sheet.mount(this.page);
+		sheet.mount(this.page, this);
+		play(this.page, "is-entering", ANIMATION.arrive);
 	}
 
 	private takeDown(): void {
+		const hadPage = this.page !== null;
+		this.sheet?.unmount();
 		this.page?.remove();
 		this.page = null;
 		this.sheet = null;
 		this.pageState = null;
 		this.contentEl.removeClass("has-page");
+		if (hadPage) this.comeBack();
+	}
+
+	/** The list and its round buttons come back from behind a page. */
+	private comeBack(): void {
+		if (this.scroller) play(this.scroller, "is-returning", ANIMATION.fadeIn);
+		for (const button of this.fabs) play(button, "is-returning", ANIMATION.comeBack);
+	}
+
+	/** A note was renamed or moved: the page about it follows. */
+	moved(from: string, to: string): void {
+		this.sheet?.moved(from, to);
 	}
 
 	/** Offers to undo what was just logged, for a few seconds, over the "+". */
@@ -179,21 +232,26 @@ export class FeedView extends ItemView implements PageHolder {
 		this.clearUndo();
 		const line = this.contentEl.createDiv({ cls: "ft-undo", attr: { role: "status" } });
 		line.createSpan({ cls: "ft-undo-text", text: offer.text });
-		line.createEl("button", { cls: "ft-undo-button", text: "Undo" }).addEventListener("click", () => {
+		line.createEl("button", { cls: "ft-undo-button", text: "Undo", attr: { type: "button" } }).addEventListener("click", () => {
 			this.clearUndo();
 			offer.undo().catch((error: unknown) => new Notice(error instanceof Error ? error.message : String(error)));
 		});
 		line.addEventListener("click", (event) => {
 			if (event.target === line) this.clearUndo();
 		});
+		arrive(line, 0);
 		this.undoEl = line;
 		this.undoTimer = window.setTimeout(() => this.clearUndo(), UNDO_MS);
 	}
 
-	private clearUndo(): void {
+	/** Takes the undo line away: it sinks out, or goes at once when the view closes. */
+	private clearUndo(now = false): void {
 		if (this.undoTimer !== null) window.clearTimeout(this.undoTimer);
 		this.undoTimer = null;
-		this.undoEl?.remove();
+		if (this.undoEl) {
+			if (now) this.undoEl.remove();
+			else leave(this.undoEl);
+		}
 		this.undoEl = null;
 	}
 
@@ -204,10 +262,12 @@ export class FeedView extends ItemView implements PageHolder {
 		return Math.max(pagesShown(this.shown, this.ui.service.today()), this.pagesLoaded);
 	}
 
-	private render(): void {
+	/** Draws the list afresh; what wasn't there before rises in, unless the list only grew by scrolling (`quiet`). */
+	private render(quiet = false): void {
 		const list = this.list;
 		if (!list) return;
 		list.empty();
+		this.arrivals.begin();
 		const today = this.ui.service.today();
 		if (!this.shown.length) {
 			list.createDiv({ cls: "ft-empty", text: "No interactions yet" });
@@ -215,14 +275,16 @@ export class FeedView extends ItemView implements PageHolder {
 		}
 		for (const day of this.shown) {
 			const group = list.createDiv("ft-group");
-			dayHeader(group, dayName(day.date, today), dayDate(day.date, today));
-			for (const entry of day.rows) this.renderRow(group, entry);
+			const header = dayHeader(group, dayName(day.date, today), dayDate(day.date, today));
+			arrive(header, this.arrivals.offset(`day:${String(day.date)}`, quiet));
+			const keys = rowKeys(day.rows);
+			day.rows.forEach((entry, at) => arrive(this.renderRow(group, entry), this.arrivals.offset(keys[at], quiet), ANIMATION.glow));
 		}
 	}
 
-	private renderRow(parent: HTMLElement, entry: FeedRow): void {
+	private renderRow(parent: HTMLElement, entry: FeedRow): HTMLElement {
 		const kind = entry.interaction.kind;
-		row(parent, {
+		return row(parent, {
 			circle: { icon: KIND_ICONS[kind], accent: kind === "meeting" },
 			title: entry.name,
 			subtitle: describe(entry.interaction, this.ui.settings().labels),

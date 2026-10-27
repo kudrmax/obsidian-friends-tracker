@@ -1,9 +1,11 @@
 import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Interaction } from "../domain/Interaction";
 import { Person } from "../domain/Person";
-import { Behind, Often, Period, byMonth, fallingBehind, mostOften, totals } from "../domain/Stats";
+import { Behind, Often, Period, buckets, fallingBehind, mostOften, totals } from "../domain/Stats";
 import { forkRow, moreButton, row, sectionLabel } from "./components";
-import { monthChart } from "./MonthChart";
+import { barChart } from "./MonthChart";
+import { ANIMATION, Arrivals, Debut, arrive, play } from "./motion";
+import { TabHistory } from "./TabHistory";
 import { UiContext } from "./UiContext";
 
 export const STATS_VIEW = "friends-tracker-stats";
@@ -23,6 +25,10 @@ export class StatsView extends ItemView {
 	private body: HTMLElement | null = null;
 	/** Where each person shown lives, so a tap opens the right note. */
 	private paths = new Map<Person, string>();
+	/** A period just picked: its numbers and its list rise in. */
+	private readonly arrivals = new Arrivals();
+	/** The chart grows once, when the view opens. */
+	private readonly debut = new Debut();
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -60,7 +66,10 @@ export class StatsView extends ItemView {
 		root.addClass("friends-tracker", "ft-view", "ft-stats");
 		const scroller = root.createDiv("ft-scroll");
 		this.body = scroller.createDiv("ft-column");
+		this.registerEvent(new TabHistory(this.app, this.leaf, STATS_VIEW).showOnPhone());
+		this.debut.restart();
 		this.refresh();
+		play(scroller, "is-returning", ANIMATION.fadeIn);
 	}
 
 	override async onClose(): Promise<void> {
@@ -71,12 +80,20 @@ export class StatsView extends ItemView {
 		const body = this.body;
 		if (!body) return;
 		body.empty();
+		this.arrivals.begin();
 		body.createEl("h1", { cls: "ft-title", text: "Stats" });
-		const periods = forkRow<Period>(body, undefined, PERIODS, this.period, (period) => {
-			this.period = period;
-			void this.app.workspace.requestSaveLayout();
-			this.refresh();
-		});
+		const periods = forkRow<Period>(
+			body,
+			undefined,
+			PERIODS,
+			this.period,
+			(period) => {
+				this.period = period;
+				void this.app.workspace.requestSaveLayout();
+				this.refresh();
+			},
+			this.arrivals,
+		);
 		periods.addClass("ft-periods");
 		const today = this.ui.service.today();
 		this.paths = new Map(this.ui.repository.list().flatMap((entry) => (entry.kind === "ok" ? [[entry.person, entry.path] as const] : [])));
@@ -84,13 +101,14 @@ export class StatsView extends ItemView {
 		this.renderNumbers(body, totals(people, this.period, today));
 		sectionLabel(body, "By month");
 		const all: Interaction[] = people.flatMap((person) => [...person.interactions()]);
-		monthChart(body, byMonth(all, today), this.ui.settings().labels);
+		barChart(body, buckets(all, "months", today), "months", this.ui.settings().labels, { grow: this.debut.offset() });
 		this.renderBehind(body, fallingBehind(people, today));
 		this.renderOften(body, mostOften(people, this.period, today));
 	}
 
 	private renderNumbers(parent: HTMLElement, numbers: ReturnType<typeof totals>): void {
 		const grid = parent.createDiv("ft-numbers");
+		arrive(grid, this.arrivals.offset(`numbers:${this.period}`));
 		const cell = (value: number, delta: number, label: string) => {
 			const item = grid.createDiv();
 			const line = item.createDiv("ft-number-line");
@@ -129,12 +147,13 @@ export class StatsView extends ItemView {
 		if (!often.length) return;
 		sectionLabel(parent, `Most often ${PERIOD_WORD[this.period]}`);
 		for (const item of often.slice(0, LIST_SHOWN)) {
-			row(parent, {
+			const line = row(parent, {
 				circle: { initial: item.person.name.slice(0, 1).toUpperCase() },
 				title: item.person.name,
 				trailing: { text: String(item.count), strong: true },
 				onClick: () => this.openPerson(item.person),
 			});
+			arrive(line, this.arrivals.offset(`often:${this.period}:${item.person.name}`));
 		}
 	}
 

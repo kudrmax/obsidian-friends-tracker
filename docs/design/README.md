@@ -44,9 +44,20 @@ The How screen with everything filled in: title "Edit interaction", the interact
 
 ## Person note (`Person.dc.html`)
 
-A panel inside the note's Properties area, above the text, collapsible under the heading "Person": rows `last seen` (days ago), `usual gap` (days), `this year` (count), `by month` (a 12-month stacked bar chart by format with a legend: Text, Call, Meeting, Whole day), `recent` (three latest as date · dot · format with qualifiers, then "All N" that expands the list in place).
+A panel inside the note's Properties area, above the text, collapsible under the heading "Person". Rows, top to bottom; a row with nothing to say is left out, except `last seen` (approved 2026-10-27, replacing the board's `this year` row):
 
-**Built from Obsidian's own Properties classes** (`metadata-container`, `metadata-properties-heading`, `metadata-property`, `metadata-property-key`, `metadata-property-icon`, `metadata-property-key-input`, `metadata-property-value`, `metadata-input-longtext`), exactly as `HabitBlock` in Marble Habit Tracker, so it is pixel-identical to the real Properties next to it. Own CSS only for the chart and the recent list, reading Obsidian's variables. The mockup is approximate; the real Properties panel is the reference.
+- `last seen` — days since the last **meeting**, "never" without one.
+- `last contact` — days since the last interaction of any kind; only when it is later than the last meeting.
+- The row that shows the latest contact turns red when the silence is longer than the usual gap, as on Stats' "Falling behind"; its tooltip says "41 days ago, usually every 19 days". No extra text: a fact has its place.
+- `usual gap` — days, as on Stats.
+- `past year` — interactions in the last 365 days, then the difference with the 365 before in small green (+) or red (−), as on Stats; no difference for a person first met within those 365 days.
+- `since` — the first logged interaction, always with its year ("12 Mar 2023").
+- `by week` / `by month` / `by year` — a fork of three small capsules (Weeks · Months · Years, 28 px, Months by default) over the stacked bar chart by format: twelve weeks from Monday labelled by the Monday's day, twelve months by letter, or the years from the first interaction on (the last twelve) labelled by year, left-aligned in twelve places so a bar is as wide in every range. The legend gives each format's count over the bars shown. The choice is the same for every person and lasts while Obsidian is open; the bars grow again when it changes.
+- `recent` — three latest as date · dot · format with qualifiers, then "All N" that expands the list in place.
+
+A person with no interactions shows `last seen: never` alone.
+
+**Built from Obsidian's own Properties classes** (`metadata-container`, `metadata-properties-heading`, `metadata-property`, `metadata-property-key`, `metadata-property-icon`, `metadata-property-key-input`, `metadata-property-value`, `metadata-input-longtext`), exactly as `HabitBlock` in Marble Habit Tracker, so it is pixel-identical to the real Properties next to it. Own CSS only for the chart, its range fork and the recent list, reading Obsidian's variables. The mockup is approximate; the real Properties panel is the reference.
 
 ## Stats (`Stats.dc.html`)
 
@@ -61,3 +72,30 @@ A panel inside the note's Properties area, above the text, collapsible under the
 
 - Every colour, size and radius is a CSS variable in `styles.css` mapped to Obsidian variables, as in Marble Habit Tracker; the same `tests/styles.test.ts` guard.
 - Shared parts are plain classes reused across screens: the row, the circle, the capsule button, the fork row, the section label, the sheet header. A new control uses an existing class; only a new kind of object gets new CSS.
+
+## Buttons (decided 2026-10-27)
+
+Every button belongs to one of four families, and a family looks, hovers, presses and shows focus the same way everywhere:
+
+1. **Filled round**: the one action of a screen, white on dark (dark on white in a light theme). The "+" (56 px) and ✓ (44 px). The grey stats button beside the "+" is its quiet sibling. The "+", the stats button and the undo line float over the list with a soft shadow.
+2. **Ghost round**: an icon alone in a 44 px circle: ✕, back, the picker's month arrows, the search's clear. The trash can is this family in red; there is no other destructive style.
+3. **Choice**: a capsule in a fork, or a round day or hour in a picker. The chosen one is filled like family 1.
+4. **Text**: grey words with a small chevron (the date and the time under a title, "N more", "All N"), and the accent "Undo". A finger gets 44 px of height even where the line is shorter.
+
+Rows are rows: the whole row is the button. On a computer every family has a hover (a quiet ground for 2–3 and rows, a slightly lighter fill for 1) and a focus ring for the keyboard; a phone has neither, only the press.
+
+On a phone the page header's title stands in the middle, as on the boards; on a computer it reads left to right like the tab around it. The views keep their own 20 px gutters on a phone too. In the person's panel the recent rows are 44 px high on a phone, and the chart and the list take the panel's whole width.
+
+## Motion (decided 2026-10-27)
+
+Few and quiet, only transform and opacity, timed by the motion tokens in `styles.css`. Nothing moves when the system asks for reduced motion.
+
+- A press shrinks a capsule, a round button or a picker cell a little.
+- A page (Who, How, Edit) rises in; closing it brings the list back with a fade and the round buttons back with a small pop.
+- A row just logged, changed or brought back by Undo rises in and glows for a moment, so you see what changed. Only rows that weren't there before move: a redraw after a change in the notes or more days added by scrolling moves nothing.
+- On How, a fork that a choice brings (What for, Company, Length) rises in, and the capsule just chosen pops.
+- The undo line rises in and sinks out.
+- On Stats, the chart's bars grow when the view opens, a few milliseconds apart; picking a period lets its numbers and its list rise in. In the person's panel the chart grows when the note opens or the panel is unfolded.
+- The search's ✕ fades in once something is typed.
+
+`src/ui/motion.ts` decides what moves: `Arrivals` compares a redraw with the one before, `Debut` plays something once, and the class it puts on comes off when its animation ends, so a tab hidden and shown again doesn't replay it.

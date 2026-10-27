@@ -41,7 +41,8 @@ export class TimePicker extends Modal {
 		const hours = root.createDiv("ft-picker-grid ft-picker-hours");
 		for (const hour of HOURS) {
 			const button = hours.createEl("button", { cls: "ft-picker-cell", text: pad(hour), attr: { type: "button" } });
-			button.toggleClass("is-picked", hour === this.hour);
+			button.toggleClass("is-on", hour === this.hour);
+			button.setAttribute("aria-pressed", String(hour === this.hour));
 			button.addEventListener("click", () => {
 				this.hour = hour;
 				this.render();
@@ -51,7 +52,8 @@ export class TimePicker extends Modal {
 		const minutes = root.createDiv("ft-picker-grid ft-picker-minutes");
 		for (const minute of MINUTES) {
 			const button = minutes.createEl("button", { cls: "ft-picker-cell", text: pad(minute), attr: { type: "button" } });
-			button.toggleClass("is-picked", minute === this.minute);
+			button.toggleClass("is-on", minute === this.minute);
+			button.setAttribute("aria-pressed", String(minute === this.minute));
 			button.addEventListener("click", () => {
 				this.onPick(LocalTime.of(this.hour, minute));
 				this.close();

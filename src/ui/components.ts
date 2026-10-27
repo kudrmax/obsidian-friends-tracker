@@ -1,5 +1,6 @@
 import { setIcon } from "obsidian";
 import { Company, Kind, Length, Purpose } from "../domain/Interaction";
+import { ANIMATION, Arrivals, arrive } from "./motion";
 
 /** Lucide icons the screens use, by name. */
 export type IconName =
@@ -104,20 +105,23 @@ export interface ForkOption<T extends string> {
 	readonly icon?: IconName;
 }
 
-/** A fork: a label and one row of equal capsules, the chosen one filled. */
+/** A fork: a label and one row of equal capsules, the chosen one filled. With `arrivals`, a fork just asked rises in and a capsule just chosen pops. */
 export function forkRow<T extends string>(
 	parent: HTMLElement,
 	label: string | undefined,
 	options: readonly ForkOption<T>[],
 	selected: T | undefined,
 	onPick: (value: T) => void,
+	arrivals?: Arrivals,
 ): HTMLElement {
 	const el = parent.createDiv("ft-fork");
+	if (arrivals) arrive(el, arrivals.offset(`fork:${label ?? ""}`));
 	if (label) el.createDiv({ cls: "ft-section", text: label });
 	const buttons = el.createDiv("ft-fork-row");
 	for (const option of options) {
 		const button = buttons.createEl("button", { cls: "ft-capsule", attr: { type: "button", "aria-pressed": String(option.value === selected) } });
 		button.toggleClass("is-on", option.value === selected);
+		if (arrivals && option.value === selected) arrive(button, arrivals.offset(`on:${label ?? ""}=${option.value}`), ANIMATION.pop);
 		if (option.icon) icon(button, option.icon);
 		button.createSpan({ text: option.text });
 		button.addEventListener("click", () => onPick(option.value));

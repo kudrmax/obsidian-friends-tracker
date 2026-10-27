@@ -1,4 +1,4 @@
-import { FeedDay, PeopleService } from "../application/PeopleService";
+import { FeedDay, FeedRow, PeopleService } from "../application/PeopleService";
 import { LocalDate } from "../domain/LocalDate";
 
 /** How many calendar days one page of the feed covers. */
@@ -21,4 +21,23 @@ export function pagesShown(shown: FeedDay[], today: LocalDate): number {
 	const last = shown[shown.length - 1];
 	if (!last) return 0;
 	return Math.floor(today.daysSince(last.date) / PAGE_DAYS) + 1;
+}
+
+/** What a row of the feed is, in words that stay the same across redraws: the person, the moment and the how. */
+export function rowKey(row: FeedRow): string {
+	const interaction = row.interaction;
+	const how =
+		interaction.kind === "call" ? [interaction.purpose] : interaction.kind === "meeting" ? [interaction.company, interaction.length] : [];
+	return [row.path, String(interaction.date), interaction.time ? String(interaction.time) : "", interaction.kind, ...how].join("|");
+}
+
+/** The keys of a day's rows; two same rows on a day are told apart by their order. */
+export function rowKeys(rows: readonly FeedRow[]): string[] {
+	const seen = new Map<string, number>();
+	return rows.map((row) => {
+		const key = rowKey(row);
+		const count = seen.get(key) ?? 0;
+		seen.set(key, count + 1);
+		return count === 0 ? key : `${key}#${count}`;
+	});
 }

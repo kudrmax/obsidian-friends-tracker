@@ -7,7 +7,9 @@ export type Period = "week" | "month" | "year";
 export const PERIOD_DAYS: Readonly<Record<Period, number>> = { week: 7, month: 30, year: 365 };
 
 const YEAR_DAYS = 365;
-const MONTHS_SHOWN = 12;
+/** Bars in a chart, at most. */
+export const BARS_SHOWN = 12;
+const WEEK_DAYS = 7;
 /** Days with an interaction needed before the usual gap means anything. */
 const MIN_DAYS_FOR_GAP = 3;
 
@@ -30,31 +32,70 @@ export function usualGap(person: Person, today: LocalDate): number | undefined {
 	return Math.round(median);
 }
 
-export interface MonthBar {
-	readonly year: number;
-	readonly month: number;
+/** Interactions by how they went: meetings that took the whole day apart from the other meetings. */
+export interface KindCounts {
 	readonly text: number;
 	readonly call: number;
 	readonly meeting: number;
-	/** Meetings that took the whole day, counted here instead of under meeting. */
 	readonly wholeDay: number;
 }
 
-/** Twelve calendar months, the current one last. */
-export function byMonth(interactions: readonly Interaction[], today: LocalDate): MonthBar[] {
-	const bars: MonthBar[] = [];
-	for (let back = MONTHS_SHOWN - 1; back >= 0; back--) {
-		const index = today.year * 12 + (today.month - 1) - back;
-		bars.push({ year: Math.floor(index / 12), month: (index % 12) + 1, text: 0, call: 0, meeting: 0, wholeDay: 0 });
-	}
-	const counts = bars.map((bar) => ({ ...bar }));
+type Tally = { -readonly [K in keyof KindCounts]: number };
+
+const NONE: KindCounts = { text: 0, call: 0, meeting: 0, wholeDay: 0 };
+
+export function countKinds(interactions: readonly Interaction[]): KindCounts {
+	const counts: Tally = { ...NONE };
 	for (const interaction of interactions) {
-		const at = counts.find((bar) => bar.year === interaction.date.year && bar.month === interaction.date.month);
-		if (!at) continue;
-		if (interaction.kind === "meeting" && interaction.length === "whole_day") at.wholeDay++;
-		else at[interaction.kind]++;
+		if (interaction.kind === "meeting" && interaction.length === "whole_day") counts.wholeDay++;
+		else counts[interaction.kind]++;
 	}
 	return counts;
+}
+
+export function sum(all: readonly KindCounts[]): KindCounts {
+	const total: Tally = { ...NONE };
+	for (const counts of all) for (const key of Object.keys(total) as (keyof KindCounts)[]) total[key] += counts[key];
+	return total;
+}
+
+/** What one bar of a chart covers. */
+export type ChartRange = "weeks" | "months" | "years";
+export const CHART_RANGES: readonly ChartRange[] = ["weeks", "months", "years"];
+
+/** One bar: the interactions from `from` to `to`, both included. */
+export interface Bucket extends KindCounts {
+	readonly from: LocalDate;
+	readonly to: LocalDate;
+}
+
+/**
+ * The bars of a chart, oldest first, the one holding today last: twelve weeks from Monday, twelve calendar months, or
+ * the years from the first interaction's on, the last twelve at most.
+ */
+export function buckets(interactions: readonly Interaction[], range: ChartRange, today: LocalDate): Bucket[] {
+	return spans(interactions, range, today).map(({ from, to }) => ({
+		from,
+		to,
+		...countKinds(interactions.filter((i) => !i.date.isBefore(from) && !i.date.isAfter(to))),
+	}));
+}
+
+function spans(interactions: readonly Interaction[], range: ChartRange, today: LocalDate): { from: LocalDate; to: LocalDate }[] {
+	const back = (count: number) => Array.from({ length: count }, (_, index) => count - 1 - index);
+	if (range === "weeks") {
+		const monday = today.startOfWeek();
+		return back(BARS_SHOWN).map((weeks) => ({ from: monday.addDays(-WEEK_DAYS * weeks), to: monday.addDays(-WEEK_DAYS * weeks + WEEK_DAYS - 1) }));
+	}
+	if (range === "months") {
+		return back(BARS_SHOWN).map((months) => ({
+			from: LocalDate.of(today.year, today.month - months, 1),
+			to: LocalDate.of(today.year, today.month - months + 1, 1).addDays(-1),
+		}));
+	}
+	const first = Math.min(today.year, ...interactions.map((i) => i.date.year));
+	const years = Math.min(BARS_SHOWN, today.year - first + 1);
+	return back(years).map((ago) => ({ from: LocalDate.of(today.year - ago, 1, 1), to: LocalDate.of(today.year - ago, 12, 31) }));
 }
 
 export interface PeriodTotals {
