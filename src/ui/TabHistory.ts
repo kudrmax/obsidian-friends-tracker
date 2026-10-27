@@ -18,12 +18,17 @@ export function pageAt(entry: HistoryEntry | undefined, type: string): PageDescr
 	return entry.state.state?.page ?? null;
 }
 
-/** How many steps back the list under the pages is; null when the history behind holds no list of this view. */
-export function stepsToList(back: readonly HistoryEntry[], type: string): number | null {
+/** What the pages were opened over: how many steps back it is, and whether it is this view's list or another view, like a note. */
+export interface UnderPages {
+	readonly steps: number;
+	readonly list: boolean;
+}
+
+/** What the pages at the end of the history were opened over; null when the history behind holds nothing but pages. */
+export function underPages(back: readonly HistoryEntry[], type: string): UnderPages | null {
 	for (let steps = 1; steps <= back.length; steps++) {
 		const page = pageAt(back[back.length - steps], type);
-		if (page === undefined) return null;
-		if (page === null) return steps;
+		if (!page) return { steps, list: page === null };
 	}
 	return null;
 }
@@ -60,15 +65,21 @@ export class TabHistory {
 		await this.history()?.go(-1);
 	}
 
-	/**
-	 * Steps back to the list the pages were opened over and forgets them, as a finished sheet should be: neither back
-	 * nor forward leads into it again. False when there is no such list to go back to.
-	 */
-	async backToList(): Promise<boolean> {
+	/** Whether the pages were opened over another view, like a note, so closing them leaves this view. */
+	pagesOverAnotherView(): boolean {
 		const history = this.history();
-		const steps = history ? stepsToList(history.backHistory, this.type) : null;
-		if (!history || steps === null) return false;
-		await history.go(-steps);
+		return history ? underPages(history.backHistory, this.type)?.list === false : false;
+	}
+
+	/**
+	 * Steps back to what the pages were opened over, the list or a note, and forgets them, as a finished sheet should
+	 * be: neither back nor forward leads into it again. False when there is nothing behind the pages to go back to.
+	 */
+	async backOutOfPages(): Promise<boolean> {
+		const history = this.history();
+		const under = history ? underPages(history.backHistory, this.type) : null;
+		if (!history || !under) return false;
+		await history.go(-under.steps);
 		this.dropForward();
 		return true;
 	}

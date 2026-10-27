@@ -171,8 +171,8 @@ export class FeedView extends ItemView implements PageHolder {
 	}
 
 	/**
-	 * Back to the list the pages were opened over, forgetting them, so the back arrow never leads into a sheet already
-	 * done with. A page with no list behind it (restored on start) is replaced by the list.
+	 * Back to what the pages were opened over, the list or a person's note, forgetting them, so the back arrow never
+	 * leads into a sheet already done with. A page with nothing behind it (restored on start) is replaced by the list.
 	 */
 	hidePage(): void {
 		if (!this.pageState) return;
@@ -180,7 +180,7 @@ export class FeedView extends ItemView implements PageHolder {
 	}
 
 	private async leavePages(): Promise<void> {
-		if (!(await this.history.backToList()) && this.pageState) {
+		if (!(await this.history.backOutOfPages()) && this.pageState) {
 			await this.leaf.setViewState({ type: FEED_VIEW, active: true, state: { page: null, replace: true } });
 			this.history.dropForward();
 		}
