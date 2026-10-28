@@ -1,7 +1,8 @@
 import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
 import { Company, Kind, Labels, Length, Purpose } from "../domain/Interaction";
 import { PropertyNames } from "../infrastructure/PersonCodec";
-import { DEFAULT_SETTINGS, MAX_DAY_START, PeopleSettings, SettingsHost } from "../settings";
+import { reachStatus } from "../domain/Reach";
+import { DEFAULT_SETTINGS, MAX_DAY_START, MAX_HEADS_UP, MIN_HEADS_UP, PeopleSettings, SettingsHost, reachRule } from "../settings";
 import { FolderSuggest, TagSuggest } from "./suggest";
 
 const LABEL_NAMES: ReadonlyArray<{ key: keyof Labels; name: string }> = [
@@ -25,7 +26,12 @@ const PROPERTY_KEYS: ReadonlyArray<{ key: PropertyKey; name: string }> = [
 	{ key: "company", name: "Company" },
 	{ key: "length", name: "Length" },
 	{ key: "purpose", name: "Purpose" },
+	{ key: "contactEvery", name: "Contact every" },
+	{ key: "headsUp", name: "Heads-up" },
 ];
+
+/** The target the heads-up setting explains itself with. */
+const EXAMPLE_EVERY = 14;
 
 export class SettingsTab extends PluginSettingTab {
 	constructor(
@@ -41,6 +47,7 @@ export class SettingsTab extends PluginSettingTab {
 		this.people(containerEl);
 		this.note(containerEl);
 		this.day(containerEl);
+		this.reach(containerEl);
 		this.labels(containerEl);
 		this.properties(containerEl);
 	}
@@ -90,7 +97,7 @@ export class SettingsTab extends PluginSettingTab {
 	private note(containerEl: HTMLElement): void {
 		new Setting(containerEl)
 			.setName("Person block in the note")
-			.setDesc("Shows the last interaction, the usual gap, the months and the latest interactions above a person's note, drawn like its Properties.")
+			.setDesc("Shows the last interaction, the target, the usual gap, the months and the latest interactions above a person's note, drawn like its Properties.")
 			.addToggle((toggle) => toggle.setValue(this.host.config.personBlock).onChange((value) => void this.save((next) => (next.personBlock = value))));
 	}
 
@@ -105,6 +112,33 @@ export class SettingsTab extends PluginSettingTab {
 					.setDynamicTooltip()
 					.onChange((value) => void this.save((next) => (next.dayStartHour = value))),
 			);
+	}
+
+	private reach(containerEl: HTMLElement): void {
+		new Setting(containerEl).setName("Reach out").setHeading();
+		const share = new Setting(containerEl).setName("Heads-up at").setDesc(this.headsUpExample());
+		share.addText((text) => {
+			text.inputEl.type = "number";
+			text.inputEl.min = String(MIN_HEADS_UP);
+			text.inputEl.max = String(MAX_HEADS_UP);
+			text.setValue(String(this.host.config.headsUpPercent)).onChange(async (value) => {
+				const percent = Number(value);
+				if (!Number.isInteger(percent) || percent < MIN_HEADS_UP || percent > MAX_HEADS_UP) return;
+				await this.save((next) => (next.headsUpPercent = percent));
+				share.setDesc(this.headsUpExample());
+			});
+		});
+		new Setting(containerEl)
+			.setName("Heads-up for new targets")
+			.setDesc("Whether a person turns yellow before their target runs out, when you give them one. Change it for one person in their note.")
+			.addToggle((toggle) => toggle.setValue(this.host.config.headsUpForNew).onChange((value) => void this.save((next) => (next.headsUpForNew = value))));
+	}
+
+	/** What the share means, worked out on an example target with the rule itself. */
+	private headsUpExample(): string {
+		const rule = reachRule(this.host.config);
+		const from = Array.from({ length: EXAMPLE_EVERY + 1 }, (_, day) => day).find((day) => reachStatus({ every: EXAMPLE_EVERY, headsUp: true }, day, rule) === "soon");
+		return `Percent of a person's target left when they turn yellow, from ${MIN_HEADS_UP} to ${MAX_HEADS_UP}. At ${rule.headsUpPercent}% and every ${EXAMPLE_EVERY} days: from day ${from}.`;
 	}
 
 	private labels(containerEl: HTMLElement): void {
@@ -122,7 +156,7 @@ export class SettingsTab extends PluginSettingTab {
 	private properties(containerEl: HTMLElement): void {
 		new Setting(containerEl)
 			.setName("Property names")
-			.setDesc("The frontmatter keys and values interactions are stored under. Changing them does not rewrite existing notes.")
+			.setDesc("The frontmatter keys and values interactions and targets are stored under. Changing them does not rewrite existing notes.")
 			.setHeading();
 		for (const { key, name } of PROPERTY_KEYS) {
 			new Setting(containerEl).setName(name).addText((text) =>
