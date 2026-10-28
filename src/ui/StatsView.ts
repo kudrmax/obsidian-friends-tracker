@@ -1,8 +1,9 @@
 import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Interaction } from "../domain/Interaction";
 import { Person } from "../domain/Person";
-import { Often, Period, buckets, mostOften, totals } from "../domain/Stats";
+import { Initiative, Often, Period, buckets, mostOften, periodInitiative, totals } from "../domain/Stats";
 import { forkRow, row, sectionLabel } from "./components";
+import { initiativeLine } from "./format";
 import { barChart } from "./MonthChart";
 import { ANIMATION, Arrivals, Debut, arrive, play } from "./motion";
 import { ReachOutBlock } from "./reach";
@@ -100,7 +101,7 @@ export class StatsView extends ItemView {
 		const today = this.ui.service.today();
 		this.paths = new Map(this.ui.repository.list().flatMap((entry) => (entry.kind === "ok" ? [[entry.person, entry.path] as const] : [])));
 		const people = [...this.paths.keys()];
-		this.renderNumbers(body, totals(people, this.period, today));
+		this.renderNumbers(body, totals(people, this.period, today), periodInitiative(people, this.period, today));
 		sectionLabel(body, "By month");
 		const all: Interaction[] = people.flatMap((person) => [...person.interactions()]);
 		barChart(body, buckets(all, "months", today), "months", this.ui.settings().labels, { grow: this.debut.offset() });
@@ -108,21 +109,24 @@ export class StatsView extends ItemView {
 		this.renderOften(body, mostOften(people, this.period, today));
 	}
 
-	private renderNumbers(parent: HTMLElement, numbers: ReturnType<typeof totals>): void {
+	private renderNumbers(parent: HTMLElement, numbers: ReturnType<typeof totals>, started: Initiative | undefined): void {
 		const grid = parent.createDiv("ft-numbers");
 		arrive(grid, this.arrivals.offset(`numbers:${this.period}`));
-		const cell = (value: number, delta: number, label: string) => {
+		const cell = (value: string, delta: number, label: string) => {
 			const item = grid.createDiv();
 			const line = item.createDiv("ft-number-line");
-			line.createSpan({ cls: "ft-number", text: String(value) });
+			line.createSpan({ cls: "ft-number", text: value });
 			if (delta !== 0) {
 				const sign = line.createSpan({ cls: "ft-delta", text: `${delta > 0 ? "+" : "−"}${Math.abs(delta)}` });
 				sign.addClass(delta > 0 ? "is-up" : "is-down");
 			}
 			item.createDiv({ cls: "ft-number-label", text: label });
 		};
-		cell(numbers.interactions, numbers.interactionsDelta, `interactions ${PERIOD_WORD[this.period]}`);
-		cell(numbers.people, numbers.peopleDelta, "people");
+		cell(String(numbers.interactions), numbers.interactionsDelta, `interactions ${PERIOD_WORD[this.period]}`);
+		cell(String(numbers.people), numbers.peopleDelta, "people");
+		if (!started) return;
+		cell(`${started.mine}%`, 0, "you started");
+		cell(`${started.theirs}%`, 0, "they started");
 	}
 
 	private renderOften(parent: HTMLElement, often: Often[]): void {
@@ -132,6 +136,7 @@ export class StatsView extends ItemView {
 			const line = row(parent, {
 				circle: { initial: item.person.name.slice(0, 1).toUpperCase() },
 				title: item.person.name,
+				...(item.initiative ? { subtitle: initiativeLine(item.initiative, item.person.name) } : {}),
 				trailing: { text: String(item.count), strong: true },
 				onClick: () => this.openPerson(item.person),
 			});

@@ -7,6 +7,7 @@ export type Period = "week" | "month" | "year";
 export const PERIOD_DAYS: Readonly<Record<Period, number>> = { week: 7, month: 30, year: 365 };
 
 const YEAR_DAYS = 365;
+const PERCENT = 100;
 /** Bars in a chart, at most. */
 export const BARS_SHOWN = 12;
 const WEEK_DAYS = 7;
@@ -132,15 +133,40 @@ export function totals(people: readonly Person[], period: Period, today: LocalDa
 	};
 }
 
+/** Who started the interactions where it is marked, in whole percent that add up to 100. */
+export interface Initiative {
+	readonly mine: number;
+	readonly theirs: number;
+}
+
+/** Who started, over the interactions where it is marked; nothing when none is. */
+export function initiative(interactions: readonly Interaction[]): Initiative | undefined {
+	const marked = interactions.filter((i) => i.initiated !== undefined);
+	if (!marked.length) return undefined;
+	const mine = Math.round((PERCENT * marked.filter((i) => i.initiated === "me").length) / marked.length);
+	return { mine, theirs: PERCENT - mine };
+}
+
+/** Who started, over everyone's interactions in the period. */
+export function periodInitiative(people: readonly Person[], period: Period, today: LocalDate): Initiative | undefined {
+	const from = today.addDays(-(PERIOD_DAYS[period] - 1));
+	return initiative(people.flatMap((person) => within(person, from, today)));
+}
+
 export interface Often {
 	readonly person: Person;
 	readonly count: number;
+	/** Who started, over the period. */
+	readonly initiative?: Initiative;
 }
 
 export function mostOften(people: readonly Person[], period: Period, today: LocalDate): Often[] {
 	const from = today.addDays(-(PERIOD_DAYS[period] - 1));
 	return people
-		.map((person) => ({ person, count: within(person, from, today).length }))
+		.map((person) => {
+			const hits = within(person, from, today);
+			return { person, count: hits.length, initiative: initiative(hits) };
+		})
 		.filter((often) => often.count > 0)
 		.sort((a, b) => b.count - a.count || a.person.name.localeCompare(b.person.name));
 }

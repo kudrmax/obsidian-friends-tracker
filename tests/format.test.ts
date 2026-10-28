@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { barLabel, dayDate, dayName, daysAgo, everyDays, fullDate, longDate, monthLetter, readDays, shortDate, sinceDays } from "../src/ui/format";
+import { barLabel, dayDate, dayName, daysAgo, everyDays, fullDate, initiativeLine, longDate, monthLetter, readDays, shortDate, sinceDays } from "../src/ui/format";
 import { d } from "./support/dates";
 
 const today = d("2026-10-26");
@@ -86,5 +86,11 @@ describe("the contact every field", () => {
 
 	it("refuses what isn't a whole number of days, one or more", () => {
 		for (const wrong of ["0", "-3", "1.5", "abc", "7 weeks"]) expect(readDays(wrong)).toBeNull();
+	});
+});
+
+describe("who starts", () => {
+	it("puts you first, then the person, in percent", () => {
+		expect(initiativeLine({ mine: 70, theirs: 30 }, "Dima")).toBe("You 70% · Dima 30%");
 	});
 });

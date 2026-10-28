@@ -8,11 +8,16 @@ export const KINDS: readonly Kind[] = ["text", "call", "meeting"];
 export type Company = "one_on_one" | "group";
 export type Length = "some_time" | "whole_day";
 export type Purpose = "talk" | "activity";
+/** Who started it: you or the other person. */
+export type Initiator = "me" | "them";
+export const INITIATORS: readonly Initiator[] = ["me", "them"];
 
-/** The day, and the time of day when it is known (records made before times were kept have none). */
+/** What every kind has: the day, the time of day when it is known (records made before times were kept have none), and who started it. */
 interface Moment {
 	readonly date: LocalDate;
 	readonly time?: LocalTime;
+	/** Who started it, when that was marked; marking it is optional. */
+	readonly initiated?: Initiator;
 }
 
 export type Interaction =
@@ -38,7 +43,7 @@ export const DEFAULT_LABELS: Labels = {
 };
 
 export function sameInteraction(a: Interaction, b: Interaction): boolean {
-	if (!a.date.equals(b.date) || a.kind !== b.kind || !sameTime(a.time, b.time)) return false;
+	if (!a.date.equals(b.date) || a.kind !== b.kind || !sameTime(a.time, b.time) || a.initiated !== b.initiated) return false;
 	if (a.kind === "call" && b.kind === "call") return a.purpose === b.purpose;
 	if (a.kind === "meeting" && b.kind === "meeting") return a.company === b.company && a.length === b.length;
 	return true;

@@ -52,4 +52,10 @@ describe("PersonStats", () => {
 	it("counts a day after today as today", () => {
 		expect(stats(one(-2)).lastContact()?.days).toBe(0);
 	});
+
+	it("tells who starts over all time, of the interactions where it is marked", () => {
+		const marked = (days: number, initiated: "me" | "them"): Interaction => ({ ...one(days), initiated });
+		expect(stats(marked(1, "me"), marked(500, "me"), marked(900, "them"), one(2)).initiative()).toEqual({ mine: 67, theirs: 33 });
+		expect(stats(one(1)).initiative()).toBeUndefined();
+	});
 });

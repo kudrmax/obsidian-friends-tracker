@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { Interaction, Kind } from "../src/domain/Interaction";
+import { Initiator, Interaction, Kind } from "../src/domain/Interaction";
 import { LocalDate } from "../src/domain/LocalDate";
 import { Person } from "../src/domain/Person";
-import { buckets, countKinds, daysSince, mostOften, sum, totals, usualGap } from "../src/domain/Stats";
+import { buckets, countKinds, daysSince, initiative, mostOften, periodInitiative, sum, totals, usualGap } from "../src/domain/Stats";
 import { d } from "./support/dates";
 
 const today = d("2026-10-26");
@@ -123,5 +123,41 @@ describe("mostOften", () => {
 			["Lyosha", 2],
 			["Pasha", 2],
 		]);
+	});
+});
+
+/** A call this many days ago, started by `initiated` when it is marked. */
+function started(days: number, initiated?: Initiator): Interaction {
+	return { date: ago(days), kind: "call", purpose: "talk", ...(initiated ? { initiated } : {}) };
+}
+
+describe("initiative", () => {
+	it("splits the marked interactions in whole percent that add up to 100, leaving unmarked ones out", () => {
+		expect(initiative([started(1, "me"), started(2, "me"), started(3, "them"), started(4)])).toEqual({ mine: 67, theirs: 33 });
+	});
+
+	it("is nothing when none is marked", () => {
+		expect(initiative([started(1), started(2)])).toBeUndefined();
+		expect(initiative([])).toBeUndefined();
+	});
+});
+
+describe("periodInitiative", () => {
+	it("counts everyone's marked interactions within the period only", () => {
+		const anya = Person.restore({ name: "Anya", interactions: [started(1, "me"), started(40, "them")] });
+		const dima = Person.restore({ name: "Dima", interactions: [started(2, "them"), started(3, "me"), started(4, "me")] });
+		expect(periodInitiative([anya, dima], "month", today)).toEqual({ mine: 75, theirs: 25 });
+		expect(periodInitiative([anya, dima], "year", today)).toEqual({ mine: 60, theirs: 40 });
+		expect(periodInitiative([Person.restore({ name: "Lyosha", interactions: [started(1)] })], "month", today)).toBeUndefined();
+	});
+});
+
+describe("mostOften with who started", () => {
+	it("gives each person who started over the period, nothing when none is marked in it", () => {
+		const katya = Person.restore({ name: "Katya", interactions: [started(1, "me"), started(2, "them"), started(60, "them")] });
+		const lyosha = Person.restore({ name: "Lyosha", interactions: [started(1)] });
+		const [first, second] = mostOften([katya, lyosha], "month", today);
+		expect(first.initiative).toEqual({ mine: 50, theirs: 50 });
+		expect(second.initiative).toBeUndefined();
 	});
 });

@@ -1,5 +1,5 @@
 import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
-import { Company, Kind, Labels, Length, Purpose } from "../domain/Interaction";
+import { Company, Initiator, Kind, Labels, Length, Purpose } from "../domain/Interaction";
 import { PropertyNames } from "../infrastructure/PersonCodec";
 import { reachStatus } from "../domain/Reach";
 import { DEFAULT_SETTINGS, MAX_DAY_START, MAX_HEADS_UP, MIN_HEADS_UP, PeopleSettings, SettingsHost, reachRule } from "../settings";
@@ -17,7 +17,8 @@ const LABEL_NAMES: ReadonlyArray<{ key: keyof Labels; name: string }> = [
 	{ key: "activity", name: "Call, shared activity" },
 ];
 
-type PropertyKey = Exclude<keyof PropertyNames, "kinds" | "companies" | "lengths" | "purposes">;
+type ValueGroup = "kinds" | "companies" | "lengths" | "purposes" | "initiators";
+type PropertyKey = Exclude<keyof PropertyNames, ValueGroup>;
 const PROPERTY_KEYS: ReadonlyArray<{ key: PropertyKey; name: string }> = [
 	{ key: "interactions", name: "Interactions list" },
 	{ key: "date", name: "Date" },
@@ -26,8 +27,14 @@ const PROPERTY_KEYS: ReadonlyArray<{ key: PropertyKey; name: string }> = [
 	{ key: "company", name: "Company" },
 	{ key: "length", name: "Length" },
 	{ key: "purpose", name: "Purpose" },
+	{ key: "initiated", name: "Who started" },
 	{ key: "contactEvery", name: "Contact every" },
 	{ key: "headsUp", name: "Heads-up" },
+];
+
+const INITIATOR_NAMES: ReadonlyArray<{ key: Initiator; name: string }> = [
+	{ key: "me", name: "Me" },
+	{ key: "them", name: "The person" },
 ];
 
 /** The target the heads-up setting explains itself with. */
@@ -97,7 +104,7 @@ export class SettingsTab extends PluginSettingTab {
 	private note(containerEl: HTMLElement): void {
 		new Setting(containerEl)
 			.setName("Person block in the note")
-			.setDesc("Shows the last interaction, the target, the usual gap, the months and the latest interactions above a person's note, drawn like its Properties.")
+			.setDesc("Shows the last interaction, the target, the usual gap, who starts, the months and the latest interactions above a person's note, drawn like its Properties.")
 			.addToggle((toggle) => toggle.setValue(this.host.config.personBlock).onChange((value) => void this.save((next) => (next.personBlock = value))));
 	}
 
@@ -166,22 +173,19 @@ export class SettingsTab extends PluginSettingTab {
 					.onChange((value) => void this.save((next) => (next.properties = { ...next.properties, [key]: value.trim() || DEFAULT_SETTINGS.properties[key] }))),
 			);
 		}
-		this.values(containerEl, "Kind values", "kinds", ["text", "call", "meeting"]);
-		this.values(containerEl, "Company values", "companies", ["one_on_one", "group"]);
-		this.values(containerEl, "Length values", "lengths", ["some_time", "whole_day"]);
-		this.values(containerEl, "Purpose values", "purposes", ["talk", "activity"]);
+		const labelled = (keys: ReadonlyArray<Kind | Company | Length | Purpose>) => keys.map((key) => ({ key, name: this.host.config.labels[key] }));
+		this.values(containerEl, "Kind values", "kinds", labelled(["text", "call", "meeting"]));
+		this.values(containerEl, "Company values", "companies", labelled(["one_on_one", "group"]));
+		this.values(containerEl, "Length values", "lengths", labelled(["some_time", "whole_day"]));
+		this.values(containerEl, "Purpose values", "purposes", labelled(["talk", "activity"]));
+		this.values(containerEl, "Who started values", "initiators", INITIATOR_NAMES);
 	}
 
-	private values<K extends "kinds" | "companies" | "lengths" | "purposes">(
-		containerEl: HTMLElement,
-		title: string,
-		group: K,
-		keys: ReadonlyArray<Kind | Company | Length | Purpose>,
-	): void {
-		for (const key of keys) {
+	private values(containerEl: HTMLElement, title: string, group: ValueGroup, keys: ReadonlyArray<{ key: string; name: string }>): void {
+		for (const { key, name } of keys) {
 			const values = this.host.config.properties[group] as Record<string, string>;
 			const fallback = (DEFAULT_SETTINGS.properties[group] as Record<string, string>)[key];
-			new Setting(containerEl).setName(`${title}: ${this.host.config.labels[key]}`).addText((text) =>
+			new Setting(containerEl).setName(`${title}: ${name}`).addText((text) =>
 				text
 					.setPlaceholder(fallback)
 					.setValue(values[key])

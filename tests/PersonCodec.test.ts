@@ -42,6 +42,17 @@ describe("decodePerson", () => {
 		expect(person.interactions()[1].time).toBeUndefined();
 	});
 
+	it("reads who started when it is marked, and leaves it unmarked when it isn't", () => {
+		const person = decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "meeting", company: "group", length: "some_time", initiated: "them" }, { date: "2026-10-23", kind: "text" }] });
+		expect(person.interactions()[0].initiated).toBe("them");
+		expect(person.interactions()[1].initiated).toBeUndefined();
+		expect(person.extras()[0]).toEqual({});
+	});
+
+	it("refuses a who-started value it doesn't know", () => {
+		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "text", initiated: "both" }] })).toThrow(/initiated: unknown value "both"/);
+	});
+
 	it("refuses a time it can't read", () => {
 		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "text", time: "6pm" }] })).toThrow(/time: invalid/);
 		expect(() => decodePerson("Misha", { interactions: [{ date: "2026-10-24", kind: "text", time: 1120 }] })).toThrow(PersonDecodeError);
@@ -95,6 +106,13 @@ describe("encodePerson", () => {
 		expect(out.interactions).toEqual([{ date: "2026-10-24", kind: "text", time: "18:40" }, { date: "2026-10-23", kind: "text" }]);
 	});
 
+	it("writes who started after the qualifiers, and leaves it out when it isn't marked", () => {
+		const out: Frontmatter = {};
+		encodePerson(Person.restore({ name: "Misha", interactions: [{ date: d("2026-10-24"), kind: "call", purpose: "talk", initiated: "me" }, { date: d("2026-10-23"), kind: "text" }] }), out);
+		expect(out.interactions).toEqual([{ date: "2026-10-24", kind: "call", purpose: "talk", initiated: "me" }, { date: "2026-10-23", kind: "text" }]);
+		expect(Object.keys((out.interactions as Frontmatter[])[0])).toEqual(["date", "kind", "purpose", "initiated"]);
+	});
+
 	it("keeps unknown fields of an interaction and unknown keys of the note", () => {
 		const out = roundTrip({ tags: ["friend"], interactions: [{ date: "2026-10-24", kind: "text", mood: "good" }] });
 		expect(out.tags).toEqual(["friend"]);
@@ -113,6 +131,14 @@ describe("encodePerson", () => {
 		encodePerson(Person.restore({ name: "Misha", interactions: [{ date: d("2026-10-24"), kind: "meeting", company: "group", length: "some_time" }] }), out, keys);
 		expect(out.met).toEqual([{ date: "2026-10-24", kind: "irl", company: "group", length: "some_time" }]);
 		expect(decodePerson("Misha", out, keys).interactions()[0].kind).toBe("meeting");
+	});
+
+	it("writes who started under the names from the settings", () => {
+		const keys = { ...DEFAULT_PROPERTY_NAMES, initiated: "who", initiators: { me: "я", them: "он" } };
+		const out: Frontmatter = {};
+		encodePerson(Person.restore({ name: "Misha", interactions: [{ date: d("2026-10-24"), kind: "text", initiated: "them" }] }), out, keys);
+		expect(out.interactions).toEqual([{ date: "2026-10-24", kind: "text", who: "он" }]);
+		expect(decodePerson("Misha", out, keys).interactions()[0].initiated).toBe("them");
 	});
 });
 

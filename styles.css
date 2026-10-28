@@ -117,6 +117,7 @@ body {
 	--ft-leading-small: 17px;
 	--ft-leading-micro: 12px;
 	--ft-leading-one: 1;
+	--ft-weight-normal: var(--font-normal);
 	--ft-weight-medium: var(--font-medium);
 	--ft-weight-semibold: var(--font-semibold);
 	--ft-weight-bold: var(--font-bold);
@@ -227,9 +228,15 @@ body {
 .ft-fork { display: flex; flex-direction: column; }
 .ft-fork .ft-section { margin-top: var(--ft-space-16); padding-bottom: var(--ft-space-8); }
 .ft-forks > .ft-fork:first-child .ft-section { margin-top: var(--ft-space-8); }
+/* "optional" after the label of a fork that may stay unanswered. */
+.ft-section-hint { margin-left: var(--ft-space-6); font-weight: var(--ft-weight-normal); color: var(--ft-faint); }
 .ft-fork-row { display: flex; gap: var(--ft-space-8); }
 .friends-tracker .ft-capsule, .ft-person-panel .ft-capsule { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--ft-space-6); height: var(--ft-button); margin: 0; padding: 0; border: none; border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); background: var(--ft-fill); box-shadow: none; color: var(--ft-text); font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-medium); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .ft-capsule .ft-icon svg { width: var(--ft-icon-capsule); height: var(--ft-icon-capsule); stroke-width: var(--ft-stroke-capsule); }
+/* A capsule holding a long name shortens it with an ellipsis instead of pushing its neighbour. */
+.ft-fork-row .ft-capsule { min-width: 0; padding-inline: var(--ft-space-12); }
+.ft-capsule .ft-icon { flex: 0 0 auto; }
+.ft-capsule > span:not(.ft-icon) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .friends-tracker .ft-capsule.is-on, .ft-person-panel .ft-capsule.is-on { background: var(--ft-strong); color: var(--ft-on-strong); font-weight: var(--ft-weight-semibold); }
 
 /* Round icon buttons, the one that saves filled. */
@@ -292,7 +299,7 @@ body {
 .ft-periods { margin-top: var(--ft-space-20); }
 .ft-stats .ft-month-chart { margin-top: var(--ft-space-4); }
 
-.ft-numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: var(--ft-space-28); }
+.ft-numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--ft-space-20); margin-top: var(--ft-space-28); }
 .ft-number-line { display: flex; align-items: baseline; gap: var(--ft-space-8); }
 .ft-number { font-size: var(--ft-font-number); line-height: var(--ft-leading-one); font-weight: var(--ft-weight-bold); letter-spacing: var(--ft-tracking-number); }
 .ft-delta { font-size: var(--ft-font-small); font-weight: var(--ft-weight-semibold); }

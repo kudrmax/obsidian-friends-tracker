@@ -1,5 +1,5 @@
 import { LocalDate, Weekday } from "../domain/LocalDate";
-import { ChartRange } from "../domain/Stats";
+import { ChartRange, Initiative } from "../domain/Stats";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const WEEKDAY_NAMES: Record<Weekday, string> = {
@@ -85,4 +85,9 @@ export function barLabel(from: LocalDate, range: ChartRange, bars: number): stri
 	if (range === "weeks") return String(from.day);
 	if (range === "months") return monthLetter(from.month);
 	return bars <= FULL_YEARS_SHOWN ? String(from.year) : `’${String(from.year).slice(-2)}`;
+}
+
+/** "You 70% · Dima 30%": who starts, you first. */
+export function initiativeLine(initiative: Initiative, name: string): string {
+	return `You ${initiative.mine}% · ${name} ${initiative.theirs}%`;
 }
