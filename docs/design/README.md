@@ -58,7 +58,7 @@ A panel inside the note's Properties area, above the text, collapsible under the
 - `by week` / `by month` / `by year` — a fork of three small capsules (Weeks · Months · Years, 28 px, Months by default) over the stacked bar chart by format: twelve weeks from Monday labelled by the Monday's day, twelve months by letter, or the years from the first interaction on (the last twelve) labelled by year, left-aligned in twelve places so a bar is as wide in every range. The legend gives each format's count over the bars shown. The choice is the same for every person and lasts while Obsidian is open; the bars grow again when it changes.
 - `recent` — three latest as date · dot · format with qualifiers, then "All N" that expands the list in place. Tap a line → Edit, opened over the note in the note's own tab (never a second tab); ✓, ✕, delete and Escape step back to the note and the finished Edit leaves the tab's history. After a delete the undo offer is an Obsidian notice with the accent "Undo", since the note has no undo line.
 
-A person with no interactions shows `last seen: never` alone.
+A person with no interactions shows `last seen: never` and `contact every`.
 
 **Built from Obsidian's own Properties classes** (`metadata-container`, `metadata-properties-heading`, `metadata-property`, `metadata-property-key`, `metadata-property-icon`, `metadata-property-key-input`, `metadata-property-value`, `metadata-input-longtext`), exactly as `HabitBlock` in Marble Habit Tracker, so it is pixel-identical to the real Properties next to it. Own CSS only for the chart, its range fork and the recent list, reading Obsidian's variables. The mockup is approximate; the real Properties panel is the reference.
 
@@ -76,7 +76,7 @@ A person with no interactions shows `last seen: never` alone.
 A person may have a target, "contact every N days", kept in the note's frontmatter (`contact_every`, `heads_up`, names in the settings) and set in the person's panel. Colour and lists exist only for people with a target; the plugin never guesses whom to call.
 
 - Days since the last interaction of any kind, `d`, against the target `N`: **late** (red) when `d > N`; **soon** (yellow) when the person's heads-up is on and at most the settings' share (20% by default) of `N` is left, day `N` included; otherwise nothing. A target and no interaction yet: late, "never" on the right.
-- The **Reach out** block, the same on the feed (above the days) and on Stats (where "Falling behind" was): section label "Reach out", person rows with "Every N days" under the name and the days since the last interaction bold on the right, in the status colour. Late first, then soon; within each by `d / N`, highest first, then by name. Five, then "N more". Tap → the person's note. Nobody due → no block.
+- The **Reach out** block, the same on the feed (above the days) and on Stats (where "Falling behind" was): section label "Reach out", person rows with "Every N days" under the name and the days since the last interaction bold on the right, in the status colour. Late first, then soon; within each by `d / N`, highest first, then by name. Everyone due is listed, never cut. Tap → the person's note. Nobody due → no block.
 
 ## Style system
 

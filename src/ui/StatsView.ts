@@ -36,7 +36,7 @@ export class StatsView extends ItemView {
 		private readonly ui: UiContext,
 	) {
 		super(leaf);
-		this.reachOut = new ReachOutBlock(ui, () => this.refresh());
+		this.reachOut = new ReachOutBlock(ui);
 	}
 
 	override getViewType(): string {

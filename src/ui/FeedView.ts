@@ -45,7 +45,7 @@ export class FeedView extends ItemView implements PageHolder {
 		private readonly ui: UiContext,
 	) {
 		super(leaf);
-		this.reachOut = new ReachOutBlock(ui, () => this.render(true));
+		this.reachOut = new ReachOutBlock(ui);
 		this.history = new TabHistory(this.app, leaf, FEED_VIEW);
 		this.scope = new Scope(this.app.scope);
 		this.scope.register([], "Escape", () => {
