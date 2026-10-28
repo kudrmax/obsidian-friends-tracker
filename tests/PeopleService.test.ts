@@ -106,3 +106,46 @@ describe("today", () => {
 		expect(String(service.today())).toBe("2026-10-25");
 	});
 });
+
+describe("targets", () => {
+	const rule = { headsUpPercent: 20, headsUpForNew: true };
+	const path = "People/Misha.md";
+
+	it("sets a target with the heads-up for new targets, and keeps the heads-up when the target changes", async () => {
+		const { service, repository } = await setUp({ Misha: [] });
+		await service.setTarget(path, 7, false);
+		expect(repository.person(path).target()).toEqual({ every: 7, headsUp: false });
+		await service.setTarget(path, 14, true);
+		expect(repository.person(path).target()).toEqual({ every: 14, headsUp: false });
+	});
+
+	it("refuses a target under one day", async () => {
+		const { service } = await setUp({ Misha: [] });
+		await expect(service.setTarget(path, 0, true)).rejects.toThrow(DomainError);
+	});
+
+	it("clears the target and switches the heads-up", async () => {
+		const { service, repository } = await setUp({ Misha: [] });
+		await service.setTarget(path, 7, true);
+		await service.setHeadsUp(path, false);
+		expect(repository.person(path).target()).toEqual({ every: 7, headsUp: false });
+		await service.clearTarget(path);
+		expect(repository.person(path).target()).toBeUndefined();
+	});
+
+	it("lists whom to reach out to, with where their notes are", async () => {
+		const { service } = await setUp({ Misha: [text(ago(20))], Anya: [text(ago(6))], Boris: [text(ago(1))] });
+		await service.setTarget("People/Misha.md", 14, true);
+		await service.setTarget("People/Anya.md", 7, true);
+		await service.setTarget("People/Boris.md", 7, true);
+		const due = service.reachOut(rule);
+		expect(due.map((item) => `${item.path} ${item.status} ${item.days}`)).toEqual(["People/Misha.md late 20", "People/Anya.md soon 6"]);
+	});
+
+	it("skips broken notes", async () => {
+		const { service, repository } = await setUp({ Misha: [] });
+		await service.setTarget(path, 7, true);
+		repository.entries.set("People/Broken.md", { kind: "broken", path: "People/Broken.md", name: "Broken", problem: "kind: missing" });
+		expect(service.reachOut(rule).map((item) => item.path)).toEqual([path]);
+	});
+});
