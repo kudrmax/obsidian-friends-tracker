@@ -59,6 +59,15 @@ export function sinceDays(days: number | undefined): string {
 	return days === undefined ? "never" : dayCount(days);
 }
 
+/** What was typed as a target: whole days, "none" for an empty field, null for anything else. */
+export function readDays(text: string): number | "none" | null {
+	const typed = text.trim();
+	if (!typed) return "none";
+	const match = /^(\d+)(\s+days?)?$/i.exec(typed);
+	const days = match ? Number(match[1]) : 0;
+	return days >= 1 ? days : null;
+}
+
 export function monthLetter(month: number): string {
 	return MONTHS[month - 1][0];
 }

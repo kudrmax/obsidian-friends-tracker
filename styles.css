@@ -327,6 +327,7 @@ body {
 .ft-person-panel .ft-range .ft-capsule { height: var(--ft-range); font-size: var(--ft-font-legend); }
 .ft-person-panel .ft-delta { margin-inline-start: var(--ft-space-6); }
 .ft-overdue { color: var(--ft-danger); }
+.ft-soon { color: var(--ft-soon); }
 .ft-recent { display: flex; flex-direction: column; gap: var(--ft-space-4); }
 .ft-person-panel .ft-recent-row { display: grid; grid-template-columns: var(--ft-recent-date) var(--ft-recent-dot) minmax(0, 1fr); align-items: center; min-height: var(--ft-space-28); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); width: 100%; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .is-mobile .ft-person-panel .ft-recent-row { min-height: var(--ft-button); }

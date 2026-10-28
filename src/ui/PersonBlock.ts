@@ -1,10 +1,12 @@
-import { WorkspaceLeaf, setIcon } from "obsidian";
+import { Notice, WorkspaceLeaf, setIcon } from "obsidian";
 import { ForkOption, forkRow, moreButton } from "./components";
 import { Interaction, describe } from "../domain/Interaction";
-import { Person } from "../domain/Person";
+import { Person, Target } from "../domain/Person";
 import { Contact, PersonStats } from "../domain/PersonStats";
+import { reachStatus } from "../domain/Reach";
+import { reachRule } from "../settings";
 import { ChartRange, buckets } from "../domain/Stats";
-import { daysAgo, fullDate, shortDate } from "./format";
+import { dayCount, daysAgo, fullDate, readDays, shortDate } from "./format";
 import { barChart } from "./MonthChart";
 import { Debut } from "./motion";
 import { UiContext } from "./UiContext";
@@ -57,6 +59,8 @@ export class PersonBlock {
 	}
 
 	render(): void {
+		/* A change that comes in while the target is being typed waits: the panel redraws when typing ends. */
+		if (this.typing()) return;
 		const panel = this.el;
 		panel.empty();
 		panel.className = "metadata-container ft-person-panel";
@@ -70,7 +74,7 @@ export class PersonBlock {
 			return;
 		}
 		const rows = content.createDiv("metadata-properties");
-		this.renderFacts(rows, new PersonStats(entry.person, this.ui.service.today()));
+		this.renderFacts(rows, entry.person, new PersonStats(entry.person, this.ui.service.today()));
 		if (!entry.person.interactions().length) return;
 		this.renderChart(rows, entry.person);
 		this.renderRecent(rows, entry.person);
@@ -106,15 +110,17 @@ export class PersonBlock {
 		return this.property(rows, icon, name).createDiv({ cls: "metadata-input-longtext", text: value });
 	}
 
-	/** The small numbers, one to a row; a row with nothing to say is left out, but for when you last met. */
-	private renderFacts(rows: HTMLElement, stats: PersonStats): void {
+	/** The small numbers, one to a row; a row with nothing to say is left out, but for when you last met and the target. */
+	private renderFacts(rows: HTMLElement, person: Person, stats: PersonStats): void {
 		const met = stats.lastMeeting();
 		const contact = stats.lastContact();
 		const usual = stats.usualGap();
 		const seen = this.text(rows, "clock", "last seen", met ? daysAgo(met.days) : "never");
 		const spoke = contact && (!met || contact.days < met.days) ? this.text(rows, "message-circle", "last contact", daysAgo(contact.days)) : seen;
-		if (contact && usual !== undefined && stats.isOverdue()) this.markOverdue(spoke, contact, usual);
-		if (usual !== undefined) this.text(rows, "align-justify", "usual gap", days(usual));
+		const target = person.target();
+		if (target) this.markStatus(spoke, target, contact);
+		this.renderTarget(rows, person);
+		if (usual !== undefined) this.text(rows, "align-justify", "usual gap", dayCount(usual));
 		const first = stats.firstDate();
 		if (!first) return;
 		const year = stats.pastYear();
@@ -123,11 +129,72 @@ export class PersonBlock {
 		this.text(rows, "calendar-plus", "since", fullDate(first));
 	}
 
-	private markOverdue(value: HTMLElement, contact: Contact, usual: number): void {
-		value.addClass("ft-overdue");
-		const said = `${daysAgo(contact.days)}, usually every ${days(usual)}`;
+	/** The latest contact in the target's colour: yellow when it is about to run out, red when it has. */
+	private markStatus(value: HTMLElement, target: Target, contact: Contact | undefined): void {
+		const status = reachStatus(target, contact?.days, reachRule(this.ui.settings()));
+		if (status === "ok") return;
+		value.addClass(status === "late" ? "ft-overdue" : "ft-soon");
+		const said = `${contact ? daysAgo(contact.days) : "never"}, every ${dayCount(target.every)}`;
 		value.setAttribute("aria-label", said);
 		value.setAttribute("title", said);
+	}
+
+	/** The target, typed in place, and with one the heads-up before it runs out. */
+	private renderTarget(rows: HTMLElement, person: Person): void {
+		const target = person.target();
+		const unread = person.unreadTarget();
+		const shown = target ? dayCount(target.every) : unread === undefined ? "" : String(unread);
+		const input = this.property(rows, "repeat", "contact every").createDiv({
+			cls: "metadata-input-longtext",
+			text: shown,
+			attr: { contenteditable: "true", spellcheck: "false", placeholder: "Empty", inputmode: "numeric" },
+		});
+		input.addEventListener("focus", () => {
+			if (target) input.textContent = String(target.every);
+		});
+		input.addEventListener("keydown", (event) => {
+			if (event.key === "Enter") {
+				event.preventDefault();
+				input.blur();
+			}
+			if (event.key === "Escape") {
+				input.textContent = shown;
+				input.blur();
+			}
+		});
+		input.addEventListener("blur", () => void this.saveTarget(input.textContent ?? "", shown, target));
+		if (!target) return;
+		const box = this.property(rows, "bell", "heads-up").createEl("input", {
+			cls: "metadata-input-checkbox",
+			type: "checkbox",
+			attr: { title: "Turn yellow before the target runs out" },
+		});
+		box.checked = target.headsUp ?? this.ui.settings().headsUpForNew;
+		box.addEventListener("change", () => void this.run(() => this.ui.service.setHeadsUp(this.path, box.checked)));
+	}
+
+	private async saveTarget(typed: string, shown: string, target: Target | undefined): Promise<void> {
+		if (typed.trim() !== shown) await this.changeTarget(readDays(typed), target);
+		this.render();
+	}
+
+	private async changeTarget(days: number | "none" | null, target: Target | undefined): Promise<void> {
+		if (days === null) new Notice("Contact every takes a whole number of days");
+		else if (days === "none") await this.run(() => this.ui.service.clearTarget(this.path));
+		else if (days !== target?.every) await this.run(() => this.ui.service.setTarget(this.path, days, this.ui.settings().headsUpForNew));
+	}
+
+	private async run(change: () => Promise<unknown>): Promise<void> {
+		try {
+			await change();
+		} catch (error) {
+			new Notice(error instanceof Error ? error.message : String(error));
+		}
+	}
+
+	private typing(): boolean {
+		const active = this.el.ownerDocument.activeElement;
+		return active instanceof HTMLElement && active.isContentEditable && this.el.contains(active);
 	}
 
 	private renderChart(rows: HTMLElement, person: Person): void {
@@ -166,8 +233,4 @@ export class PersonBlock {
 			this.render();
 		});
 	}
-}
-
-function days(count: number): string {
-	return `${count} ${count === 1 ? "day" : "days"}`;
 }

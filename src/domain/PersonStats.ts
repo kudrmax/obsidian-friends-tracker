@@ -28,13 +28,6 @@ export class PersonStats {
 		return usualGap(this.person, this.today);
 	}
 
-	/** The silence since the last contact of any kind has outlasted the usual gap. */
-	isOverdue(): boolean {
-		const last = this.lastContact();
-		const usual = this.usualGap();
-		return last !== undefined && usual !== undefined && last.days > usual;
-	}
-
 	/**
 	 * Interactions in the last 365 days, and how many more than in the 365 before them; no difference when the person
 	 * only turned up within the last 365 days, as there was no year before to compare with.

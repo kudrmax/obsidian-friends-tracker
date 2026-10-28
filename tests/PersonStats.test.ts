@@ -25,7 +25,6 @@ describe("PersonStats", () => {
 		expect(empty.lastMeeting()).toBeUndefined();
 		expect(empty.usualGap()).toBeUndefined();
 		expect(empty.firstDate()).toBeUndefined();
-		expect(empty.isOverdue()).toBe(false);
 		expect(empty.pastYear()).toEqual({ count: 0 });
 	});
 
@@ -34,12 +33,6 @@ describe("PersonStats", () => {
 		expect(person.lastContact()).toEqual({ date: ago(3), days: 3 });
 		expect(person.lastMeeting()).toEqual({ date: ago(41), days: 41 });
 		expect(stats(one(3, "text"), one(5, "call")).lastMeeting()).toBeUndefined();
-	});
-
-	it("is overdue only once the silence is longer than the usual gap", () => {
-		expect(stats(one(10), one(20), one(30)).isOverdue()).toBe(false);
-		expect(stats(one(11), one(21), one(31)).isOverdue()).toBe(true);
-		expect(stats(one(100), one(120)).isOverdue()).toBe(false);
 	});
 
 	it("compares the past year with the year before", () => {
