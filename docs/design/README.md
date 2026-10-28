@@ -55,7 +55,7 @@ A panel inside the note's Properties area, above the text, collapsible under the
 - With a target, the row that shows the latest contact is yellow when the target is about to run out and red when it has; its tooltip says "6 days ago, every 7 days". Without a target it has no colour. No extra text: a fact has its place.
 - `usual gap` — days, as on Stats. A fact only, never a colour.
 - `past year` — interactions in the last 365 days, then the difference with the 365 before in small green (+) or red (−), as on Stats; no difference for a person first met within those 365 days.
-- `who starts` — "You 70% · Dima 30%": over all time, of the interactions where who started is marked. No row when none is marked (`PersonStarted.dc.html`, approved 2026-10-29).
+- `who starts` — one bar split in two, your share and theirs, with "↗ 70%" at its left end and "30% ↙" at its right: the arrows of How's "Who started", your share a muted grey, theirs the fill. Over all time, of the interactions where who started is marked. No row when none is marked (`PersonStarted.dc.html`, approved 2026-10-29; Max rejected a "You 70% · Dima 30%" line: never list facts in one line with dots).
 - `since` — the first logged interaction, always with its year ("12 Mar 2023").
 - `by week` / `by month` / `by year` — a fork of three small capsules (Weeks · Months · Years, 28 px, Months by default) over the stacked bar chart by format: twelve weeks from Monday labelled by the Monday's day, twelve months by letter, or the years from the first interaction on (the last twelve) labelled by year, left-aligned in twelve places so a bar is as wide in every range. The legend gives each format's count over the bars shown. The choice is the same for every person and lasts while Obsidian is open; the bars grow again when it changes.
 - `recent` — three latest as date · dot · format with qualifiers, then "All N" that expands the list in place. Tap a line → Edit, opened over the note in the note's own tab (never a second tab); ✓, ✕, delete and Escape step back to the note and the finished Edit leaves the tab's history. After a delete the undo offer is an Obsidian notice with the accent "Undo", since the note has no undo line.
@@ -71,7 +71,7 @@ A person with no interactions shows `last seen: never` and `contact every`.
 - Under them two more numbers of the same size, without a difference: "you started" and "they started", in percent of the period's interactions where it is marked; left out when nothing in the period is marked (`StatsStarted.dc.html`, approved 2026-10-29). Everything on Stats is over the chosen period.
 - "By month": the same chart as in the person note, over everyone.
 - "Reach out" (below).
-- "Most often this month/week/year": person rows with the count on the right. Under the name, a grey line "You 70% · Katya 30%" — who started, over the period; no line for a person with nothing marked in it.
+- "Most often this month/week/year": person rows with the count on the right. Under the name, the same split bar as on the person note, small and grey — who started, over the period; the ends hold room for "100%", so the bars of the list line up. No bar for a person with nothing marked in it.
 - Tap a person → their note.
 
 ## Reach out (decided 2026-10-29)

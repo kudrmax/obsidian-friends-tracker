@@ -2,8 +2,7 @@ import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Interaction } from "../domain/Interaction";
 import { Person } from "../domain/Person";
 import { Initiative, Often, Period, buckets, mostOften, periodInitiative, totals } from "../domain/Stats";
-import { forkRow, row, sectionLabel } from "./components";
-import { initiativeLine } from "./format";
+import { forkRow, initiativeSplit, row, sectionLabel } from "./components";
 import { barChart } from "./MonthChart";
 import { ANIMATION, Arrivals, Debut, arrive, play } from "./motion";
 import { ReachOutBlock } from "./reach";
@@ -136,7 +135,7 @@ export class StatsView extends ItemView {
 			const line = row(parent, {
 				circle: { initial: item.person.name.slice(0, 1).toUpperCase() },
 				title: item.person.name,
-				...(item.initiative ? { subtitle: initiativeLine(item.initiative, item.person.name) } : {}),
+				...(item.initiative ? { subtitle: initiativeSplit(createDiv(), item.initiative) } : {}),
 				trailing: { text: String(item.count), strong: true },
 				onClick: () => this.openPerson(item.person),
 			});

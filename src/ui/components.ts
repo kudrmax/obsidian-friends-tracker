@@ -1,5 +1,6 @@
 import { setIcon } from "obsidian";
 import { Company, Initiator, Kind, Length, Purpose } from "../domain/Interaction";
+import { Initiative } from "../domain/Stats";
 import { ANIMATION, Arrivals, arrive } from "./motion";
 
 /** Lucide icons the screens use, by name. */
@@ -62,7 +63,7 @@ export function circle(parent: HTMLElement, content: CircleContent): HTMLElement
 export interface RowOptions {
 	readonly circle: CircleContent;
 	readonly title: string | HTMLElement;
-	readonly subtitle?: string;
+	readonly subtitle?: string | HTMLElement;
 	readonly trailing?: "chevron" | { readonly text: string; readonly strong?: boolean; readonly tone?: "soon" | "late" };
 	/** A quiet fact on the right, before the chevron: the time of day. */
 	readonly meta?: string;
@@ -80,7 +81,8 @@ export function row(parent: HTMLElement, options: RowOptions): HTMLElement {
 	const title = text.createSpan("ft-row-title");
 	if (typeof options.title === "string") title.setText(options.title);
 	else title.append(options.title);
-	if (options.subtitle !== undefined) text.createSpan({ cls: "ft-row-sub", text: options.subtitle });
+	if (typeof options.subtitle === "string") text.createSpan({ cls: "ft-row-sub", text: options.subtitle });
+	else if (options.subtitle) text.createSpan("ft-row-sub").append(options.subtitle);
 	if (options.meta !== undefined) el.createSpan({ cls: "ft-row-meta", text: options.meta });
 	if (options.trailing === "chevron") icon(el, "chevron-right").addClass("ft-row-chevron");
 	else if (options.trailing) {
@@ -89,6 +91,26 @@ export function row(parent: HTMLElement, options: RowOptions): HTMLElement {
 		if (options.trailing.tone) value.addClass(`is-${options.trailing.tone}`);
 	}
 	if (options.onClick) el.addEventListener("click", options.onClick);
+	return el;
+}
+
+/**
+ * Who starts, as one bar split in two: your share on the left by the arrow going out, theirs on the right by the arrow
+ * coming in, mirrored; the same arrows as on How's "Who started".
+ */
+export function initiativeSplit(parent: HTMLElement, initiative: Initiative): HTMLElement {
+	const el = parent.createDiv({ cls: "ft-split", attr: { "aria-label": `You started ${initiative.mine}%, they started ${initiative.theirs}%` } });
+	const end = (side: Initiator, share: number) => {
+		const holder = el.createSpan(`ft-split-end is-${side}`);
+		icon(holder, INITIATOR_ICONS[side]);
+		holder.createSpan({ cls: "ft-split-share", text: `${share}%` });
+	};
+	end("me", initiative.mine);
+	const bar = el.createSpan("ft-split-bar");
+	for (const [side, share] of [["me", initiative.mine], ["them", initiative.theirs]] as const) {
+		if (share > 0) bar.createSpan(`ft-split-part is-${side}`).style.setProperty("flex-grow", String(share));
+	}
+	end("them", initiative.theirs);
 	return el;
 }
 
