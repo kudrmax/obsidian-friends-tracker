@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>People · Stats · Every target</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#1e1e1e}
+a{color:#a88bfa}a:hover{color:#c4b1ff}
+button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+</style>
+</helmet>
+<div style="width: 390px; height: 1340px; position: relative; display: flex; flex-direction: column; background: #1e1e1e; color: #dadada; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif; overflow: hidden">
+
+  <div style="height: 48px; flex: 0 0 auto; margin-top: 44px; display: flex; align-items: center; justify-content: flex-start; padding: 0 8px">
+    <a href="Main.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #dadada"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+  </div>
+
+  <main style="flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 4px 20px 0">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 700; line-height: 1.12; letter-spacing: -0.02em; color: #dadada">Stats</h1>
+
+    <div style="display: flex; gap: 8px; margin-top: 20px">
+      <button type="button" aria-pressed="false" style="flex: 1 1 0; height: 44px; padding: 0; border: none; border-radius: 22px; background: #2b2b2b; color: #dadada; font-size: 15px; font-weight: 500; cursor: pointer">Week</button>
+      <button type="button" aria-pressed="true" style="flex: 1 1 0; height: 44px; padding: 0; border: none; border-radius: 22px; background: #dadada; color: #1e1e1e; font-size: 15px; font-weight: 600; cursor: pointer">Month</button>
+      <button type="button" aria-pressed="false" style="flex: 1 1 0; height: 44px; padding: 0; border: none; border-radius: 22px; background: #2b2b2b; color: #dadada; font-size: 15px; font-weight: 500; cursor: pointer">Year</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 28px">
+      <div><div style="display: flex; align-items: baseline; gap: 8px"><span style="font-size: 32px; font-weight: 700; letter-spacing: -0.03em; line-height: 1">23</span><span style="font-size: 13px; font-weight: 600; color: #44cf6e">+4</span></div><div style="margin-top: 6px; font-size: 13px; color: #8a8a8a">interactions</div></div>
+      <div><div style="display: flex; align-items: baseline; gap: 8px"><span style="font-size: 32px; font-weight: 700; letter-spacing: -0.03em; line-height: 1">11</span><span style="font-size: 13px; font-weight: 600; color: #fb6b70">−2</span></div><div style="margin-top: 6px; font-size: 13px; color: #8a8a8a">people</div></div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 20px">
+      <div><div style="display: flex; align-items: baseline; gap: 8px"><span style="font-size: 32px; font-weight: 700; letter-spacing: -0.03em; line-height: 1">64%</span></div><div style="margin-top: 6px; font-size: 13px; color: #8a8a8a">you started</div></div>
+      <div><div style="display: flex; align-items: baseline; gap: 8px"><span style="font-size: 32px; font-weight: 700; letter-spacing: -0.03em; line-height: 1">36%</span></div><div style="margin-top: 6px; font-size: 13px; color: #8a8a8a">they started</div></div>
+    </div>
+
+    <div style="display: flex; align-items: flex-end; height: 36px; margin-top: 20px; padding-bottom: 8px; box-sizing: border-box; font-size: 13px; font-weight: 600; color: #8a8a8a">By month</div>
+    <div style="display: flex; gap: 5px; align-items: flex-end; height: 64px">
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:14px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:8px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:16px;border-radius:2px;background:#a882ff"></i><i style="display:block;height:4px;border-radius:2px;background:#d9ccff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:12px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:10px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:14px;border-radius:2px;background:#a882ff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:16px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:6px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:20px;border-radius:2px;background:#a882ff"></i><i style="display:block;height:8px;border-radius:2px;background:#d9ccff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:10px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:8px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:10px;border-radius:2px;background:#a882ff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:8px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:6px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:8px;border-radius:2px;background:#a882ff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:14px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:12px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:18px;border-radius:2px;background:#a882ff"></i><i style="display:block;height:12px;border-radius:2px;background:#d9ccff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:16px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:10px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:22px;border-radius:2px;background:#a882ff"></i><i style="display:block;height:10px;border-radius:2px;background:#d9ccff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:12px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:8px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:16px;border-radius:2px;background:#a882ff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:10px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:8px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:12px;border-radius:2px;background:#a882ff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:12px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:10px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:14px;border-radius:2px;background:#a882ff"></i><i style="display:block;height:6px;border-radius:2px;background:#d9ccff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:10px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:6px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:10px;border-radius:2px;background:#a882ff"></i></div>
+      <div style="flex: 1 1 0; display: flex; flex-direction: column-reverse; gap: 1px"><i style="display:block;height:14px;border-radius:2px;background:#4a4a4a"></i><i style="display:block;height:8px;border-radius:2px;background:#6b5aa8"></i><i style="display:block;height:18px;border-radius:2px;background:#a882ff"></i><i style="display:block;height:4px;border-radius:2px;background:#d9ccff"></i></div>
+    </div>
+    <div style="display: flex; gap: 5px; margin-top: 5px; font-size: 10px; line-height: 12px; color: #6e6e6e"><span style="flex:1 1 0;text-align:center">N</span><span style="flex:1 1 0;text-align:center">D</span><span style="flex:1 1 0;text-align:center">J</span><span style="flex:1 1 0;text-align:center">F</span><span style="flex:1 1 0;text-align:center">M</span><span style="flex:1 1 0;text-align:center">A</span><span style="flex:1 1 0;text-align:center">M</span><span style="flex:1 1 0;text-align:center">J</span><span style="flex:1 1 0;text-align:center">J</span><span style="flex:1 1 0;text-align:center">A</span><span style="flex:1 1 0;text-align:center">S</span><span style="flex:1 1 0;text-align:center">O</span></div>
+    <div style="display: flex; gap: 14px; margin-top: 10px; font-size: 12px; line-height: 14px; color: #8a8a8a; white-space: nowrap"><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#4a4a4a;margin-right:4px"></i>Text</span><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#6b5aa8;margin-right:4px"></i>Call</span><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#a882ff;margin-right:4px"></i>Meeting</span><span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#d9ccff;margin-right:4px"></i>Whole day</span></div>
+
+    <div style="display: flex; align-items: flex-end; height: 36px; margin-top: 20px; padding-bottom: 6px; box-sizing: border-box; font-size: 13px; font-weight: 600; color: #8a8a8a">Contact every</div>
+    <a href="Person.dc.html" style="display: flex; align-items: center; gap: 12px; height: 60px; text-decoration: none; color: inherit">
+      <span style="width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: #2b2b2b; color: #b3b3b3; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">S</span>
+      <span style="flex: 1 1 auto; min-width: 0; height: 40px; display: flex; flex-direction: column; justify-content: center; gap: 1px"><span style="font-size: 17px; line-height: 22px; letter-spacing: -0.01em; color: #dadada">Seryozha</span><span style="font-size: 13px; line-height: 17px; color: #8a8a8a">Every 30 days</span></span>
+      <span style="flex: 0 0 auto; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: #ff5f57">41 days</span>
+    </a>
+    <a href="Person.dc.html" style="display: flex; align-items: center; gap: 12px; height: 60px; text-decoration: none; color: inherit">
+      <span style="width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: #2b2b2b; color: #b3b3b3; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">A</span>
+      <span style="flex: 1 1 auto; min-width: 0; height: 40px; display: flex; flex-direction: column; justify-content: center; gap: 1px"><span style="font-size: 17px; line-height: 22px; letter-spacing: -0.01em; color: #dadada">Anya</span><span style="font-size: 13px; line-height: 17px; color: #8a8a8a">Every 14 days</span></span>
+      <span style="flex: 0 0 auto; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: #ff5f57">16 days</span>
+    </a>
+    <a href="Person.dc.html" style="display: flex; align-items: center; gap: 12px; height: 60px; text-decoration: none; color: inherit">
+      <span style="width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: #2b2b2b; color: #b3b3b3; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">D</span>
+      <span style="flex: 1 1 auto; min-width: 0; height: 40px; display: flex; flex-direction: column; justify-content: center; gap: 1px"><span style="font-size: 17px; line-height: 22px; letter-spacing: -0.01em; color: #dadada">Dima</span><span style="font-size: 13px; line-height: 17px; color: #8a8a8a">Every 7 days</span></span>
+      <span style="flex: 0 0 auto; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: #ffb340">6 days</span>
+    </a>
+
+    <a href="Person.dc.html" style="display: flex; align-items: center; gap: 12px; height: 60px; text-decoration: none; color: inherit">
+      <span style="width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: #2b2b2b; color: #b3b3b3; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">L</span>
+      <span style="flex: 1 1 auto; min-width: 0; height: 40px; display: flex; flex-direction: column; justify-content: center; gap: 1px"><span style="font-size: 17px; line-height: 22px; letter-spacing: -0.01em; color: #dadada">Lena</span><span style="font-size: 13px; line-height: 17px; color: #8a8a8a">Every 30 days</span></span>
+      <span style="flex: 0 0 auto; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: #dadada">12 days</span>
+    </a>
+    <a href="Person.dc.html" style="display: flex; align-items: center; gap: 12px; height: 60px; text-decoration: none; color: inherit">
+      <span style="width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: #2b2b2b; color: #b3b3b3; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">M</span>
+      <span style="flex: 1 1 auto; min-width: 0; height: 40px; display: flex; flex-direction: column; justify-content: center; gap: 1px"><span style="font-size: 17px; line-height: 22px; letter-spacing: -0.01em; color: #dadada">Misha</span><span style="font-size: 13px; line-height: 17px; color: #8a8a8a">Every 60 days</span></span>
+      <span style="flex: 0 0 auto; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: #dadada">9 days</span>
+    </a>
+    <div style="display: flex; align-items: flex-end; height: 36px; margin-top: 12px; padding-bottom: 6px; box-sizing: border-box; font-size: 13px; font-weight: 600; color: #8a8a8a">Most often this month</div>
+    <a href="Person.dc.html" style="display: flex; align-items: center; gap: 12px; height: 60px; text-decoration: none; color: inherit">
+      <span style="width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: #2b2b2b; color: #b3b3b3; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">K</span>
+      <span style="flex: 1 1 auto; min-width: 0; height: 40px; display: flex; flex-direction: column; justify-content: center; gap: 1px"><span style="font-size: 17px; line-height: 22px; letter-spacing: -0.01em; color: #dadada">Katya</span><span style="font-size: 13px; line-height: 17px; color: #8a8a8a">you start 70%</span></span>
+      <span style="flex: 0 0 auto; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: #dadada">9</span>
+    </a>
+    <a href="Person.dc.html" style="display: flex; align-items: center; gap: 12px; height: 60px; text-decoration: none; color: inherit">
+      <span style="width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: #2b2b2b; color: #b3b3b3; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">P</span>
+      <span style="flex: 1 1 auto; min-width: 0; height: 40px; display: flex; flex-direction: column; justify-content: center; gap: 1px"><span style="font-size: 17px; line-height: 22px; letter-spacing: -0.01em; color: #dadada">Pasha</span><span style="font-size: 13px; line-height: 17px; color: #8a8a8a">you start 20%</span></span>
+      <span style="flex: 0 0 auto; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: #dadada">5</span>
+    </a>
+    <a href="Person.dc.html" style="display: flex; align-items: center; gap: 12px; height: 60px; text-decoration: none; color: inherit">
+      <span style="width: 40px; height: 40px; flex: 0 0 auto; border-radius: 50%; background: #2b2b2b; color: #b3b3b3; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">L</span>
+      <span style="flex: 1 1 auto; min-width: 0; font-size: 17px; line-height: 22px; letter-spacing: -0.01em; color: #dadada">Lyosha</span>
+      <span style="flex: 0 0 auto; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; color: #dadada">4</span>
+    </a>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1340}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

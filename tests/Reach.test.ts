@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Interaction } from "../src/domain/Interaction";
 import { Person, Target } from "../src/domain/Person";
-import { ReachRule, reachOut, reachStatus } from "../src/domain/Reach";
+import { ReachRule, reachOut, reachStatus, tracked } from "../src/domain/Reach";
 import { d } from "./support/dates";
 
 const today = d("2026-10-26");
@@ -68,5 +68,26 @@ describe("reachOut", () => {
 
 	it("counts a day after today as today", () => {
 		expect(reachOut([person("Pasha", { every: 7 }, -1)], today, rule)).toEqual([]);
+	});
+});
+
+describe("tracked", () => {
+	it("lists everyone with a target: the late, then the soon, then the rest, each the furthest along first", () => {
+		const people = [
+			person("A", { every: 30 }, 12),
+			person("B", { every: 14 }, 16),
+			person("C", { every: 7 }, 6),
+			person("D", { every: 60 }, 9),
+			person("E", undefined, 300),
+		];
+		const all = tracked(people, today, rule);
+		expect(all.map((item) => item.person.name)).toEqual(["B", "C", "A", "D"]);
+		expect(all.map((item) => item.status)).toEqual(["late", "soon", "ok", "ok"]);
+		expect(all.map((item) => item.days)).toEqual([16, 6, 12, 9]);
+	});
+
+	it("orders equals on track by name", () => {
+		const all = tracked([person("Vova", { every: 10 }, 2), person("Anya", { every: 20 }, 4)], today, rule);
+		expect(all.map((item) => item.person.name)).toEqual(["Anya", "Vova"]);
 	});
 });

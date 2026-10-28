@@ -19,7 +19,7 @@ This document wins over `docs/superpowers/specs/2026-10-26-people-tracker-design
 - Days are groups: "Today  Sun, 26 Oct" / "Friday  24 Oct" — day name 15 px semibold, date 13 px grey, 8 px apart, on one line. Groups are 12 px apart with a hairline above each but the first. Empty days don't appear.
 - Row: format icon in a circle (Meeting: accent-tinted circle with accent icon; Call and Text: grey circle, grey icon), the person's name, under it the format and its qualifiers as one grey line ("Meeting, one on one", "Call, shared activity", "Text"), the time of day in grey 13 px tabular figures, then a faint chevron (`MainTime.dc.html`, approved 2026-10-27). Within a day the rows go by time, latest first; a time before the day's start hour counts as the end of that day. Records without a time come last, by name. Two interactions with the same person the same day are two rows. Tap → Edit.
 - The "+" → Who.
-- Above the days, under the title: the Reach out block (`MainReach.dc.html`, decided 2026-10-29), the same one as on Stats. The first day under it gets the hairline every other day has.
+- Above the days, under the title: the Reach out block (`MainReach.dc.html`, decided 2026-10-29): only the people who are due. The first day under it gets the hairline every other day has.
 
 ## Who (`Who.dc.html`) — step 1 of a new interaction
 
@@ -70,7 +70,7 @@ A person with no interactions shows `last seen: never` and `contact every`.
 - Two numbers 32 px bold: interactions and people in the period, each with the difference to the previous period in small green (+) or red (−).
 - Under them two more numbers of the same size, without a difference: "you started" and "they started", in percent of the period's interactions where it is marked; left out when nothing in the period is marked (`StatsStarted.dc.html`, approved 2026-10-29). Everything on Stats is over the chosen period.
 - "By month": the same chart as in the person note, over everyone.
-- "Reach out" (below).
+- "Contact every" (below): everyone with a target (`StatsTargets.dc.html`, decided 2026-10-29).
 - "Most often this month/week/year": person rows with the count on the right. Under the name, a grey line "you start 70%" — over the period; no line for a person with nothing marked in it.
 - Tap a person → their note.
 
@@ -79,7 +79,8 @@ A person with no interactions shows `last seen: never` and `contact every`.
 A person may have a target, "contact every N days", kept in the note's frontmatter (`contact_every`, `heads_up`, names in the settings) and set in the person's panel. Colour and lists exist only for people with a target; the plugin never guesses whom to call.
 
 - Days since the last interaction of any kind, `d`, against the target `N`: **late** (red) when `d > N`; **soon** (yellow) when the person's heads-up is on and at most the settings' share (20% by default) of `N` is left, day `N` included; otherwise nothing. A target and no interaction yet: late, "never" on the right.
-- The **Reach out** block, the same on the feed (above the days) and on Stats (where "Falling behind" was): section label "Reach out", person rows with "Every N days" under the name and the days since the last interaction bold on the right, in the status colour. Late first, then soon; within each by `d / N`, highest first, then by name. Everyone due is listed, never cut. Tap → the person's note. Nobody due → no block.
+- The **Reach out** block on the feed, above the days: section label "Reach out", person rows with "Every N days" under the name and the days since the last interaction bold on the right, in the status colour. Late first, then soon; within each by `d / N`, highest first, then by name. Everyone due is listed, never cut. Tap → the person's note. Nobody due → no block.
+- The **Contact every** block on Stats (where "Falling behind" was; `StatsTargets.dc.html`, decided 2026-10-29): the same rows, but for everyone with a target, so the targets set are all seen in one place. Late and soon keep their colour; the others have the days in the ordinary text colour. One list, in the same order: late, then soon, then the rest, each by `d / N`, highest first, then by name. It does not depend on the period. Nobody with a target → no block.
 
 ## Style system
 
