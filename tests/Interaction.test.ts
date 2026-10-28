@@ -35,4 +35,10 @@ describe("sameInteraction", () => {
 		expect(sameInteraction(at(LocalTime.of(18, 40)), at())).toBe(false);
 		expect(sameInteraction(at(), at())).toBe(true);
 	});
+
+	it("tells two records apart by who started them, marked or not", () => {
+		expect(sameInteraction({ date, kind: "text", initiated: "me" }, { date, kind: "text", initiated: "me" })).toBe(true);
+		expect(sameInteraction({ date, kind: "text", initiated: "me" }, { date, kind: "text", initiated: "them" })).toBe(false);
+		expect(sameInteraction({ date, kind: "text", initiated: "me" }, { date, kind: "text" })).toBe(false);
+	});
 });

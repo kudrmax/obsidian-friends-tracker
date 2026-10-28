@@ -1,5 +1,5 @@
 import { DomainError } from "../domain/DomainError";
-import { Company, Interaction, Kind, Length, Purpose } from "../domain/Interaction";
+import { Company, Initiator, Interaction, Kind, Length, Purpose } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
 import { LocalTime } from "../domain/LocalTime";
 import { Extras, Person, Target } from "../domain/Person";
@@ -17,12 +17,14 @@ export interface PropertyNames {
 	readonly company: string;
 	readonly length: string;
 	readonly purpose: string;
+	readonly initiated: string;
 	readonly contactEvery: string;
 	readonly headsUp: string;
 	readonly kinds: Readonly<Record<Kind, string>>;
 	readonly companies: Readonly<Record<Company, string>>;
 	readonly lengths: Readonly<Record<Length, string>>;
 	readonly purposes: Readonly<Record<Purpose, string>>;
+	readonly initiators: Readonly<Record<Initiator, string>>;
 }
 
 export const DEFAULT_PROPERTY_NAMES: PropertyNames = {
@@ -33,12 +35,14 @@ export const DEFAULT_PROPERTY_NAMES: PropertyNames = {
 	company: "company",
 	length: "length",
 	purpose: "purpose",
+	initiated: "initiated",
 	contactEvery: "contact_every",
 	headsUp: "heads_up",
 	kinds: { text: "text", call: "call", meeting: "meeting" },
 	companies: { one_on_one: "one_on_one", group: "group" },
 	lengths: { some_time: "some_time", whole_day: "whole_day" },
 	purposes: { talk: "talk", activity: "activity" },
+	initiators: { me: "me", them: "them" },
 };
 
 export function decodePerson(name: string, frontmatter: Frontmatter | null | undefined, keys: PropertyNames = DEFAULT_PROPERTY_NAMES): Person {
@@ -98,6 +102,7 @@ function writeInteraction(interaction: Interaction, keys: PropertyNames): Frontm
 		out[keys.length] = keys.lengths[interaction.length];
 	}
 	if (interaction.kind === "call") out[keys.purpose] = keys.purposes[interaction.purpose];
+	if (interaction.initiated) out[keys.initiated] = keys.initiators[interaction.initiated];
 	return out;
 }
 
@@ -107,8 +112,10 @@ function readInteraction(item: unknown, keys: PropertyNames): { interaction: Int
 	const time = readTime(item[keys.time], keys.time);
 	const kind = readValue<Kind>(item[keys.kind], keys.kinds, keys.kind);
 	if (kind === undefined) throw new PersonDecodeError(`${keys.kind}: missing`);
-	const own = new Set([keys.date, keys.time, keys.kind]);
-	const moment = time ? { date, time } : { date };
+	/* Who started it is the one optional mark: a record without it is simply not marked. */
+	const initiated = readValue<Initiator>(item[keys.initiated], keys.initiators, keys.initiated);
+	const own = new Set([keys.date, keys.time, keys.kind, keys.initiated]);
+	const moment = { date, ...(time ? { time } : {}), ...(initiated ? { initiated } : {}) };
 	/* A qualifier is spelled out every time: a record that leaves one out says nothing, and is not guessed at. */
 	const qualifier = <T extends string>(key: string, values: Readonly<Record<T, string>>): T => {
 		own.add(key);

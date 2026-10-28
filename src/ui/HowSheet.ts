@@ -1,12 +1,12 @@
 import { App, Notice } from "obsidian";
-import { Company, KINDS, Kind, Labels, Length, Purpose, describe } from "../domain/Interaction";
+import { Company, INITIATORS, Initiator, KINDS, Kind, Labels, Length, Purpose, describe } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
 import { DatePicker } from "./DatePicker";
 import { TimePicker } from "./TimePicker";
 import { LocalTime } from "../domain/LocalTime";
-import { KIND_ICONS, QUALIFIER_ICONS, forkRow, iconButton, row, sheetHeader, subtleButton } from "./components";
+import { INITIATOR_ICONS, KIND_ICONS, QUALIFIER_ICONS, forkRow, iconButton, optionalForkRow, row, sheetHeader, subtleButton } from "./components";
 import { longDate } from "./format";
-import { HowState, isComplete, toInteraction, withKind } from "./howState";
+import { HowState, isComplete, toInteraction, withInitiator, withKind } from "./howState";
 import { Arrivals } from "./motion";
 import { FullSheet, PageDescriptor } from "./sheet";
 import { UiContext } from "./UiContext";
@@ -16,8 +16,8 @@ export interface HowPerson {
 	readonly name: string;
 }
 
-/** The forks the How screen asks, for a state: the kind, then what the kind needs. */
-export function renderForks(parent: HTMLElement, state: HowState, labels: Labels, onChange: (next: HowState) => void, arrivals?: Arrivals): void {
+/** The forks the How screen asks, for a state: the kind, then what the kind needs, then who started it. */
+export function renderForks(parent: HTMLElement, state: HowState, labels: Labels, personName: string, onChange: (next: HowState) => void, arrivals?: Arrivals): void {
 	forkRow<Kind>(parent, "How", KINDS.map((kind) => ({ value: kind, text: labels[kind], icon: KIND_ICONS[kind] })), state.kind, (kind) => onChange(withKind(state, kind)), arrivals);
 	if (state.kind === "call") {
 		const purposes: Purpose[] = ["talk", "activity"];
@@ -28,6 +28,11 @@ export function renderForks(parent: HTMLElement, state: HowState, labels: Labels
 		forkRow<Company>(parent, "Company", companies.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.company, (company) => onChange({ ...state, company }), arrivals);
 		const lengths: Length[] = ["some_time", "whole_day"];
 		forkRow<Length>(parent, "Length", lengths.map((value) => ({ value, text: labels[value], icon: QUALIFIER_ICONS[value] })), state.length, (length) => onChange({ ...state, length }), arrivals);
+	}
+	if (state.kind) {
+		const initiators: Record<Initiator, string> = { me: "Me", them: personName };
+		const options = INITIATORS.map((value) => ({ value, text: initiators[value], icon: INITIATOR_ICONS[value] }));
+		optionalForkRow<Initiator>(parent, "Who started", options, state.initiated, (initiated) => onChange(withInitiator(state, initiated)), arrivals);
 	}
 }
 
@@ -155,6 +160,7 @@ export class HowSheet extends FullSheet {
 			forks,
 			this.state,
 			this.ui.settings().labels,
+			this.person.name,
 			(next) => {
 				this.state = next;
 				this.render();

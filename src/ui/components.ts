@@ -1,5 +1,5 @@
 import { setIcon } from "obsidian";
-import { Company, Kind, Length, Purpose } from "../domain/Interaction";
+import { Company, Initiator, Kind, Length, Purpose } from "../domain/Interaction";
 import { ANIMATION, Arrivals, arrive } from "./motion";
 
 /** Lucide icons the screens use, by name. */
@@ -23,7 +23,9 @@ export type IconName =
 	| "search"
 	| "calendar"
 	| "align-justify"
-	| "activity";
+	| "activity"
+	| "arrow-up-right"
+	| "arrow-down-left";
 
 export const KIND_ICONS: Readonly<Record<Kind, IconName>> = { text: "message-circle", call: "phone", meeting: "users" };
 export const QUALIFIER_ICONS: Readonly<Record<Company | Length | Purpose, IconName>> = {
@@ -34,6 +36,8 @@ export const QUALIFIER_ICONS: Readonly<Record<Company | Length | Purpose, IconNa
 	talk: "message-square",
 	activity: "gamepad-2",
 };
+
+export const INITIATOR_ICONS: Readonly<Record<Initiator, IconName>> = { me: "arrow-up-right", them: "arrow-down-left" };
 
 export function icon(parent: HTMLElement, name: IconName): HTMLElement {
 	const holder = parent.createSpan("ft-icon");
@@ -127,6 +131,20 @@ export function forkRow<T extends string>(
 		button.createSpan({ text: option.text });
 		button.addEventListener("click", () => onPick(option.value));
 	}
+	return el;
+}
+
+/** A fork that may stay unanswered: "optional" stands after its label. */
+export function optionalForkRow<T extends string>(
+	parent: HTMLElement,
+	label: string,
+	options: readonly ForkOption<T>[],
+	selected: T | undefined,
+	onPick: (value: T) => void,
+	arrivals?: Arrivals,
+): HTMLElement {
+	const el = forkRow(parent, label, options, selected, onPick, arrivals);
+	el.querySelector(".ft-section")?.createSpan({ cls: "ft-section-hint", text: "optional" });
 	return el;
 }
 

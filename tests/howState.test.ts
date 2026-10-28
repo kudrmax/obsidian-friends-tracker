@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DomainError } from "../src/domain/DomainError";
 import { LocalTime } from "../src/domain/LocalTime";
-import { HowState, fromInteraction, isComplete, toInteraction, withKind } from "../src/ui/howState";
+import { HowState, fromInteraction, isComplete, toInteraction, withInitiator, withKind } from "../src/ui/howState";
 import { d } from "./support/dates";
 
 const date = d("2026-10-26");
@@ -40,5 +40,20 @@ describe("a new interaction's state", () => {
 		const time = LocalTime.of(9, 15);
 		expect(withKind({ date, time, kind: "call", purpose: "activity" }, "meeting")).toEqual({ date, time, kind: "meeting" });
 		expect(withKind({ date, kind: "text" }, "call")).toEqual({ date, kind: "call" });
+	});
+
+	it("leaves who started optional, keeps it across a change of kind and carries it both ways", () => {
+		const state: HowState = { date, kind: "text", initiated: "me" };
+		expect(isComplete({ date, kind: "text" })).toBe(true);
+		expect(toInteraction(state)).toEqual({ date, kind: "text", initiated: "me" });
+		expect(fromInteraction({ date, kind: "call", purpose: "talk", initiated: "them" })).toEqual({ date, kind: "call", purpose: "talk", initiated: "them" });
+		expect(withKind(state, "call")).toEqual({ date, kind: "call", initiated: "me" });
+	});
+
+	it("picks who started, switches it, and unpicks it on a second tap of the same answer", () => {
+		const picked = withInitiator({ date, kind: "text" }, "them");
+		expect(picked).toEqual({ date, kind: "text", initiated: "them" });
+		expect(withInitiator(picked, "me")).toEqual({ date, kind: "text", initiated: "me" });
+		expect(withInitiator(picked, "them")).toEqual({ date, kind: "text" });
 	});
 });

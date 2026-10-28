@@ -1,7 +1,7 @@
 import { Kind } from "./Interaction";
 import { LocalDate } from "./LocalDate";
 import { Person } from "./Person";
-import { PERIOD_DAYS, totals, usualGap } from "./Stats";
+import { Initiative, PERIOD_DAYS, initiative, totals, usualGap } from "./Stats";
 
 /** A day of contact and how many days ago it was; a day after today counts as today. */
 export interface Contact {
@@ -35,6 +35,11 @@ export class PersonStats {
 	pastYear(): { readonly count: number; readonly delta?: number } {
 		const year = totals([this.person], "year", this.today);
 		return this.knownBefore(this.today.addDays(-(PERIOD_DAYS.year - 1))) ? { count: year.interactions, delta: year.interactionsDelta } : { count: year.interactions };
+	}
+
+	/** Who starts, over all time. */
+	initiative(): Initiative | undefined {
+		return initiative(this.person.interactions());
 	}
 
 	firstDate(): LocalDate | undefined {

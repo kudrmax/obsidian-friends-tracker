@@ -81,11 +81,13 @@ function loadProperties(value: unknown): PropertyNames {
 		company: text(raw.company, DEFAULT_PROPERTY_NAMES.company),
 		length: text(raw.length, DEFAULT_PROPERTY_NAMES.length),
 		purpose: text(raw.purpose, DEFAULT_PROPERTY_NAMES.purpose),
+		initiated: text(raw.initiated, DEFAULT_PROPERTY_NAMES.initiated),
 		contactEvery: text(raw.contactEvery, DEFAULT_PROPERTY_NAMES.contactEvery),
 		headsUp: text(raw.headsUp, DEFAULT_PROPERTY_NAMES.headsUp),
 		kinds: loadTexts(raw.kinds, DEFAULT_PROPERTY_NAMES.kinds),
 		companies: loadTexts(raw.companies, DEFAULT_PROPERTY_NAMES.companies),
 		lengths: loadTexts(raw.lengths, DEFAULT_PROPERTY_NAMES.lengths),
 		purposes: loadTexts(raw.purposes, DEFAULT_PROPERTY_NAMES.purposes),
+		initiators: loadTexts(raw.initiators, DEFAULT_PROPERTY_NAMES.initiators),
 	};
 }
