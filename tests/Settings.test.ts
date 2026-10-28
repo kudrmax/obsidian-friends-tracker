@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_LABELS } from "../src/domain/Interaction";
 import { DEFAULT_PROPERTY_NAMES } from "../src/infrastructure/PersonCodec";
-import { DEFAULT_SETTINGS, loadSettings } from "../src/settings";
+import { DEFAULT_SETTINGS, loadSettings, reachRule } from "../src/settings";
 
 describe("loadSettings", () => {
 	it("uses defaults for missing data", () => {
@@ -13,6 +13,8 @@ describe("loadSettings", () => {
 			properties: DEFAULT_PROPERTY_NAMES,
 			labels: DEFAULT_LABELS,
 			dayStartHour: 4,
+			headsUpPercent: 20,
+			headsUpForNew: true,
 		});
 		expect(loadSettings(undefined)).toEqual(DEFAULT_SETTINGS);
 	});
@@ -35,5 +37,25 @@ describe("loadSettings", () => {
 
 	it("strips the hash from the tag", () => {
 		expect(loadSettings({ tag: "#friends" }).tag).toBe("friends");
+	});
+
+	it("takes a heads-up share of 1 to 99 whole percent", () => {
+		expect(loadSettings({ headsUpPercent: 1 }).headsUpPercent).toBe(1);
+		expect(loadSettings({ headsUpPercent: 99 }).headsUpPercent).toBe(99);
+		for (const wrong of [0, 100, 12.5, "30"]) expect(loadSettings({ headsUpPercent: wrong }).headsUpPercent).toBe(20);
+	});
+
+	it("reads the heads-up for new targets", () => {
+		expect(loadSettings({ headsUpForNew: false }).headsUpForNew).toBe(false);
+	});
+
+	it("reads the target's property names", () => {
+		expect(DEFAULT_PROPERTY_NAMES.contactEvery).toBe("contact_every");
+		expect(DEFAULT_PROPERTY_NAMES.headsUp).toBe("heads_up");
+		expect(loadSettings({ properties: { contactEvery: "every" } }).properties.contactEvery).toBe("every");
+	});
+
+	it("gives the target's rule", () => {
+		expect(reachRule(loadSettings({ headsUpPercent: 30, headsUpForNew: false }))).toEqual({ headsUpPercent: 30, headsUpForNew: false });
 	});
 });
