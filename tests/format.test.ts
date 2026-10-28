@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { barLabel, dayDate, dayName, daysAgo, fullDate, longDate, monthLetter, shortDate } from "../src/ui/format";
+import { barLabel, dayDate, dayName, daysAgo, everyDays, fullDate, longDate, monthLetter, shortDate, sinceDays } from "../src/ui/format";
 import { d } from "./support/dates";
 
 const today = d("2026-10-26");
@@ -56,5 +56,19 @@ describe("a chart's labels", () => {
 
 	it("write a date years back in full", () => {
 		expect(fullDate(d("2023-03-12"))).toBe("12 Mar 2023");
+	});
+});
+
+describe("the Reach out rows", () => {
+	it("say the target under the name", () => {
+		expect(everyDays(1)).toBe("Every 1 day");
+		expect(everyDays(7)).toBe("Every 7 days");
+	});
+
+	it("say the days since the last interaction, or never", () => {
+		expect(sinceDays(undefined)).toBe("never");
+		expect(sinceDays(0)).toBe("0 days");
+		expect(sinceDays(1)).toBe("1 day");
+		expect(sinceDays(16)).toBe("16 days");
 	});
 });

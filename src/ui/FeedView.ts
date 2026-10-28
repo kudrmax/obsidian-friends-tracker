@@ -7,6 +7,7 @@ import { nextPage, pagesAvailable, pagesShown, rowKeys } from "./feed";
 import { ANIMATION, Arrivals, arrive, leave, play } from "./motion";
 import { FullSheet, PageDescriptor, PageHolder, samePage, sheetForPage } from "./sheet";
 import { dayDate, dayName } from "./format";
+import { ReachOutBlock } from "./reach";
 import { TabHistory } from "./TabHistory";
 import { UiContext, UndoOffer } from "./UiContext";
 
@@ -22,6 +23,8 @@ export class FeedView extends ItemView implements PageHolder {
 	override navigation = true;
 	private shown: FeedDay[] = [];
 	private list: HTMLElement | null = null;
+	private reach: HTMLElement | null = null;
+	private readonly reachOut: ReachOutBlock;
 	private scroller: HTMLElement | null = null;
 	private undoEl: HTMLElement | null = null;
 	private undoTimer: number | null = null;
@@ -42,6 +45,7 @@ export class FeedView extends ItemView implements PageHolder {
 		private readonly ui: UiContext,
 	) {
 		super(leaf);
+		this.reachOut = new ReachOutBlock(ui, () => this.render(true));
 		this.history = new TabHistory(this.app, leaf, FEED_VIEW);
 		this.scope = new Scope(this.app.scope);
 		this.scope.register([], "Escape", () => {
@@ -70,6 +74,7 @@ export class FeedView extends ItemView implements PageHolder {
 		this.scroller = root.createDiv("ft-scroll");
 		const column = this.scroller.createDiv("ft-column");
 		column.createEl("h1", { cls: "ft-title", text: "Friends" });
+		this.reach = column.createDiv("ft-reach");
 		this.list = column.createDiv("ft-feed-list");
 		this.scroller.addEventListener("scroll", () => this.maybeLoadMore());
 		root.createDiv("ft-fade");
@@ -275,6 +280,10 @@ export class FeedView extends ItemView implements PageHolder {
 		if (!list) return;
 		list.empty();
 		this.arrivals.begin();
+		if (this.reach) {
+			this.reach.empty();
+			this.reachOut.render(this.reach, this.arrivals);
+		}
 		const today = this.ui.service.today();
 		if (!this.shown.length) {
 			list.createDiv({ cls: "ft-empty", text: "No interactions yet" });

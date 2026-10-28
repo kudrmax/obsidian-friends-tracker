@@ -38,6 +38,8 @@ body {
 	--ft-float-light-hover: color-mix(in srgb, var(--ft-fill-ink) 24%, var(--ft-bg));
 	--ft-fill-ink: rgb(118, 118, 128);
 	--ft-danger: var(--color-red);
+	/* A target about to run out. */
+	--ft-soon: var(--color-yellow);
 	--ft-up: var(--color-green);
 	--ft-fade-from: rgba(var(--ft-bg-rgb), 0);
 	--ft-bg-rgb: var(--mono-rgb-0);
@@ -205,10 +207,14 @@ body {
 .ft-row-chevron svg { width: var(--ft-chevron); height: var(--ft-chevron); stroke-width: var(--ft-stroke-bold); }
 .ft-row-value { flex: 0 0 auto; font-size: var(--ft-font-body); color: var(--ft-text); font-variant-numeric: tabular-nums; }
 .ft-row-value.is-strong { font-weight: var(--ft-weight-semibold); }
+.ft-row-value.is-late { color: var(--ft-danger); }
+.ft-row-value.is-soon { color: var(--ft-soon); }
 
 /* A day's header and the group under it. */
 .ft-group { display: flex; flex-direction: column; margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-hairline) solid var(--ft-line); }
 .ft-group:first-of-type { margin-top: var(--ft-space-20); padding-top: 0; border-top: none; }
+/* Under the Reach out block the first day is set off like every other. */
+.ft-reach:not(:empty) + .ft-feed-list .ft-group:first-of-type { margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-hairline) solid var(--ft-line); }
 .ft-day { display: flex; align-items: baseline; gap: var(--ft-space-8); height: var(--ft-day); line-height: var(--ft-day); }
 .ft-day-name { font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); color: var(--ft-text); }
 .ft-day-date { font-size: var(--ft-font-small); color: var(--ft-muted); }

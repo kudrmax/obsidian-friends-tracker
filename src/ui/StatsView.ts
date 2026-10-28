@@ -1,10 +1,11 @@
 import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
 import { Interaction } from "../domain/Interaction";
 import { Person } from "../domain/Person";
-import { Behind, Often, Period, buckets, fallingBehind, mostOften, totals } from "../domain/Stats";
-import { forkRow, moreButton, row, sectionLabel } from "./components";
+import { Often, Period, buckets, mostOften, totals } from "../domain/Stats";
+import { forkRow, row, sectionLabel } from "./components";
 import { barChart } from "./MonthChart";
 import { ANIMATION, Arrivals, Debut, arrive, play } from "./motion";
+import { ReachOutBlock } from "./reach";
 import { TabHistory } from "./TabHistory";
 import { UiContext } from "./UiContext";
 
@@ -17,11 +18,10 @@ const PERIODS: readonly { value: Period; text: string }[] = [
 const PERIOD_WORD: Record<Period, string> = { week: "this week", month: "this month", year: "this year" };
 const LIST_SHOWN = 5;
 
-/** How much you talk to people, who you are falling behind with, and who you see most. */
+/** How much you talk to people, whom to reach out to, and who you see most. */
 export class StatsView extends ItemView {
 	override navigation = true;
 	private period: Period = "month";
-	private behindOpen = false;
 	private body: HTMLElement | null = null;
 	/** Where each person shown lives, so a tap opens the right note. */
 	private paths = new Map<Person, string>();
@@ -29,12 +29,14 @@ export class StatsView extends ItemView {
 	private readonly arrivals = new Arrivals();
 	/** The chart grows once, when the view opens. */
 	private readonly debut = new Debut();
+	private readonly reachOut: ReachOutBlock;
 
 	constructor(
 		leaf: WorkspaceLeaf,
 		private readonly ui: UiContext,
 	) {
 		super(leaf);
+		this.reachOut = new ReachOutBlock(ui, () => this.refresh());
 	}
 
 	override getViewType(): string {
@@ -102,7 +104,7 @@ export class StatsView extends ItemView {
 		sectionLabel(body, "By month");
 		const all: Interaction[] = people.flatMap((person) => [...person.interactions()]);
 		barChart(body, buckets(all, "months", today), "months", this.ui.settings().labels, { grow: this.debut.offset() });
-		this.renderBehind(body, fallingBehind(people, today));
+		this.reachOut.render(body, this.arrivals);
 		this.renderOften(body, mostOften(people, this.period, today));
 	}
 
@@ -121,26 +123,6 @@ export class StatsView extends ItemView {
 		};
 		cell(numbers.interactions, numbers.interactionsDelta, `interactions ${PERIOD_WORD[this.period]}`);
 		cell(numbers.people, numbers.peopleDelta, "people");
-	}
-
-	private renderBehind(parent: HTMLElement, behind: Behind[]): void {
-		if (!behind.length) return;
-		sectionLabel(parent, "Falling behind");
-		const shown = this.behindOpen ? behind : behind.slice(0, LIST_SHOWN);
-		for (const item of shown) {
-			row(parent, {
-				circle: { initial: item.person.name.slice(0, 1).toUpperCase() },
-				title: item.person.name,
-				subtitle: `Usually every ${item.usual} ${item.usual === 1 ? "day" : "days"}`,
-				trailing: { text: `${item.days} days`, strong: true },
-				onClick: () => this.openPerson(item.person),
-			});
-		}
-		if (behind.length <= LIST_SHOWN) return;
-		moreButton(parent, this.behindOpen, this.behindOpen ? "Fewer" : `${behind.length - LIST_SHOWN} more`, () => {
-			this.behindOpen = !this.behindOpen;
-			this.refresh();
-		});
 	}
 
 	private renderOften(parent: HTMLElement, often: Often[]): void {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Interaction, Kind } from "../src/domain/Interaction";
 import { LocalDate } from "../src/domain/LocalDate";
 import { Person } from "../src/domain/Person";
-import { buckets, countKinds, daysSince, fallingBehind, mostOften, sum, totals, usualGap } from "../src/domain/Stats";
+import { buckets, countKinds, daysSince, mostOften, sum, totals, usualGap } from "../src/domain/Stats";
 import { d } from "./support/dates";
 
 const today = d("2026-10-26");
@@ -107,23 +107,6 @@ describe("totals", () => {
 		];
 		expect(totals(people, "month", today)).toEqual({ interactions: 3, people: 2, interactionsDelta: 0, peopleDelta: 0 });
 		expect(totals(people, "week", today)).toEqual({ interactions: 3, people: 2, interactionsDelta: 3, peopleDelta: 2 });
-	});
-});
-
-describe("fallingBehind", () => {
-	it("lists people past their usual gap, the most overdue first", () => {
-		const people = [
-			person("Dima", [17, 27, 37, 47]),
-			person("Seryozha", [41, 60, 79, 98]),
-			person("Anya", [23, 35, 47, 59]),
-			person("Katya", [1, 3, 5, 7]),
-			person("Two", [50, 90]),
-		];
-		expect(fallingBehind(people, today).map((b) => [b.person.name, b.days, b.usual])).toEqual([
-			["Seryozha", 41, 19],
-			["Anya", 23, 12],
-			["Dima", 17, 10],
-		]);
 	});
 });
 
