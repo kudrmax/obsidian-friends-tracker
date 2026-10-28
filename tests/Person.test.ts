@@ -59,4 +59,36 @@ describe("Person", () => {
 		expect(person.removeAt(0, text("2026-10-24")).extras()).toEqual([{}]);
 		expect(person.add(call("2026-10-25"), today).extras()).toEqual([{}, { mood: "good" }, {}]);
 	});
+
+	it("takes a target of whole days, at least one", () => {
+		const misha = Person.create("Misha");
+		expect(() => misha.withTarget(0, true)).toThrow(DomainError);
+		expect(() => misha.withTarget(1.5, true)).toThrow(DomainError);
+		expect(misha.withTarget(7, true).target()).toEqual({ every: 7, headsUp: true });
+	});
+
+	it("keeps the heads-up already chosen when the target changes", () => {
+		const misha = Person.create("Misha").withTarget(7, false).withTarget(14, true);
+		expect(misha.target()).toEqual({ every: 14, headsUp: false });
+	});
+
+	it("drops the target, and a value it couldn't read, together", () => {
+		const misha = Person.restore({ name: "Misha", interactions: [], unreadTarget: "abc" });
+		expect(misha.unreadTarget()).toBe("abc");
+		expect(misha.withTarget(7, true).unreadTarget()).toBeUndefined();
+		const cleared = misha.withTarget(7, true).withoutTarget();
+		expect(cleared.target()).toBeUndefined();
+		expect(cleared.unreadTarget()).toBeUndefined();
+	});
+
+	it("turns the heads-up on and off only with a target", () => {
+		expect(() => Person.create("Misha").withHeadsUp(true)).toThrow(DomainError);
+		expect(Person.create("Misha").withTarget(7, true).withHeadsUp(false).target()).toEqual({ every: 7, headsUp: false });
+	});
+
+	it("keeps the target through changes to the interactions", () => {
+		const misha = Person.create("Misha").withTarget(7, true).add(text("2026-10-24"), today);
+		expect(misha.target()).toEqual({ every: 7, headsUp: true });
+		expect(misha.removeAt(0, text("2026-10-24")).target()).toEqual({ every: 7, headsUp: true });
+	});
 });

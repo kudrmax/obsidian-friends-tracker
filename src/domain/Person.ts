@@ -7,12 +7,22 @@ const FORBIDDEN_NAME_CHARS = /[\\/:*?"<>|#^[\]]/;
 /** Fields of a stored interaction the plugin doesn't know; kept so a note loses nothing when it is written back. */
 export type Extras = Readonly<Record<string, unknown>>;
 
+/** How often you want to be in touch: at least once every `every` days, and whether to be told before that runs out. */
+export interface Target {
+	readonly every: number;
+	/** Unset when the note never said; the settings decide then. */
+	readonly headsUp?: boolean;
+}
+
 export interface PersonState {
 	readonly name: string;
 	/** From newest to oldest; within a day, in the order they were added. */
 	readonly interactions: readonly Interaction[];
 	/** extras[i] belongs to interactions[i]. */
 	readonly extras?: readonly Extras[];
+	readonly target?: Target;
+	/** What the note holds where a target should be, when it isn't a whole number of days; kept so it can be corrected. */
+	readonly unreadTarget?: unknown;
 }
 
 export class Person {
@@ -26,7 +36,7 @@ export class Person {
 		if (!name) throw new DomainError("Give the person a name");
 		if (FORBIDDEN_NAME_CHARS.test(name)) throw new DomainError('A name can\'t contain \\ / : * ? " < > | # ^ [ ]');
 		const extras = state.interactions.map((_, index) => state.extras?.[index] ?? {});
-		return new Person({ name, interactions: state.interactions }, extras);
+		return new Person({ name, interactions: state.interactions, target: state.target, unreadTarget: state.unreadTarget }, extras);
 	}
 
 	static create(name: string): Person {
@@ -51,6 +61,31 @@ export class Person {
 			if (sameInteraction(this.state.interactions[index], interaction)) return index;
 		}
 		return -1;
+	}
+
+	target(): Target | undefined {
+		return this.state.target;
+	}
+
+	unreadTarget(): unknown {
+		return this.state.unreadTarget;
+	}
+
+	/** A new target keeps the heads-up the person already has, and takes `headsUp` only when there was none. */
+	withTarget(every: number, headsUp: boolean): Person {
+		if (!Number.isInteger(every) || every < 1) throw new DomainError("Contact every takes a whole number of days");
+		const target = { every, headsUp: this.state.target?.headsUp ?? headsUp };
+		return new Person({ ...this.state, target, unreadTarget: undefined }, this.extra);
+	}
+
+	withoutTarget(): Person {
+		return new Person({ ...this.state, target: undefined, unreadTarget: undefined }, this.extra);
+	}
+
+	withHeadsUp(on: boolean): Person {
+		const target = this.state.target;
+		if (!target) throw new DomainError("Set a target first");
+		return new Person({ ...this.state, target: { ...target, headsUp: on } }, this.extra);
 	}
 
 	lastDate(): LocalDate | undefined {
