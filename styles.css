@@ -38,9 +38,9 @@ body {
 	--ft-float-light-hover: color-mix(in srgb, var(--ft-fill-ink) 24%, var(--ft-bg));
 	--ft-fill-ink: rgb(118, 118, 128);
 	--ft-danger: var(--color-red);
-	/* A target about to run out, and one that has: the colours of the approved boards. */
-	--ft-soon: #e0c060;
-	--ft-late: #fb6b70;
+	/* A target about to run out, and one that has: a warm orange and coral, chosen by Max for the black of a phone and the grey of a computer alike. */
+	--ft-soon: #ffb340;
+	--ft-late: #ff5f57;
 	--ft-up: var(--color-green);
 	--ft-fade-from: rgba(var(--ft-bg-rgb), 0);
 	--ft-bg-rgb: var(--mono-rgb-0);
