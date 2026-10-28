@@ -97,11 +97,6 @@ body {
 	--ft-dot: 10px;
 	--ft-recent-date: 52px;
 	--ft-recent-dot: 16px;
-	/* Who starts: a bar split in two, your share and theirs, with an arrow and a percent at each end. */
-	--ft-split-bar: 6px;
-	--ft-icon-split: 14px;
-	/* Room for "100%" at each end, so the bars of a list line up. */
-	--ft-split-share: 4.4ch;
 	--ft-stroke: 1.75px;
 	/* The "+", ✓ and the chevrons draw bolder; a capsule's icon a little. */
 	--ft-stroke-bold: 2.4px;
@@ -209,19 +204,6 @@ body {
 .ft-row-title { font-size: var(--ft-font-body); line-height: var(--ft-leading-body); letter-spacing: var(--ft-tracking-body); color: var(--ft-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ft-row-title b { font-weight: var(--ft-weight-semibold); }
 .ft-row-sub { font-size: var(--ft-font-small); line-height: var(--ft-leading-small); color: var(--ft-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* Who starts: your share and theirs, one bar between the two ends. */
-.ft-split { display: flex; align-items: center; gap: var(--ft-space-8); flex: 1 1 auto; width: 100%; min-width: 0; font-variant-numeric: tabular-nums; }
-.ft-split-end { flex: 0 0 auto; display: inline-flex; align-items: center; gap: var(--ft-space-2); }
-.ft-split-share { min-width: var(--ft-split-share); }
-.ft-split-end.is-them { flex-direction: row-reverse; }
-.ft-split-end.is-them .ft-split-share { text-align: right; }
-.ft-split-end .ft-icon { display: inline-flex; color: var(--ft-muted); }
-.ft-split-end .ft-icon svg { width: var(--ft-icon-split); height: var(--ft-icon-split); stroke-width: var(--ft-stroke-capsule); }
-.ft-split-bar { flex: 1 1 auto; display: flex; gap: var(--ft-bar-gap); min-width: 0; height: var(--ft-split-bar); }
-.ft-split-part { flex: 0 1 0; border-radius: var(--ft-radius-capsule); }
-.ft-split-part.is-me { background: var(--ft-muted); }
-.ft-split-part.is-them { background: var(--ft-fill-hover); }
 .ft-row-meta { flex: 0 0 auto; font-size: var(--ft-font-small); line-height: var(--ft-leading-small); color: var(--ft-muted); font-variant-numeric: tabular-nums; }
 .ft-row-chevron { flex: 0 0 auto; color: var(--ft-faint); }
 .ft-row-chevron svg { width: var(--ft-chevron); height: var(--ft-chevron); stroke-width: var(--ft-stroke-bold); }

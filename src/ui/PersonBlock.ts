@@ -1,5 +1,5 @@
 import { Notice, WorkspaceLeaf, setIcon } from "obsidian";
-import { ForkOption, forkRow, initiativeSplit, moreButton } from "./components";
+import { ForkOption, forkRow, moreButton } from "./components";
 import { Interaction, describe } from "../domain/Interaction";
 import { Person, TARGET_NOT_DAYS, Target } from "../domain/Person";
 import { Contact, PersonStats } from "../domain/PersonStats";
@@ -132,7 +132,10 @@ export class PersonBlock {
 		const count = this.text(rows, "bar-chart-3", "past year", `${year.count} ${year.count === 1 ? "interaction" : "interactions"}`);
 		if (year.delta) count.createSpan({ cls: `ft-delta ${year.delta > 0 ? "is-up" : "is-down"}`, text: `${year.delta > 0 ? "+" : "−"}${Math.abs(year.delta)}` });
 		const started = stats.initiative();
-		if (started) initiativeSplit(this.property(rows, "arrow-left-right", "who starts"), started);
+		if (started) {
+			this.text(rows, "arrow-up-right", "you start", `${started.mine}%`);
+			this.text(rows, "arrow-down-left", "they start", `${started.theirs}%`);
+		}
 		this.text(rows, "calendar-plus", "since", fullDate(first));
 	}
 
