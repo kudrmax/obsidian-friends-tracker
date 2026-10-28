@@ -3,7 +3,7 @@ import { Interaction } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
 import { LocalTime } from "../domain/LocalTime";
 import { Person } from "../domain/Person";
-import { Due, ReachRule, reachOut } from "../domain/Reach";
+import { Due, ReachRule, Tracked, reachOut, tracked } from "../domain/Reach";
 import { PersonRepository } from "./ports";
 
 export interface FeedRow {
@@ -45,6 +45,11 @@ export interface SearchResult {
 
 /** A person to get in touch with, and where their note is. */
 export interface ReachRow extends Due {
+	readonly path: string;
+}
+
+/** A person with a target, and where their note is. */
+export interface TargetRow extends Tracked {
 	readonly path: string;
 }
 
@@ -123,9 +128,20 @@ export class PeopleService {
 
 	/** People whose target ran out or is about to, the most pressing first. */
 	reachOut(rule: ReachRule): ReachRow[] {
+		const paths = this.paths();
+		return reachOut([...paths.keys()], this.today(), rule).map((due) => ({ ...due, path: paths.get(due.person) as string }));
+	}
+
+	/** Everyone with a target, in the order of `reachOut`, those on track last. */
+	targets(rule: ReachRule): TargetRow[] {
+		const paths = this.paths();
+		return tracked([...paths.keys()], this.today(), rule).map((item) => ({ ...item, path: paths.get(item.person) as string }));
+	}
+
+	private paths(): Map<Person, string> {
 		const paths = new Map<Person, string>();
 		for (const entry of this.repository.list()) if (entry.kind === "ok") paths.set(entry.person, entry.path);
-		return reachOut([...paths.keys()], this.today(), rule).map((due) => ({ ...due, path: paths.get(due.person) as string }));
+		return paths;
 	}
 
 	setTarget(path: string, every: number, headsUpForNew: boolean): Promise<Person> {

@@ -5,7 +5,7 @@ import { Initiative, Often, Period, buckets, mostOften, periodInitiative, totals
 import { forkRow, row, sectionLabel } from "./components";
 import { barChart } from "./MonthChart";
 import { ANIMATION, Arrivals, Debut, arrive, play } from "./motion";
-import { ReachOutBlock } from "./reach";
+import { ContactEveryBlock } from "./reach";
 import { TabHistory } from "./TabHistory";
 import { UiContext } from "./UiContext";
 
@@ -18,7 +18,7 @@ const PERIODS: readonly { value: Period; text: string }[] = [
 const PERIOD_WORD: Record<Period, string> = { week: "this week", month: "this month", year: "this year" };
 const LIST_SHOWN = 5;
 
-/** How much you talk to people, whom to reach out to, and who you see most. */
+/** How much you talk to people, everyone against their target, and who you see most. */
 export class StatsView extends ItemView {
 	override navigation = true;
 	private period: Period = "month";
@@ -29,14 +29,14 @@ export class StatsView extends ItemView {
 	private readonly arrivals = new Arrivals();
 	/** The chart grows once, when the view opens. */
 	private readonly debut = new Debut();
-	private readonly reachOut: ReachOutBlock;
+	private readonly targets: ContactEveryBlock;
 
 	constructor(
 		leaf: WorkspaceLeaf,
 		private readonly ui: UiContext,
 	) {
 		super(leaf);
-		this.reachOut = new ReachOutBlock(ui);
+		this.targets = new ContactEveryBlock(ui);
 	}
 
 	override getViewType(): string {
@@ -104,7 +104,7 @@ export class StatsView extends ItemView {
 		sectionLabel(body, "By month");
 		const all: Interaction[] = people.flatMap((person) => [...person.interactions()]);
 		barChart(body, buckets(all, "months", today), "months", this.ui.settings().labels, { grow: this.debut.offset() });
-		this.reachOut.render(body, this.arrivals);
+		this.targets.render(body, this.arrivals);
 		this.renderOften(body, mostOften(people, this.period, today));
 	}
 

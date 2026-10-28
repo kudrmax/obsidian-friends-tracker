@@ -142,6 +142,15 @@ describe("targets", () => {
 		expect(due.map((item) => `${item.path} ${item.status} ${item.days}`)).toEqual(["People/Misha.md late 20", "People/Anya.md soon 6"]);
 	});
 
+	it("lists everyone with a target, those on track last, with where their notes are", async () => {
+		const { service } = await setUp({ Misha: [text(ago(20))], Anya: [text(ago(6))], Boris: [text(ago(1))], Vera: [] });
+		await service.setTarget("People/Misha.md", 14, true);
+		await service.setTarget("People/Anya.md", 7, true);
+		await service.setTarget("People/Boris.md", 7, true);
+		const all = service.targets(rule);
+		expect(all.map((item) => `${item.path} ${item.status} ${item.days}`)).toEqual(["People/Misha.md late 20", "People/Anya.md soon 6", "People/Boris.md ok 1"]);
+	});
+
 	it("skips broken notes", async () => {
 		const { service, repository } = await setUp({ Misha: [] });
 		await service.setTarget(path, 7, true);
