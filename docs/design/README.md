@@ -19,6 +19,7 @@ This document wins over `docs/superpowers/specs/2026-10-26-people-tracker-design
 - Days are groups: "Today  Sun, 26 Oct" / "Friday  24 Oct" — day name 15 px semibold, date 13 px grey, 8 px apart, on one line. Groups are 12 px apart with a hairline above each but the first. Empty days don't appear.
 - Row: format icon in a circle (Meeting: accent-tinted circle with accent icon; Call and Text: grey circle, grey icon), the person's name, under it the format and its qualifiers as one grey line ("Meeting, one on one", "Call, shared activity", "Text"), the time of day in grey 13 px tabular figures, then a faint chevron (`MainTime.dc.html`, approved 2026-10-27). Within a day the rows go by time, latest first; a time before the day's start hour counts as the end of that day. Records without a time come last, by name. Two interactions with the same person the same day are two rows. Tap → Edit.
 - The "+" → Who.
+- Above the days, under the title: the Reach out block (`MainReach.dc.html`, decided 2026-10-29), the same one as on Stats. The first day under it gets the hairline every other day has.
 
 ## Who (`Who.dc.html`) — step 1 of a new interaction
 
@@ -48,14 +49,16 @@ A panel inside the note's Properties area, above the text, collapsible under the
 
 - `last seen` — days since the last **meeting**, "never" without one.
 - `last contact` — days since the last interaction of any kind; only when it is later than the last meeting.
-- The row that shows the latest contact turns red when the silence is longer than the usual gap, as on Stats' "Falling behind"; its tooltip says "41 days ago, usually every 19 days". No extra text: a fact has its place.
-- `usual gap` — days, as on Stats.
+- `contact every` — the target, "7 days", typed in place; empty ("Empty") when there is none. Always shown, so a target is set from the note (`PersonTarget.dc.html`, decided 2026-10-29).
+- `heads-up` — a checkbox: whether this person gets the yellow stage before the target runs out. Only with a target.
+- With a target, the row that shows the latest contact is yellow when the target is about to run out and red when it has; its tooltip says "6 days ago, every 7 days". Without a target it has no colour. No extra text: a fact has its place.
+- `usual gap` — days, as on Stats. A fact only, never a colour.
 - `past year` — interactions in the last 365 days, then the difference with the 365 before in small green (+) or red (−), as on Stats; no difference for a person first met within those 365 days.
 - `since` — the first logged interaction, always with its year ("12 Mar 2023").
 - `by week` / `by month` / `by year` — a fork of three small capsules (Weeks · Months · Years, 28 px, Months by default) over the stacked bar chart by format: twelve weeks from Monday labelled by the Monday's day, twelve months by letter, or the years from the first interaction on (the last twelve) labelled by year, left-aligned in twelve places so a bar is as wide in every range. The legend gives each format's count over the bars shown. The choice is the same for every person and lasts while Obsidian is open; the bars grow again when it changes.
 - `recent` — three latest as date · dot · format with qualifiers, then "All N" that expands the list in place. Tap a line → Edit, opened over the note in the note's own tab (never a second tab); ✓, ✕, delete and Escape step back to the note and the finished Edit leaves the tab's history. After a delete the undo offer is an Obsidian notice with the accent "Undo", since the note has no undo line.
 
-A person with no interactions shows `last seen: never` alone.
+A person with no interactions shows `last seen: never` and `contact every`.
 
 **Built from Obsidian's own Properties classes** (`metadata-container`, `metadata-properties-heading`, `metadata-property`, `metadata-property-key`, `metadata-property-icon`, `metadata-property-key-input`, `metadata-property-value`, `metadata-input-longtext`), exactly as `HabitBlock` in Marble Habit Tracker, so it is pixel-identical to the real Properties next to it. Own CSS only for the chart, its range fork and the recent list, reading Obsidian's variables. The mockup is approximate; the real Properties panel is the reference.
 
@@ -64,9 +67,16 @@ A person with no interactions shows `last seen: never` alone.
 - Title "Stats", fork "Week · Month · Year" (Month by default). No back arrow of its own: Stats opens in the Friends tab, and the tab's own back arrow leads to the feed (decided 2026-10-27).
 - Two numbers 32 px bold: interactions and people in the period, each with the difference to the previous period in small green (+) or red (−).
 - "By month": the same chart as in the person note, over everyone.
-- "Falling behind": person rows with "Usually every N days" under the name and "N days" (since the last interaction) bold on the right; "N more" expands.
+- "Reach out" (below).
 - "Most often this month/week/year": person rows with the count on the right.
 - Tap a person → their note.
+
+## Reach out (decided 2026-10-29)
+
+A person may have a target, "contact every N days", kept in the note's frontmatter (`contact_every`, `heads_up`, names in the settings) and set in the person's panel. Colour and lists exist only for people with a target; the plugin never guesses whom to call.
+
+- Days since the last interaction of any kind, `d`, against the target `N`: **late** (red) when `d > N`; **soon** (yellow) when the person's heads-up is on and at most the settings' share (20% by default) of `N` is left, day `N` included; otherwise nothing. A target and no interaction yet: late, "never" on the right.
+- The **Reach out** block, the same on the feed (above the days) and on Stats (where "Falling behind" was): section label "Reach out", person rows with "Every N days" under the name and the days since the last interaction bold on the right, in the status colour. Late first, then soon; within each by `d / N`, highest first, then by name. Everyone due is listed, never cut. Tap → the person's note. Nobody due → no block.
 
 ## Style system
 

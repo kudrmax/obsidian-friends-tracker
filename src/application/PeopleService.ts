@@ -3,6 +3,7 @@ import { Interaction } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
 import { LocalTime } from "../domain/LocalTime";
 import { Person } from "../domain/Person";
+import { Due, ReachRule, reachOut } from "../domain/Reach";
 import { PersonRepository } from "./ports";
 
 export interface FeedRow {
@@ -40,6 +41,11 @@ export interface SearchResult {
 	readonly everyone: PersonHit[];
 	/** Whether someone has exactly the name that was typed. */
 	readonly exact: boolean;
+}
+
+/** A person to get in touch with, and where their note is. */
+export interface ReachRow extends Due {
+	readonly path: string;
 }
 
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
@@ -113,6 +119,25 @@ export class PeopleService {
 
 	removeInteraction(path: string, index: number, expected: Interaction): Promise<Person> {
 		return this.repository.update(path, (person) => person.removeAt(index, expected));
+	}
+
+	/** People whose target ran out or is about to, the most pressing first. */
+	reachOut(rule: ReachRule): ReachRow[] {
+		const paths = new Map<Person, string>();
+		for (const entry of this.repository.list()) if (entry.kind === "ok") paths.set(entry.person, entry.path);
+		return reachOut([...paths.keys()], this.today(), rule).map((due) => ({ ...due, path: paths.get(due.person) as string }));
+	}
+
+	setTarget(path: string, every: number, headsUpForNew: boolean): Promise<Person> {
+		return this.repository.update(path, (person) => person.withTarget(every, headsUpForNew));
+	}
+
+	clearTarget(path: string): Promise<Person> {
+		return this.repository.update(path, (person) => person.withoutTarget());
+	}
+
+	setHeadsUp(path: string, on: boolean): Promise<Person> {
+		return this.repository.update(path, (person) => person.withHeadsUp(on));
 	}
 
 	createPerson(name: string): Promise<string> {

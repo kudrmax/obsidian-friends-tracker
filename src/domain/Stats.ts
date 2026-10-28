@@ -132,24 +132,6 @@ export function totals(people: readonly Person[], period: Period, today: LocalDa
 	};
 }
 
-export interface Behind {
-	readonly person: Person;
-	readonly days: number;
-	readonly usual: number;
-}
-
-/** People whose silence has outlasted their usual gap, the most overdue first. */
-export function fallingBehind(people: readonly Person[], today: LocalDate): Behind[] {
-	const behind: Behind[] = [];
-	for (const person of people) {
-		const days = daysSince(person, today);
-		const usual = usualGap(person, today);
-		if (days === undefined || usual === undefined || days <= usual) continue;
-		behind.push({ person, days, usual });
-	}
-	return behind.sort((a, b) => b.days / b.usual - a.days / a.usual || a.person.name.localeCompare(b.person.name));
-}
-
 export interface Often {
 	readonly person: Person;
 	readonly count: number;

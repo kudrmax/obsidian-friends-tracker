@@ -2,7 +2,7 @@ import { DomainError } from "../domain/DomainError";
 import { Company, Interaction, Kind, Length, Purpose } from "../domain/Interaction";
 import { LocalDate } from "../domain/LocalDate";
 import { LocalTime } from "../domain/LocalTime";
-import { Extras, Person } from "../domain/Person";
+import { Extras, Person, Target } from "../domain/Person";
 
 export type Frontmatter = Record<string, unknown>;
 
@@ -17,6 +17,8 @@ export interface PropertyNames {
 	readonly company: string;
 	readonly length: string;
 	readonly purpose: string;
+	readonly contactEvery: string;
+	readonly headsUp: string;
 	readonly kinds: Readonly<Record<Kind, string>>;
 	readonly companies: Readonly<Record<Company, string>>;
 	readonly lengths: Readonly<Record<Length, string>>;
@@ -31,6 +33,8 @@ export const DEFAULT_PROPERTY_NAMES: PropertyNames = {
 	company: "company",
 	length: "length",
 	purpose: "purpose",
+	contactEvery: "contact_every",
+	headsUp: "heads_up",
 	kinds: { text: "text", call: "call", meeting: "meeting" },
 	companies: { one_on_one: "one_on_one", group: "group" },
 	lengths: { some_time: "some_time", whole_day: "whole_day" },
@@ -40,11 +44,15 @@ export const DEFAULT_PROPERTY_NAMES: PropertyNames = {
 export function decodePerson(name: string, frontmatter: Frontmatter | null | undefined, keys: PropertyNames = DEFAULT_PROPERTY_NAMES): Person {
 	try {
 		const read = list(frontmatter ?? {}, keys.interactions).map((item) => readInteraction(item, keys));
+		const note = frontmatter ?? {};
+		const target = readTarget(note, keys);
 		const sorted = [...read.keys()].sort((a, b) => read[b].interaction.date.compare(read[a].interaction.date) || a - b);
 		return Person.restore({
 			name,
 			interactions: sorted.map((index) => read[index].interaction),
 			extras: sorted.map((index) => read[index].extras),
+			target,
+			unreadTarget: target || note[keys.contactEvery] === undefined || note[keys.contactEvery] === null ? undefined : note[keys.contactEvery],
 		});
 	} catch (error) {
 		if (error instanceof DomainError) throw new PersonDecodeError(error.message);
@@ -57,6 +65,28 @@ export function encodePerson(person: Person, frontmatter: Frontmatter, keys: Pro
 	const items = person.interactions().map((interaction, index) => ({ ...extras[index], ...writeInteraction(interaction, keys) }));
 	if (items.length) frontmatter[keys.interactions] = items;
 	else delete frontmatter[keys.interactions];
+	writeTarget(person, frontmatter, keys);
+}
+
+/** A whole number of days, at least one, as a number or as the text Properties may save it as; anything else is no target. */
+function readTarget(frontmatter: Frontmatter, keys: PropertyNames): Target | undefined {
+	const raw = frontmatter[keys.contactEvery];
+	const every = typeof raw === "string" && /^\s*\d+\s*$/.test(raw) ? Number(raw) : raw;
+	if (typeof every !== "number" || !Number.isInteger(every) || every < 1) return undefined;
+	const headsUp = frontmatter[keys.headsUp];
+	return { every, headsUp: typeof headsUp === "boolean" ? headsUp : undefined };
+}
+
+/** Writes what the person holds; a value that couldn't be read, and a heads-up never set, stay as the note has them. */
+function writeTarget(person: Person, frontmatter: Frontmatter, keys: PropertyNames): void {
+	const target = person.target();
+	if (target) {
+		frontmatter[keys.contactEvery] = target.every;
+		if (target.headsUp !== undefined) frontmatter[keys.headsUp] = target.headsUp;
+	} else if (person.unreadTarget() === undefined) {
+		delete frontmatter[keys.contactEvery];
+		delete frontmatter[keys.headsUp];
+	}
 }
 
 function writeInteraction(interaction: Interaction, keys: PropertyNames): Frontmatter {

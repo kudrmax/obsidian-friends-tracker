@@ -59,7 +59,7 @@ export interface RowOptions {
 	readonly circle: CircleContent;
 	readonly title: string | HTMLElement;
 	readonly subtitle?: string;
-	readonly trailing?: "chevron" | { readonly text: string; readonly strong?: boolean };
+	readonly trailing?: "chevron" | { readonly text: string; readonly strong?: boolean; readonly tone?: "soon" | "late" };
 	/** A quiet fact on the right, before the chevron: the time of day. */
 	readonly meta?: string;
 	readonly onClick?: () => void;
@@ -82,6 +82,7 @@ export function row(parent: HTMLElement, options: RowOptions): HTMLElement {
 	else if (options.trailing) {
 		const value = el.createSpan({ cls: "ft-row-value", text: options.trailing.text });
 		value.toggleClass("is-strong", options.trailing.strong === true);
+		if (options.trailing.tone) value.addClass(`is-${options.trailing.tone}`);
 	}
 	if (options.onClick) el.addEventListener("click", options.onClick);
 	return el;

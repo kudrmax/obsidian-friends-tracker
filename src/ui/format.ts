@@ -44,6 +44,30 @@ export function daysAgo(days: number): string {
 	return `${days} ${days === 1 ? "day" : "days"} ago`;
 }
 
+/** "1 day", "16 days". */
+export function dayCount(days: number): string {
+	return `${days} ${days === 1 ? "day" : "days"}`;
+}
+
+/** A target under a person's name: "Every 7 days". */
+export function everyDays(days: number): string {
+	return `Every ${dayCount(days)}`;
+}
+
+/** The days since the last interaction, or "never" for someone not contacted yet. */
+export function sinceDays(days: number | undefined): string {
+	return days === undefined ? "never" : dayCount(days);
+}
+
+/** What was typed as a target: whole days, "none" for an empty field, null for anything else. */
+export function readDays(text: string): number | "none" | null {
+	const typed = text.trim();
+	if (!typed) return "none";
+	const match = /^(\d+)(\s+days?)?$/i.exec(typed);
+	const days = match ? Number(match[1]) : 0;
+	return days >= 1 ? days : null;
+}
+
 export function monthLetter(month: number): string {
 	return MONTHS[month - 1][0];
 }

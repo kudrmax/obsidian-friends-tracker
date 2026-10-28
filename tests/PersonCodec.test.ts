@@ -115,3 +115,72 @@ describe("encodePerson", () => {
 		expect(decodePerson("Misha", out, keys).interactions()[0].kind).toBe("meeting");
 	});
 });
+
+describe("the target", () => {
+	const text = { date: "2026-10-24", kind: "text" };
+	const later: Interaction = { date: d("2026-10-25"), kind: "text" };
+
+	it("reads the target and the heads-up", () => {
+		expect(decodePerson("Misha", { contact_every: 14, heads_up: false }).target()).toEqual({ every: 14, headsUp: false });
+	});
+
+	it("reads a target typed as text in Properties, and no heads-up when the note has none", () => {
+		expect(decodePerson("Misha", { contact_every: "14" }).target()).toEqual({ every: 14, headsUp: undefined });
+	});
+
+	it("reads no target from a value that isn't whole days, and keeps that value", () => {
+		for (const value of ["abc", 0, -3, 1.5]) {
+			const person = decodePerson("Misha", { contact_every: value });
+			expect(person.target()).toBeUndefined();
+			expect(person.unreadTarget()).toBe(value);
+		}
+	});
+
+	it("reads an empty contact_every as no target at all", () => {
+		const person = decodePerson("Misha", { contact_every: null });
+		expect(person.target()).toBeUndefined();
+		expect(person.unreadTarget()).toBeUndefined();
+	});
+
+	it("keeps an unreadable target as it was", () => {
+		const out: Frontmatter = { contact_every: "abc", interactions: [text] };
+		encodePerson(decodePerson("Misha", out).add(later, d("2026-10-26")), out);
+		expect(out.contact_every).toBe("abc");
+	});
+
+	it("leaves heads_up out when it was never written", () => {
+		const out: Frontmatter = { contact_every: 7, interactions: [text] };
+		encodePerson(decodePerson("Misha", out).add(later, d("2026-10-26")), out);
+		expect(out.contact_every).toBe(7);
+		expect("heads_up" in out).toBe(false);
+	});
+
+	it("leaves a heads_up it can't read in the note, and reads it as unset", () => {
+		const out: Frontmatter = { contact_every: 7, heads_up: "yes" };
+		const person = decodePerson("Misha", out);
+		expect(person.target()).toEqual({ every: 7, headsUp: undefined });
+		encodePerson(person, out);
+		expect(out.heads_up).toBe("yes");
+	});
+
+	it("writes a new target with its heads-up", () => {
+		const out: Frontmatter = {};
+		encodePerson(Person.create("Misha").withTarget(7, true), out);
+		expect(out).toMatchObject({ contact_every: 7, heads_up: true });
+	});
+
+	it("removes both properties when the target is cleared", () => {
+		const out: Frontmatter = { contact_every: 7, heads_up: true };
+		encodePerson(decodePerson("Misha", out).withoutTarget(), out);
+		expect("contact_every" in out).toBe(false);
+		expect("heads_up" in out).toBe(false);
+	});
+
+	it("uses the names from the settings", () => {
+		const keys = { ...DEFAULT_PROPERTY_NAMES, contactEvery: "every", headsUp: "warn" };
+		const out: Frontmatter = {};
+		encodePerson(Person.create("Misha").withTarget(5, false), out, keys);
+		expect(out).toEqual({ every: 5, warn: false });
+		expect(decodePerson("Misha", out, keys).target()).toEqual({ every: 5, headsUp: false });
+	});
+});

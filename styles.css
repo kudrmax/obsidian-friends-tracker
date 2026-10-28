@@ -38,6 +38,9 @@ body {
 	--ft-float-light-hover: color-mix(in srgb, var(--ft-fill-ink) 24%, var(--ft-bg));
 	--ft-fill-ink: rgb(118, 118, 128);
 	--ft-danger: var(--color-red);
+	/* A target about to run out, and one that has: a warm orange and coral, chosen by Max for the black of a phone and the grey of a computer alike. */
+	--ft-soon: #ffb340;
+	--ft-late: #ff5f57;
 	--ft-up: var(--color-green);
 	--ft-fade-from: rgba(var(--ft-bg-rgb), 0);
 	--ft-bg-rgb: var(--mono-rgb-0);
@@ -205,10 +208,16 @@ body {
 .ft-row-chevron svg { width: var(--ft-chevron); height: var(--ft-chevron); stroke-width: var(--ft-stroke-bold); }
 .ft-row-value { flex: 0 0 auto; font-size: var(--ft-font-body); color: var(--ft-text); font-variant-numeric: tabular-nums; }
 .ft-row-value.is-strong { font-weight: var(--ft-weight-semibold); }
+.ft-row-value.is-late { color: var(--ft-late); }
+.ft-row-value.is-soon { color: var(--ft-soon); }
 
 /* A day's header and the group under it. */
 .ft-group { display: flex; flex-direction: column; margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-hairline) solid var(--ft-line); }
 .ft-group:first-of-type { margin-top: var(--ft-space-20); padding-top: 0; border-top: none; }
+/* The block sits as close under the title as on the board. */
+.ft-reach > .ft-section:first-child { margin-top: var(--ft-space-8); }
+/* Under the Reach out block the first day is set off like every other. */
+.ft-reach:not(:empty) + .ft-feed-list .ft-group:first-of-type { margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-hairline) solid var(--ft-line); }
 .ft-day { display: flex; align-items: baseline; gap: var(--ft-space-8); height: var(--ft-day); line-height: var(--ft-day); }
 .ft-day-name { font-size: var(--ft-font-capsule); font-weight: var(--ft-weight-semibold); color: var(--ft-text); }
 .ft-day-date { font-size: var(--ft-font-small); color: var(--ft-muted); }
@@ -320,7 +329,8 @@ body {
 .ft-person-panel .ft-range .ft-fork-row { gap: var(--ft-space-4); }
 .ft-person-panel .ft-range .ft-capsule { height: var(--ft-range); font-size: var(--ft-font-legend); }
 .ft-person-panel .ft-delta { margin-inline-start: var(--ft-space-6); }
-.ft-overdue { color: var(--ft-danger); }
+.ft-overdue { color: var(--ft-late); }
+.ft-soon { color: var(--ft-soon); }
 .ft-recent { display: flex; flex-direction: column; gap: var(--ft-space-4); }
 .ft-person-panel .ft-recent-row { display: grid; grid-template-columns: var(--ft-recent-date) var(--ft-recent-dot) minmax(0, 1fr); align-items: center; min-height: var(--ft-space-28); border-radius: var(--ft-radius-capsule); corner-shape: var(--ft-corner); width: 100%; margin: 0; padding: 0; border: none; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .is-mobile .ft-person-panel .ft-recent-row { min-height: var(--ft-button); }

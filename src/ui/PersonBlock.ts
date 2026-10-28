@@ -1,10 +1,12 @@
-import { WorkspaceLeaf, setIcon } from "obsidian";
+import { Notice, WorkspaceLeaf, setIcon } from "obsidian";
 import { ForkOption, forkRow, moreButton } from "./components";
 import { Interaction, describe } from "../domain/Interaction";
-import { Person } from "../domain/Person";
+import { Person, TARGET_NOT_DAYS, Target } from "../domain/Person";
 import { Contact, PersonStats } from "../domain/PersonStats";
+import { reachStatus } from "../domain/Reach";
+import { reachRule } from "../settings";
 import { ChartRange, buckets } from "../domain/Stats";
-import { daysAgo, fullDate, shortDate } from "./format";
+import { dayCount, daysAgo, fullDate, readDays, shortDate } from "./format";
 import { barChart } from "./MonthChart";
 import { Debut } from "./motion";
 import { UiContext } from "./UiContext";
@@ -34,6 +36,8 @@ export class PersonBlock {
 	readonly el: HTMLElement;
 	/** The chart grows when the panel first shows a person, and when it is unfolded. */
 	private readonly debut = new Debut();
+	/** A change came in while the target was being typed; the panel redraws once typing ends. */
+	private stale = false;
 
 	constructor(
 		private readonly ui: UiContext,
@@ -57,6 +61,11 @@ export class PersonBlock {
 	}
 
 	render(): void {
+		if (this.typing()) {
+			this.stale = true;
+			return;
+		}
+		this.stale = false;
 		const panel = this.el;
 		panel.empty();
 		panel.className = "metadata-container ft-person-panel";
@@ -70,7 +79,7 @@ export class PersonBlock {
 			return;
 		}
 		const rows = content.createDiv("metadata-properties");
-		this.renderFacts(rows, new PersonStats(entry.person, this.ui.service.today()));
+		this.renderFacts(rows, entry.person, new PersonStats(entry.person, this.ui.service.today()));
 		if (!entry.person.interactions().length) return;
 		this.renderChart(rows, entry.person);
 		this.renderRecent(rows, entry.person);
@@ -106,15 +115,17 @@ export class PersonBlock {
 		return this.property(rows, icon, name).createDiv({ cls: "metadata-input-longtext", text: value });
 	}
 
-	/** The small numbers, one to a row; a row with nothing to say is left out, but for when you last met. */
-	private renderFacts(rows: HTMLElement, stats: PersonStats): void {
+	/** The small numbers, one to a row; a row with nothing to say is left out, but for when you last met and the target. */
+	private renderFacts(rows: HTMLElement, person: Person, stats: PersonStats): void {
 		const met = stats.lastMeeting();
 		const contact = stats.lastContact();
 		const usual = stats.usualGap();
 		const seen = this.text(rows, "clock", "last seen", met ? daysAgo(met.days) : "never");
 		const spoke = contact && (!met || contact.days < met.days) ? this.text(rows, "message-circle", "last contact", daysAgo(contact.days)) : seen;
-		if (contact && usual !== undefined && stats.isOverdue()) this.markOverdue(spoke, contact, usual);
-		if (usual !== undefined) this.text(rows, "align-justify", "usual gap", days(usual));
+		const target = person.target();
+		if (target) this.markStatus(spoke, target, contact);
+		this.renderTarget(rows, person);
+		if (usual !== undefined) this.text(rows, "align-justify", "usual gap", dayCount(usual));
 		const first = stats.firstDate();
 		if (!first) return;
 		const year = stats.pastYear();
@@ -123,11 +134,88 @@ export class PersonBlock {
 		this.text(rows, "calendar-plus", "since", fullDate(first));
 	}
 
-	private markOverdue(value: HTMLElement, contact: Contact, usual: number): void {
-		value.addClass("ft-overdue");
-		const said = `${daysAgo(contact.days)}, usually every ${days(usual)}`;
+	/** The latest contact in the target's colour: yellow when it is about to run out, red when it has. */
+	private markStatus(value: HTMLElement, target: Target, contact: Contact | undefined): void {
+		const status = reachStatus(target, contact?.days, reachRule(this.ui.settings()));
+		if (status === "ok") return;
+		value.addClass(status === "late" ? "ft-overdue" : "ft-soon");
+		const said = `${contact ? daysAgo(contact.days) : "never"}, every ${dayCount(target.every)}`;
 		value.setAttribute("aria-label", said);
 		value.setAttribute("title", said);
+	}
+
+	/** The target, typed in place, and with one the heads-up before it runs out. */
+	private renderTarget(rows: HTMLElement, person: Person): void {
+		/* The note it was drawn for: a save after the tab moved on still goes to this person. */
+		const path = this.path;
+		const target = person.target();
+		const unread = person.unreadTarget();
+		const shown = target ? dayCount(target.every) : unread === undefined ? "" : String(unread).trim();
+		const input = this.property(rows, "repeat", "contact every").createDiv({
+			cls: "metadata-input-longtext",
+			text: shown,
+			attr: { contenteditable: "true", spellcheck: "false", placeholder: "Empty", inputmode: "numeric" },
+		});
+		input.addEventListener("focus", () => {
+			input.textContent = (input.textContent ?? "").replace(/\s+days?$/i, "");
+		});
+		input.addEventListener("keydown", (event) => {
+			if (event.key === "Enter") {
+				event.preventDefault();
+				input.blur();
+			}
+			if (event.key === "Escape") {
+				input.textContent = shown;
+				input.blur();
+			}
+		});
+		input.addEventListener("blur", () => void this.saveTarget(path, input, shown, target));
+		if (!target) return;
+		const box = this.property(rows, "bell", "heads-up").createEl("input", {
+			cls: "metadata-input-checkbox",
+			type: "checkbox",
+			attr: { title: "Turn yellow before the target runs out" },
+		});
+		box.checked = target.headsUp ?? this.ui.settings().headsUpForNew;
+		box.addEventListener("change", () => void this.run(() => this.ui.service.setHeadsUp(path, box.checked)));
+	}
+
+	/**
+	 * Saves what was typed; the panel redraws only when the note changed, so a click that ends the typing still lands.
+	 * Anything else puts the field back as it was.
+	 */
+	private async saveTarget(path: string, input: HTMLElement, shown: string, target: Target | undefined): Promise<void> {
+		const typed = (input.textContent ?? "").trim();
+		const changed = typed !== shown && (await this.changeTarget(path, readDays(typed), target));
+		if (changed || this.stale) this.render();
+		else input.textContent = shown;
+	}
+
+	/** Whether the note was written. */
+	private async changeTarget(path: string, days: number | "none" | null, target: Target | undefined): Promise<boolean> {
+		if (days === null) {
+			new Notice(TARGET_NOT_DAYS);
+			return false;
+		}
+		if (days === "none") return this.run(() => this.ui.service.clearTarget(path));
+		if (days === target?.every) return false;
+		return this.run(() => this.ui.service.setTarget(path, days, this.ui.settings().headsUpForNew));
+	}
+
+	/** Whether the change went through; a refused one says why. */
+	private async run(change: () => Promise<unknown>): Promise<boolean> {
+		try {
+			await change();
+			return true;
+		} catch (error) {
+			new Notice(error instanceof Error ? error.message : String(error));
+			return false;
+		}
+	}
+
+	private typing(): boolean {
+		const active = this.el.ownerDocument.activeElement;
+		return active instanceof HTMLElement && active.isContentEditable && this.el.contains(active);
 	}
 
 	private renderChart(rows: HTMLElement, person: Person): void {
@@ -166,8 +254,4 @@ export class PersonBlock {
 			this.render();
 		});
 	}
-}
-
-function days(count: number): string {
-	return `${count} ${count === 1 ? "day" : "days"}`;
 }

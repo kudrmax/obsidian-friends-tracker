@@ -102,16 +102,16 @@ export class PersonNotes extends Component {
 		this.hideOwnProperties(view);
 	}
 
-	/** Hides the interactions list, and the tags when they hold only the plugin's tag. */
+	/** Hides the interactions list and the target, and the tags when they hold only the plugin's tag. */
 	private hideOwnProperties(view: MarkdownView): void {
 		const settings = this.ui.settings();
-		const own = settings.properties.interactions.toLowerCase();
+		const own = new Set([settings.properties.interactions, settings.properties.contactEvery, settings.properties.headsUp].map((key) => key.toLowerCase()));
 		const tag = settings.tag.toLowerCase();
 		for (const container of view.contentEl.querySelectorAll<HTMLElement>(".metadata-container:not(.ft-person-panel)")) {
 			const properties = [...container.querySelectorAll<HTMLElement>(".metadata-property")];
 			for (const property of properties) {
 				const key = (property.dataset.propertyKey ?? "").toLowerCase();
-				const hidden = key === own || (key === "tags" && settings.source === "tag" && this.onlyOwnTag(property, tag));
+				const hidden = own.has(key) || (key === "tags" && settings.source === "tag" && this.onlyOwnTag(property, tag));
 				property.toggleClass(OWN_PROPERTY, hidden);
 			}
 			container.toggleClass(ONLY_OWN, properties.length > 0 && properties.every((property) => property.hasClass(OWN_PROPERTY)));
