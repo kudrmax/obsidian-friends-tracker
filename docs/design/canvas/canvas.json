@@ -14,9 +14,13 @@
     "Edit.dc.html": { "x": 1410, "y": 1560, "w": 390, "h": 844, "title": "Edit — tap a row in the feed", "radius": 40 },
     "Person.dc.html": { "x": 0, "y": 2820, "w": 390, "h": 1000, "title": "Person note — block inside Properties", "radius": 40 },
     "PersonTarget.dc.html": { "x": 470, "y": 2820, "w": 390, "h": 1100, "title": "Person note — a target, and none", "radius": 40 },
-    "Stats.dc.html": { "x": 1410, "y": 2820, "w": 390, "h": 1100, "title": "Stats — from the feed header", "radius": 40 }
+    "Stats.dc.html": { "x": 1410, "y": 2820, "w": 390, "h": 1100, "title": "Stats — from the feed header", "radius": 40 },
+    "HowStarted.dc.html": { "x": 1880, "y": 1560, "w": 390, "h": 844, "title": "How · Who started, optional, not picked", "radius": 40 },
+    "HowStartedText.dc.html": { "x": 2350, "y": 1560, "w": 390, "h": 844, "title": "How · Who started, picked", "radius": 40 },
+    "PersonStarted.dc.html": { "x": 940, "y": 2820, "w": 390, "h": 1100, "title": "Person note — who starts, and none marked", "radius": 40 },
+    "StatsStarted.dc.html": { "x": 1880, "y": 2820, "w": 390, "h": 1220, "title": "Stats — who started over the period", "radius": 40 }
   },
-  "order": ["Main.dc.html", "MainReach.dc.html", "Who.dc.html", "How.dc.html", "HowCall.dc.html", "HowMeeting.dc.html", "Edit.dc.html", "Person.dc.html", "PersonTarget.dc.html", "Stats.dc.html"],
+  "order": ["Main.dc.html", "MainReach.dc.html", "Who.dc.html", "How.dc.html", "HowCall.dc.html", "HowMeeting.dc.html", "Edit.dc.html", "Person.dc.html", "PersonTarget.dc.html", "Stats.dc.html", "HowStarted.dc.html", "HowStartedText.dc.html", "PersonStarted.dc.html", "StatsStarted.dc.html"],
   "notes": {
     "t1": { "x": 0, "y": 0, "text": "Friends Tracker — phone, dark Obsidian theme", "kind": "title1", "maxW": 1800 },
     "t2": { "x": 0, "y": 1300, "text": "New interaction — every fork", "kind": "title1", "maxW": 1800 },
