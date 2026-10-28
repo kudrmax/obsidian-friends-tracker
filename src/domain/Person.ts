@@ -4,6 +4,8 @@ import { LocalDate } from "./LocalDate";
 
 const FORBIDDEN_NAME_CHARS = /[\\/:*?"<>|#^[\]]/;
 
+export const TARGET_NOT_DAYS = "Contact every takes a whole number of days";
+
 /** Fields of a stored interaction the plugin doesn't know; kept so a note loses nothing when it is written back. */
 export type Extras = Readonly<Record<string, unknown>>;
 
@@ -73,7 +75,7 @@ export class Person {
 
 	/** A new target keeps the heads-up the person already has, and takes `headsUp` only when there was none. */
 	withTarget(every: number, headsUp: boolean): Person {
-		if (!Number.isInteger(every) || every < 1) throw new DomainError("Contact every takes a whole number of days");
+		if (!Number.isInteger(every) || every < 1) throw new DomainError(TARGET_NOT_DAYS);
 		const target = { every, headsUp: this.state.target?.headsUp ?? headsUp };
 		return new Person({ ...this.state, target, unreadTarget: undefined }, this.extra);
 	}

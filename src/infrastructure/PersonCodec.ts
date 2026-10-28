@@ -52,7 +52,7 @@ export function decodePerson(name: string, frontmatter: Frontmatter | null | und
 			interactions: sorted.map((index) => read[index].interaction),
 			extras: sorted.map((index) => read[index].extras),
 			target,
-			unreadTarget: target || note[keys.contactEvery] === undefined ? undefined : note[keys.contactEvery],
+			unreadTarget: target || note[keys.contactEvery] === undefined || note[keys.contactEvery] === null ? undefined : note[keys.contactEvery],
 		});
 	} catch (error) {
 		if (error instanceof DomainError) throw new PersonDecodeError(error.message);

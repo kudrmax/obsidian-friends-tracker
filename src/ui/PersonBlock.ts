@@ -1,7 +1,7 @@
 import { Notice, WorkspaceLeaf, setIcon } from "obsidian";
 import { ForkOption, forkRow, moreButton } from "./components";
 import { Interaction, describe } from "../domain/Interaction";
-import { Person, Target } from "../domain/Person";
+import { Person, TARGET_NOT_DAYS, Target } from "../domain/Person";
 import { Contact, PersonStats } from "../domain/PersonStats";
 import { reachStatus } from "../domain/Reach";
 import { reachRule } from "../settings";
@@ -36,6 +36,8 @@ export class PersonBlock {
 	readonly el: HTMLElement;
 	/** The chart grows when the panel first shows a person, and when it is unfolded. */
 	private readonly debut = new Debut();
+	/** A change came in while the target was being typed; the panel redraws once typing ends. */
+	private stale = false;
 
 	constructor(
 		private readonly ui: UiContext,
@@ -59,8 +61,11 @@ export class PersonBlock {
 	}
 
 	render(): void {
-		/* A change that comes in while the target is being typed waits: the panel redraws when typing ends. */
-		if (this.typing()) return;
+		if (this.typing()) {
+			this.stale = true;
+			return;
+		}
+		this.stale = false;
 		const panel = this.el;
 		panel.empty();
 		panel.className = "metadata-container ft-person-panel";
@@ -141,16 +146,18 @@ export class PersonBlock {
 
 	/** The target, typed in place, and with one the heads-up before it runs out. */
 	private renderTarget(rows: HTMLElement, person: Person): void {
+		/* The note it was drawn for: a save after the tab moved on still goes to this person. */
+		const path = this.path;
 		const target = person.target();
 		const unread = person.unreadTarget();
-		const shown = target ? dayCount(target.every) : unread === undefined ? "" : String(unread);
+		const shown = target ? dayCount(target.every) : unread === undefined ? "" : String(unread).trim();
 		const input = this.property(rows, "repeat", "contact every").createDiv({
 			cls: "metadata-input-longtext",
 			text: shown,
 			attr: { contenteditable: "true", spellcheck: "false", placeholder: "Empty", inputmode: "numeric" },
 		});
 		input.addEventListener("focus", () => {
-			if (target) input.textContent = String(target.every);
+			input.textContent = (input.textContent ?? "").replace(/\s+days?$/i, "");
 		});
 		input.addEventListener("keydown", (event) => {
 			if (event.key === "Enter") {
@@ -162,7 +169,7 @@ export class PersonBlock {
 				input.blur();
 			}
 		});
-		input.addEventListener("blur", () => void this.saveTarget(input.textContent ?? "", shown, target));
+		input.addEventListener("blur", () => void this.saveTarget(path, input, shown, target));
 		if (!target) return;
 		const box = this.property(rows, "bell", "heads-up").createEl("input", {
 			cls: "metadata-input-checkbox",
@@ -170,25 +177,39 @@ export class PersonBlock {
 			attr: { title: "Turn yellow before the target runs out" },
 		});
 		box.checked = target.headsUp ?? this.ui.settings().headsUpForNew;
-		box.addEventListener("change", () => void this.run(() => this.ui.service.setHeadsUp(this.path, box.checked)));
+		box.addEventListener("change", () => void this.run(() => this.ui.service.setHeadsUp(path, box.checked)));
 	}
 
-	private async saveTarget(typed: string, shown: string, target: Target | undefined): Promise<void> {
-		if (typed.trim() !== shown) await this.changeTarget(readDays(typed), target);
-		this.render();
+	/**
+	 * Saves what was typed; the panel redraws only when the note changed, so a click that ends the typing still lands.
+	 * Anything else puts the field back as it was.
+	 */
+	private async saveTarget(path: string, input: HTMLElement, shown: string, target: Target | undefined): Promise<void> {
+		const typed = (input.textContent ?? "").trim();
+		const changed = typed !== shown && (await this.changeTarget(path, readDays(typed), target));
+		if (changed || this.stale) this.render();
+		else input.textContent = shown;
 	}
 
-	private async changeTarget(days: number | "none" | null, target: Target | undefined): Promise<void> {
-		if (days === null) new Notice("Contact every takes a whole number of days");
-		else if (days === "none") await this.run(() => this.ui.service.clearTarget(this.path));
-		else if (days !== target?.every) await this.run(() => this.ui.service.setTarget(this.path, days, this.ui.settings().headsUpForNew));
+	/** Whether the note was written. */
+	private async changeTarget(path: string, days: number | "none" | null, target: Target | undefined): Promise<boolean> {
+		if (days === null) {
+			new Notice(TARGET_NOT_DAYS);
+			return false;
+		}
+		if (days === "none") return this.run(() => this.ui.service.clearTarget(path));
+		if (days === target?.every) return false;
+		return this.run(() => this.ui.service.setTarget(path, days, this.ui.settings().headsUpForNew));
 	}
 
-	private async run(change: () => Promise<unknown>): Promise<void> {
+	/** Whether the change went through; a refused one says why. */
+	private async run(change: () => Promise<unknown>): Promise<boolean> {
 		try {
 			await change();
+			return true;
 		} catch (error) {
 			new Notice(error instanceof Error ? error.message : String(error));
+			return false;
 		}
 	}
 

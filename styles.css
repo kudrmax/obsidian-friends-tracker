@@ -214,6 +214,8 @@ body {
 /* A day's header and the group under it. */
 .ft-group { display: flex; flex-direction: column; margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-hairline) solid var(--ft-line); }
 .ft-group:first-of-type { margin-top: var(--ft-space-20); padding-top: 0; border-top: none; }
+/* The block sits as close under the title as on the board. */
+.ft-reach > .ft-section:first-child { margin-top: var(--ft-space-8); }
 /* Under the Reach out block the first day is set off like every other. */
 .ft-reach:not(:empty) + .ft-feed-list .ft-group:first-of-type { margin-top: var(--ft-space-12); padding-top: var(--ft-space-12); border-top: var(--ft-hairline) solid var(--ft-line); }
 .ft-day { display: flex; align-items: baseline; gap: var(--ft-space-8); height: var(--ft-day); line-height: var(--ft-day); }

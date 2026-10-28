@@ -130,7 +130,7 @@ export class SettingsTab extends PluginSettingTab {
 		});
 		new Setting(containerEl)
 			.setName("Heads-up for new targets")
-			.setDesc("Whether a person turns yellow before their target runs out, when you give them one. Change it for one person in their note.")
+			.setDesc("Whether a person turns yellow before their target runs out when you give them a target, and when their note doesn't say. Change it for one person in their note.")
 			.addToggle((toggle) => toggle.setValue(this.host.config.headsUpForNew).onChange((value) => void this.save((next) => (next.headsUpForNew = value))));
 	}
 

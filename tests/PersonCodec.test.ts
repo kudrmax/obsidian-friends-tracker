@@ -136,6 +136,12 @@ describe("the target", () => {
 		}
 	});
 
+	it("reads an empty contact_every as no target at all", () => {
+		const person = decodePerson("Misha", { contact_every: null });
+		expect(person.target()).toBeUndefined();
+		expect(person.unreadTarget()).toBeUndefined();
+	});
+
 	it("keeps an unreadable target as it was", () => {
 		const out: Frontmatter = { contact_every: "abc", interactions: [text] };
 		encodePerson(decodePerson("Misha", out).add(later, d("2026-10-26")), out);
