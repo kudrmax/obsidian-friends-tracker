@@ -1,0 +1,405 @@
+<title>Идеи из «We Should Get Together»</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a field notebook — a reading column for the synthesis, a filterable list of numbered ideas, full agent reports underneath. */
+:root {
+  --bg: #f2f4ee;
+  --surface: #fbfcf8;
+  --ink: #1c231f;
+  --muted: #5a6560;
+  --line: #d8ddd2;
+  --leaf: #2d6a4d;
+  --leaf-soft: #e1ece4;
+  --coral: #c94f33;
+  --coral-soft: #f8e1d9;
+  --chip: #e7eae2;
+  --font-display: "Onest", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Literata", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131714; --surface: #1a1f1b; --ink: #e5eae3; --muted: #9ba69e; --line: #2b322d;
+    --leaf: #82c4a1; --leaf-soft: #1f3128; --coral: #ff8f72; --coral-soft: #3b231c; --chip: #232a25;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131714; --surface: #1a1f1b; --ink: #e5eae3; --muted: #9ba69e; --line: #2b322d;
+  --leaf: #82c4a1; --leaf-soft: #1f3128; --coral: #ff8f72; --coral-soft: #3b231c; --chip: #232a25;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.wrap {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+h1, h2, h3, h4, .ui { font-family: var(--font-display); }
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; margin: 0; }
+p { margin: 0; }
+.mono { font-family: var(--font-mono); font-size: 0.82em; }
+
+header.top { padding-block: 48px 28px; display: grid; gap: 18px; }
+.eyebrow { font-family: var(--font-display); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--leaf); font-weight: 600; }
+h1 { font-size: clamp(30px, 5vw, 50px); font-weight: 700; letter-spacing: -0.02em; max-width: 18ch; }
+.lede { font-size: 18px; max-width: 62ch; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px 28px; font-family: var(--font-display); }
+.stat b { display: block; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--leaf); line-height: 1.1; }
+.stat span { font-size: 13px; color: var(--muted); }
+
+nav.toc { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+nav.toc .wrap { display: flex; gap: 6px; overflow-x: auto; padding-block: 10px; scrollbar-width: none; }
+nav.toc a { font-family: var(--font-display); font-size: 14px; font-weight: 500; white-space: nowrap; color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 999px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--chip); color: var(--ink); outline: none; }
+
+section { padding-block: 44px 8px; display: grid; gap: 20px; scroll-margin-top: 64px; }
+section > h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+.sub { color: var(--muted); max-width: 66ch; }
+.howto { background: var(--leaf-soft); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; max-width: 76ch; font-size: 15.5px; }
+.howto b { font-family: var(--font-display); }
+
+ol.theses { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+ol.theses li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 6px; min-width: 0; }
+ol.theses h3 { font-size: 16px; font-weight: 600; }
+ol.theses p { font-size: 15px; color: var(--muted); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-family: var(--font-display); font-size: 13px; color: var(--muted); align-items: center; }
+.legend > span { display: inline-flex; gap: 6px; align-items: center; }
+
+.filters { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.frow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.frow > .lbl { font-family: var(--font-display); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-right: 6px; min-width: 88px; }
+.fbtn { font-family: var(--font-display); font-size: 13px; border: 1px solid var(--line); background: transparent; color: var(--ink); padding: 5px 11px; border-radius: 999px; cursor: pointer; }
+.fbtn[aria-pressed="true"] { background: var(--leaf); color: var(--surface); border-color: var(--leaf); }
+.fbtn:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
+#q { font-family: var(--font-display); font-size: 14px; flex: 1 1 220px; min-width: 0; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+#q:focus-visible { outline: 2px solid var(--leaf); outline-offset: 1px; }
+.count { font-family: var(--font-display); font-size: 13px; color: var(--muted); }
+
+.theme-block { display: grid; gap: 12px; }
+.theme-block h3 { font-size: 19px; font-weight: 600; display: flex; gap: 10px; align-items: baseline; }
+.theme-block h3 small { font-size: 13px; color: var(--muted); font-weight: 400; }
+.cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); }
+@media (max-width: 420px) { .cards { grid-template-columns: 1fr; } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 10px; align-content: start; min-width: 0; scroll-margin-top: 70px; }
+.card.core { border-color: var(--coral); box-shadow: inset 0 0 0 1px var(--coral); }
+.card .head { display: flex; gap: 10px; align-items: baseline; }
+.num { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--surface); background: var(--leaf); border-radius: 999px; min-width: 34px; height: 26px; padding: 0 8px; display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; flex: none; }
+.card.core .num { background: var(--coral); }
+.card h4 { font-size: 16.5px; font-weight: 600; line-height: 1.3; }
+.blk { display: grid; gap: 2px; }
+.blk .k { font-family: var(--font-display); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; }
+.blk p { font-size: 15px; line-height: 1.55; }
+.card .data { font-family: var(--font-display); font-size: 12.5px; color: var(--muted); }
+.card .data code { font-family: var(--font-mono); font-size: 12px; color: var(--leaf); overflow-wrap: anywhere; }
+.card .foot { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-family: var(--font-display); font-size: 12px; padding-top: 8px; border-top: 1px solid var(--line); }
+.pill { padding: 2px 9px; border-radius: 999px; background: var(--chip); color: var(--muted); }
+.pill.v3 { background: var(--coral); color: var(--surface); }
+.pill.v25 { background: var(--coral-soft); color: var(--coral); }
+.cx { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; color: var(--muted); }
+.dots { letter-spacing: 1px; color: var(--leaf); font-size: 11px; }
+.dots .off { color: var(--line); }
+.src { color: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+.empty { color: var(--muted); font-family: var(--font-display); padding: 20px 0; }
+
+.decisions { display: grid; gap: 0; }
+.decision { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 16px 0; border-top: 1px solid var(--line); }
+.decision .tag { font-family: var(--font-display); font-weight: 700; font-size: 14px; height: 28px; border-radius: 999px; display: grid; place-items: center; background: var(--coral-soft); color: var(--coral); }
+.decision h3 { font-size: 16.5px; font-weight: 600; margin-bottom: 4px; }
+.decision p { font-size: 15.5px; max-width: 74ch; }
+.decision p + p { margin-top: 6px; color: var(--muted); }
+
+.principles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.principle { padding: 14px 16px; border-left: 3px solid var(--leaf); background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; display: grid; gap: 4px; min-width: 0; }
+.principle h3 { font-size: 15.5px; font-weight: 600; }
+.principle h3 span { color: var(--leaf); margin-right: 6px; }
+.principle p { font-size: 15px; color: var(--muted); }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--font-display); font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-family: var(--font-display); font-weight: 600; min-width: 170px; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.report { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px clamp(16px, 4vw, 40px); min-width: 0; }
+.md { max-width: 74ch; font-size: 15.5px; overflow-wrap: anywhere; }
+.md h1 { font-size: 24px; margin: 6px 0 14px; }
+.md h2 { font-size: 21px; margin: 30px 0 10px; padding-top: 14px; border-top: 1px solid var(--line); }
+.md h3 { font-size: 17px; margin: 22px 0 6px; font-family: var(--font-display); }
+.md p, .md ul, .md ol, .md blockquote, .md pre { margin: 0 0 10px; }
+.md ul, .md ol { padding-left: 22px; }
+.md li { margin: 3px 0; }
+.md code { font-family: var(--font-mono); font-size: 0.85em; background: var(--chip); padding: 1px 5px; border-radius: 5px; }
+.md pre { background: var(--chip); padding: 12px; border-radius: 10px; overflow-x: auto; }
+.md pre code { background: none; padding: 0; }
+.md blockquote { border-left: 3px solid var(--line); padding-left: 12px; color: var(--muted); }
+.md table { font-size: 13.5px; display: block; overflow-x: auto; }
+.md hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
+
+footer { padding-block: 40px 60px; color: var(--muted); font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<header class="wrap top">
+  <div class="eyebrow">Friends Tracker · исследование · 29 октября 2026</div>
+  <h1>Идеи из «We Should Get Together»</h1>
+  <p class="lede">Что книга Кэт Веллос о взрослой дружбе предлагает добавить в плагин. Это список идей для разговора, а не план: что брать, решим отдельно.</p>
+  <div class="stats">
+    <div class="stat"><b id="n-total">—</b><span>идей, пронумерованы с 1</span></div>
+    <div class="stat"><b id="n-core">—</b><span>в сильном ядре</span></div>
+    <div class="stat"><b>7</b><span>развилок, Р1–Р7</span></div>
+    <div class="stat"><b>14</b><span>принципов, П1–П14</span></div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Разделы">
+  <div class="wrap">
+    <a href="#theses">Главное из книги</a>
+    <a href="#catalog">Идеи 1–91</a>
+    <a href="#decisions">Развилки Р1–Р7</a>
+    <a href="#principles">Принципы П1–П14</a>
+    <a href="#concepts">Цифры из книги</a>
+    <a href="#reports">Отчёты агентов</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section id="theses">
+  <h2>Главное из книги</h2>
+  <p class="sub">Девять мыслей, из которых растут почти все идеи ниже.</p>
+  <ol class="theses">
+    <li><h3>Взрослую дружбу надо вести сознательно</h3><p>В школе и универе друзья появлялись сами: соседняя парта, общая комната. Во взрослой жизни этого нет, и без усилий дружбы тихо засыхают. Автор сравнивает дружбу с садом, который надо поливать. Плагин и есть такая лейка: он напоминает, кого давно не поливал.</p></li>
+    <li><h3>Важно, как вы проводите время, а не только как часто</h3><p>Близость растёт от разговоров по-настоящему, от встреч дома, от нового, что вы пробуете вместе. Сейчас плагин считает только количество контактов, а книга даёт способы видеть и качество.</p></li>
+    <li><h3>Переписка — самая слабая связь</h3><p>Обмен новостями держит в курсе, но почти не сближает. Голос сильнее текста, встреча сильнее голоса. Лайк вообще не считается общением.</p></li>
+    <li><h3>Регулярность держится на системе, а не на настроении</h3><p>У автора два списка по пять друзей и напоминание раз в неделю. Постоянный созвон по выходным, хоть на пять минут, даёт больше, чем редкие большие встречи.</p></li>
+    <li><h3>Включённость видна по поступкам</h3><p>Кто зовёт первым, приходишь ли, когда обещал, помнишь ли про собеседование друга. Несдержанные обещания — вторая по частоте причина, почему дружба не складывается.</p></li>
+    <li><h3>Сблизиться можно быстрее, если делать это нарочно</h3><p>В книге два готовых способа. QQ10: общаться десять дней подряд. Инкубатор: 90 дней, 12 встреч, разные занятия, в гостях друг у друга, разговор по душам. Оба почти дословно ложатся на записи плагина.</p></li>
+    <li><h3>Не в одиночку</h3><p>В компании из 3–6 человек больше общих воспоминаний, и собрать всех снова может любой. Настоящее сообщество — когда твои друзья знают и друг друга.</p></li>
+    <li><h3>Знать, на кого опереться, и уметь просить</h3><p>Важно знать, кому позвонишь ночью, если станет плохо. Просьба о помощи сближает, а полная самостоятельность изолирует.</p></li>
+    <li><h3>Довольство дружбами важнее их числа</h3><p>То, насколько ты доволен дружбами, предсказывает счастье лучше, чем количество друзей. Поэтому лучше несколько людей в фокусе, чем вечно красный список на всех.</p></li>
+  </ol>
+</section>
+
+<section id="catalog">
+  <h2>Идеи 1–91</h2>
+  <div class="howto">
+    <p><b>Как читать карточку.</b> «Из книги» — что говорит книга и зачем это нужно. «В плагине» — что ты увидел бы у себя, на примере. Имена в примерах выдуманы.</p>
+    <p><b>Номера</b> сквозные и не меняются от фильтров: называй идеи по номеру, например «берём 1, 14 и 34».</p>
+    <p><b>Коралловая карточка</b> — сильное ядро: идею независимо предложили три или четыре агента из четырёх и оценили высоко.</p>
+  </div>
+  <div class="legend">
+    <span><span class="pill v3">высокая</span> ценность по оценке агентов</span>
+    <span><span class="cx">S</span><span class="cx">M</span><span class="cx">L</span> сложность: мало, средне, много работы</span>
+    <span><span class="dots">●●●<span class="off">●</span></span> сколько агентов из 4 предложили</span>
+    <span><span class="src">A·B1</span> где искать в отчёте агента</span>
+  </div>
+  <div class="filters" role="search">
+    <div class="frow"><span class="lbl">Поиск</span><input id="q" type="search" placeholder="номер, слово: звонок, инкубатор…" aria-label="Поиск по идеям"></div>
+    <div class="frow" id="f-theme"><span class="lbl">Тема</span></div>
+    <div class="frow" id="f-value"><span class="lbl">Ценность</span></div>
+    <div class="frow" id="f-cx"><span class="lbl">Сложность</span></div>
+    <div class="frow" id="f-core"><span class="lbl">Отбор</span></div>
+    <div class="count" id="count" aria-live="polite"></div>
+  </div>
+  <div id="catalog-out" style="display:grid;gap:30px"></div>
+</section>
+
+<section id="decisions">
+  <h2>Развилки Р1–Р7</h2>
+  <p class="sub">Вопросы, которые надо решить до того, как брать часть идей. От ответа зависит, что вообще возможно.</p>
+  <div class="decisions">
+    <div class="decision"><div class="tag">Р1</div><div><h3>Можно ли что-то не отмечать</h3><p>Сейчас у записи встречи все поля обязательны, а запись без поля считается сломанной. Многие идеи добавляют к встрече новые отметки: где были, кто позвал, каким был разговор. Если сделать их обязательными, старые записи сломаются, а встречу уже не записать за два тапа.</p><p>Значит, новые отметки должны быть необязательными, а это меняет правило плагина. Нужно для идей 14–24, 34, 36, 40.</p></div></div>
+    <div class="decision"><div class="tag">Р2</div><div><h3>Где задавать вопросы о встрече</h3><p>Вариант А: прямо при записи, ещё один ряд кнопок. Вариант Б: только на экране правки записи. Вариант В: после записи всплывает строка «как прошло?», которую можно смахнуть.</p><p>Касается идей 14–24.</p></div></div>
+    <div class="decision"><div class="tag">Р3</div><div><h3>Договорённости на будущее</h3><p>Сейчас нельзя записать встречу на будущую дату. Для планов, отмен и «договорились на субботу» нужен отдельный список в заметке человека, а не обычная запись.</p><p>Касается идей 22 и 34.</p></div></div>
+    <div class="decision"><div class="tag">Р4</div><div><h3>Что-то кроме людей</h3><p>Сейчас в плагине есть только люди: у каждого своя заметка. Компания с общей целью и программы вроде инкубатора — новые вещи, у которых нет своей заметки-человека. Вопросы для разговора могут жить в обычной заметке.</p><p>Касается идей 39–45, 67, 68.</p></div></div>
+    <div class="decision"><div class="tag">Р5</div><div><h3>Плагин не решает за тебя, кому писать</h3><p>Это правило из спеки. Идеи вроде «кого вспомнить на этой неделе» или «давние друзья» с ним совместимы, только если людей туда кладёшь ты сам или раздел включается в настройках.</p><p>Касается идей 4, 38, 53, 77.</p></div></div>
+    <div class="decision"><div class="tag">Р6</div><div><h3>Где хранить личное</h3><p>Чувства, ссоры, «кому я помог», «что я о нём знаю» синхронизируются вместе с хранилищем. Решить, хранить их в скрытых свойствах заметки, как сейчас записи встреч, или в тексте заметки.</p><p>Касается идей 20, 21, 35, 36, 89.</p></div></div>
+    <div class="decision"><div class="tag">Р7</div><div><h3>Сначала макеты</h3><p>По правилам проекта новый экран сначала рисуется на досках. Это касается Heart Time, программ, карточки «Перед встречей», выбора нескольких людей и обзоров.</p><p>Касается идей 25, 39, 40, 46, 66, 74, 75.</p></div></div>
+  </div>
+</section>
+
+<section id="principles">
+  <h2>Принципы П1–П14</h2>
+  <p class="sub">О чём книга предупреждает и что из этого следует для плагина. Все четыре агента сошлись почти во всём.</p>
+  <div class="principles">
+    <div class="principle"><h3><span>П1</span>Факты, а не оценки</h3><p>Никаких «здоровье дружбы 43 из 100». Плагин показывает, что было, а выводы делаешь ты. Книга прямо говорит: не превращайте дружбу в стрессовый чек-лист.</p></div>
+    <div class="principle"><h3><span>П2</span>Цвет только там, где ты поставил цель</h3><p>Подсказки (позвать домой, сблизиться, вспомнить давнего друга) появляются только у людей, которых ты сам отметил, или в разделе, который ты включил.</p></div>
+    <div class="principle"><h3><span>П3</span>Дружба не сделка</h3><p>«Кто позвал» и «кто помог» показываются за год, без цвета, без «долга» и «теперь твоя очередь». Это зеркало, а не бухгалтерия.</p></div>
+    <div class="principle"><h3><span>П4</span>Качество рядом с количеством</h3><p>Ни одна цифра не должна поощрять «больше встреч ради больших чисел». Рядом со счётчиками стоят разговоры по-настоящему, встречи дома, часы вместе и то, насколько ты доволен.</p></div>
+    <div class="principle"><h3><span>П5</span>Без огня и наград</h3><p>Никаких серий, которые «сгорают», значков и красного за пропущенный день. Пропуск — просто факт: «последний раз 2 недели назад».</p></div>
+    <div class="principle"><h3><span>П6</span>Честно про силы, без вины</h3><p>Автор отступила, когда пообещала себе слишком много людей. Цель легко поставить на паузу, дружбу легко отпустить, сохранив историю, а перегруз целей видно.</p></div>
+    <div class="principle"><h3><span>П7</span>Частота — дело двоих</h3><p>Подруге автора хватало шести встреч в год. Чаще не всегда лучше, и плагин не сравнивает тебя со «средним человеком».</p></div>
+    <div class="principle"><h3><span>П8</span>Люди не товар</h3><p>Никаких свайпов, рейтингов полезности и «почистить список» одной кнопкой.</p></div>
+    <div class="principle"><h3><span>П9</span>Не ещё одна лента</h3><p>Ни импорта из соцсетей, ни кнопок «поделиться». Лайк не закрывает цель. Экран отвечает на вопрос «с кем и как связаться».</p></div>
+    <div class="principle"><h3><span>П10</span>Не база контактов</h3><p>Список людей сам ничего не решает. Плагин ведёт к живым действиям: позвать, позвонить, спросить, как прошло.</p></div>
+    <div class="principle"><h3><span>П11</span>Компания — полноценная встреча</h3><p>Встреча вчетвером не хуже встречи вдвоём. Записи и статистика её не принижают.</p></div>
+    <div class="principle"><h3><span>П12</span>Ссору решают голосом</h3><p>Шаблоны извинения нужны, чтобы подготовиться к разговору, а не чтобы писать длинные сообщения.</p></div>
+    <div class="principle"><h3><span>П13</span>Тон без стыда</h3><p>«Давно не виделись», а не «ты забыл». Книга исходит из того, что с дружбой трудно каждому второму.</p></div>
+    <div class="principle"><h3><span>П14</span>Два тапа остаются двумя тапами</h3><p>Всё новое про качество встречи необязательно и не мешает быстро записать встречу.</p></div>
+  </div>
+</section>
+
+<section id="concepts">
+  <h2>Цифры и понятия из книги</h2>
+  <p class="sub">На них ссылаются идеи. В правой колонке — номера идей, которые их используют.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Понятие</th><th>Что говорит книга</th><th>Идеи</th></tr></thead>
+      <tbody>
+        <tr><td>Насколько вы близки</td><td>Знакомый, друг, близкий друг, «выбранная семья». Отдельно «Friend Lite» — приятель, с которым хочется сблизиться.</td><td>54</td></tr>
+        <tr><td>Четыре условия дружбы</td><td>Живёте близко, видитесь часто, вам хорошо вместе, оба вкладываетесь. Первые три зависят от вас, совместимость — от случая.</td><td>49, 58</td></tr>
+        <tr><td>Расстояние</td><td>До 15 минут, 20–60 минут, 3 часа и дальше.</td><td>56</td></tr>
+        <tr><td>Как часто видитесь</td><td>Каждую неделю, раз в месяц, раз в сезон, раз-два в год.</td><td>6</td></tr>
+        <tr><td>Четыре месяца</td><td>Если после знакомства 4 месяца не было продолжения, дружба вряд ли сложится.</td><td>38</td></tr>
+        <tr><td>Часы до дружбы</td><td>Около 50 часов вместе — приятели, 90 — друзья, 200 — близкие друзья.</td><td>19, 55</td></tr>
+        <tr><td>Круги Данбара</td><td>Около 5 самых близких, 15 близких, 50 друзей, 150 знакомых. Новый роман вытесняет двух близких друзей.</td><td>55, 60</td></tr>
+        <tr><td>Каким был разговор</td><td>Болтовня, обмен новостями, разговор по-настоящему, по душам.</td><td>15, 25</td></tr>
+        <tr><td>Дома или вне дома</td><td>С приятелями около 90% времени проводят вне дома, с друзьями около 80%, а с близкими около 70% времени — дома.</td><td>16</td></tr>
+        <tr><td>Новизна</td><td>Необычный общий опыт сближает быстрее привычного.</td><td>18</td></tr>
+        <tr><td>Четыре вида поддержки</td><td>Выслушать, помочь делом, советом, побыть рядом.</td><td>35, 36</td></tr>
+        <tr><td>Компания</td><td>Лучший формат по опросу автора — 3–6 человек.</td><td>66–71</td></tr>
+        <tr><td>QQ10</td><td>10 дней подряд видеться или созваниваться. Разговор не начинается заново, проступает настоящий человек, остаётся тёплая привычность.</td><td>39</td></tr>
+        <tr><td>Инкубатор</td><td>90 дней, от 12 встреч, 3+ разных занятия, 2+ раза новое для обоих, по 2 раза в гостях друг у друга, разговор по душам.</td><td>40–44</td></tr>
+        <tr><td>Heart Time</td><td>10 минут говорит один, второй слушает; потом ответ, какой попросили; потом смена ролей.</td><td>46</td></tr>
+        <tr><td>Три вида друзей в паре</td><td>Общие друзья пары, друзья каждого из партнёров, свои друзья наедине.</td><td>63, 64</td></tr>
+        <tr><td>Живое общение каждый день</td><td>Есть только у половины людей.</td><td>73</td></tr>
+        <tr><td>Довольство дружбами</td><td>Предсказывает счастье лучше, чем число друзей.</td><td>76</td></tr>
+        <tr><td>Отговорки</td><td>Нет времени, работа и деньги, нет сил, далеко, любовь и семья, интернет.</td><td>78</td></tr>
+        <tr><td>Иллюзия близости</td><td>По ленте кажется, что ты и так всё знаешь о друге.</td><td>10</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="reports">
+  <h2>Отчёты агентов целиком</h2>
+  <p class="sub">Исходные отчёты четырёх агентов без правок. Они написаны плотнее и техничнее, зато подробнее: с полями для заметки и связью с текущим кодом. Код источника на карточке, например A·B1, — это отчёт A, фича B1.</p>
+  <div class="tabs" id="tabs"></div>
+  <div class="report"><div class="md" id="md">Загружаю отчёт…</div></div>
+</section>
+
+</main>
+
+<footer class="wrap">Источник: Kat Vellos, «We Should Get Together: The Secret to Cultivating Better Friendships», 2019. Цитаты не приводятся, идеи пересказаны.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="ideas.js"></script>
+<script>
+const VALUE = { 3: "высокая", 2.5: "средне-высокая", 2: "средняя", 1.5: "низко-средняя", 1: "низкая" };
+const THEMES = window.THEMES || {};
+const IDEAS = (window.IDEAS || []).map((x, i) => Object.assign({ no: i + 1 }, x));
+const isCore = i => i.v >= 3 && i.k >= 3;
+document.getElementById("n-total").textContent = IDEAS.length;
+document.getElementById("n-core").textContent = IDEAS.filter(isCore).length;
+
+const state = { theme: "all", value: "all", cx: "all", core: false, q: "" };
+function button(row, label, key, val) {
+  const b = document.createElement("button");
+  b.className = "fbtn"; b.type = "button"; b.textContent = label;
+  b.dataset.key = key; b.dataset.val = val;
+  b.addEventListener("click", () => {
+    if (key === "core") state.core = !state.core; else state[key] = val;
+    sync(); render();
+  });
+  row.appendChild(b);
+}
+const fTheme = document.getElementById("f-theme");
+button(fTheme, "Все", "theme", "all");
+Object.entries(THEMES).forEach(([k, v]) => button(fTheme, v, "theme", k));
+const fValue = document.getElementById("f-value");
+[["all", "Любая"], ["3", "Только высокая"], ["2.5", "Средне-высокая и выше"]].forEach(([v, l]) => button(fValue, l, "value", v));
+const fCx = document.getElementById("f-cx");
+[["all", "Любая"], ["S", "S"], ["M", "M"], ["L", "L"]].forEach(([v, l]) => button(fCx, l, "cx", v));
+button(document.getElementById("f-core"), "Только сильное ядро", "core", "1");
+
+function sync() {
+  document.querySelectorAll(".fbtn[data-key]").forEach(b => {
+    const k = b.dataset.key;
+    const on = k === "core" ? state.core : state[k] === b.dataset.val;
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+}
+document.getElementById("q").addEventListener("input", e => { state.q = e.target.value.trim().toLowerCase(); render(); });
+
+function matches(i) {
+  if (state.theme !== "all" && i.t !== state.theme) return false;
+  if (state.value !== "all" && i.v < Number(state.value)) return false;
+  if (state.cx !== "all" && !i.c.includes(state.cx)) return false;
+  if (state.core && !isCore(i)) return false;
+  if (state.q) {
+    if (/^\d+$/.test(state.q)) return String(i.no) === state.q;
+    if (!(i.n + " " + i.why + " " + i.see + " " + i.d).toLowerCase().includes(state.q)) return false;
+  }
+  return true;
+}
+function esc(s) { return String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); }
+function card(i) {
+  const vc = i.v >= 3 ? "v3" : i.v >= 2.5 ? "v25" : "";
+  const dots = "●".repeat(i.k) + '<span class="off">' + "●".repeat(4 - i.k) + "</span>";
+  const plain = /[а-яё]/i.test(i.d) && !/[a-z_]{3,}/.test(i.d);
+  const data = plain ? esc(i.d) : "<code>" + esc(i.d) + "</code>";
+  return `<article class="card${isCore(i) ? " core" : ""}" id="idea-${i.no}">
+    <div class="head"><span class="num">${i.no}</span><h4>${esc(i.n)}</h4></div>
+    <div class="blk"><span class="k">Из книги</span><p>${esc(i.why)}</p></div>
+    <div class="blk"><span class="k">В плагине</span><p>${esc(i.see)}</p></div>
+    <div class="data">Что хранить: ${data}</div>
+    <div class="foot"><span class="pill ${vc}">${VALUE[i.v]}</span><span class="cx">${i.c}</span><span class="dots" title="Предложили агентов: ${i.k} из 4">${dots}</span><span class="src">${esc(i.s).split(" ").join(" · ")}</span></div>
+  </article>`;
+}
+function render() {
+  const out = document.getElementById("catalog-out");
+  const shown = IDEAS.filter(matches);
+  let html = "";
+  Object.entries(THEMES).forEach(([k, name]) => {
+    const list = shown.filter(i => i.t === k);
+    if (!list.length) return;
+    const all = IDEAS.filter(i => i.t === k);
+    html += `<div class="theme-block"><h3>${name} <small>${all[0].no}–${all[all.length - 1].no}</small></h3><div class="cards">${list.map(card).join("")}</div></div>`;
+  });
+  out.innerHTML = html || '<p class="empty">Под эти фильтры ничего не подходит. Сбрось поиск или выбери «Все».</p>';
+  document.getElementById("count").textContent = `Показано ${shown.length} из ${IDEAS.length}`;
+}
+sync(); render();
+if (/^#idea-\d+$/.test(location.hash)) { const el = document.querySelector(location.hash); if (el) el.scrollIntoView(); }
+
+const REPORTS = [
+  ["A", "A · Part 1: условия дружбы", "reports/A.md"],
+  ["B", "B · Переезды и занятость", "reports/B.md"],
+  ["C", "C · Семья, Part 3, заключение, приложения", "reports/C.md"],
+  ["D", "D · Близость и Part 3", "reports/D.md"]
+];
+const tabs = document.getElementById("tabs"), md = document.getElementById("md");
+const cache = {};
+async function show(key) {
+  tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.k === key ? "true" : "false"));
+  const r = REPORTS.find(x => x[0] === key);
+  try {
+    if (!cache[key]) {
+      const res = await fetch(r[2]);
+      if (!res.ok) throw new Error(res.status);
+      cache[key] = await res.text();
+    }
+    md.innerHTML = window.marked ? marked.parse(cache[key]) : "<pre>" + esc(cache[key]) + "</pre>";
+  } catch (e) {
+    md.textContent = "Отчёт не загрузился. Обнови страницу.";
+  }
+}
+REPORTS.forEach(([k, label]) => {
+  const b = document.createElement("button");
+  b.className = "fbtn"; b.type = "button"; b.textContent = label; b.dataset.k = k;
+  b.addEventListener("click", () => show(k));
+  tabs.appendChild(b);
+});
+show("A");
+</script>
